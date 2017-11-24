@@ -1,7 +1,7 @@
 {
-  "name": "pms",
-  "author": "MakeAwesomeHappen",
-  "version": "1.0.0",
+  "name": "PebbleMediaSecretary",
+  "author": "Dawn Nowell",
+  "version": "0.0.1",
   "keywords": [
     "pebble-app"
   ],
@@ -24,7 +24,14 @@
       "watchface": false
     },
     "messageKeys": [
-      "dummy"
+      "SonarrApi",
+      "SonarrShow",
+      "SonarrResult",
+      "JSREADY",
+      "ISSETUP",
+      "REQUESTTIMELINE",
+      "SERVERURL",
+      "SERVERSECRET"
     ],
     "resources": {
       "media": []
