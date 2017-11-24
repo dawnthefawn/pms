@@ -6,13 +6,49 @@ static MenuLayer *s_main_menu;
 static DictationSession *s_dictation_session;
 static char s_last_text[512];
 
+static int *s_mode;
+
+enum mode_types {
+	PMS_MENU = 1,
+	PMS_SONARR = 2,
+	PMS_RADARR = 3,
+	PMS_CONFIRMATION = 4
+};
 
 static void sonarr_dictation_deinit() {
      dictation_session_destroy(s_dictation_session);
 }
 
-void dictation_session_callback(DictationSession *session, DictationSessionStatus status, char *transcription, void *context) {
+static void dictation_session_callback(DictationSession *session, DictationSessionStatus status, char *transcription, void *context) {
      APP_LOG(APP_LOG_LEVEL_INFO, "Dictation Status: %d", (int)status);
+}
+
+
+
+
+
+
+static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *cell_index, void *data) {
+
+     switch (cell_index->row) {
+          case 0:
+                menu_cell_title_draw(ctx, cell_layer, "Add a Show");
+                break;
+          case 1:
+                menu_cell_title_draw(ctx, cell_layer, "Add a Movie - N/A");
+                break;
+     }
+
+}
+
+static void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
+     switch (cell_index->row) {
+          case 0:
+                sonarr_dictation_init();
+                break;
+          case 1: 
+                break;
+	}
 }
 
 
@@ -28,43 +64,18 @@ static void sonarr_dictation_init() {
     snprintf(s_failed_buff, sizeof(s_failed_buff), "Transcription Failed!\n\nReason:\n%d", (int)status);
     text_layer_set_text(s_text_layer, s_failed_buff);
     sonarr_dictation_deinit();
-}
-
-
-
-
-void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuIndex *cell_index, void *data) {
-
-     switch (cell_index->row) {
-          case 0:
-                menu_cell_title_draw(ctx, cell_layer, "Add a Show");
-                break;
-          case 1:
-                menu_cell_title_draw(ctx, cell_layer, "Add a Movie - N/A");
-                break;
-     }
-
-}
-
-void menu_select_callback(MenuLayer *menu_layer, MenuIndex *cell_index, void *data) {
-     switch (cell_index->row) {
-          case 0:
-                sonarr_dictation_init();
-                break;
-          case 1: 
-                break;
 	}
 }
 
-void prv_select_click_handler(ClickRecognizerRef recognizer, void *context) {
+static void prv_select_click_handler(ClickRecognizerRef recognizer, void *context) {
 	menu_select_callback(s_main_menu, menu_layer_get_selected_index(s_main_menu), NULL);
 }
 
-void prv_up_click_handler(ClickRecognizerRef recognizer, void *context) {
+static void prv_up_click_handler(ClickRecognizerRef recognizer, void *context) {
 	menu_layer_set_selected_next(s_main_menu, true, MenuRowAlignCenter, true);
 }
 
-void prv_down_click_handler(ClickRecognizerRef recognizer, void *context) {
+static void prv_down_click_handler(ClickRecognizerRef recognizer, void *context) {
 	menu_layer_set_selected_next(s_main_menu, false, MenuRowAlignCenter, true);
 }
 
@@ -91,6 +102,7 @@ static void prv_window_unload(Window *window) {
 }
 
 static void prv_init(void) {
+  s_mode = PMS_MENU;
   s_window = window_create();
   window_set_click_config_provider(s_window, prv_click_config_provider);
   window_set_window_handlers(s_window, (WindowHandlers) {
@@ -102,8 +114,10 @@ static void prv_init(void) {
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
 	.draw_row = draw_row_callback,
 	.select_click = prv_select_click_handler,
-:x
+
+	});
 }
+
 
 static void prv_deinit(void) {
   window_destroy(s_window);
