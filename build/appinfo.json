@@ -1,0 +1,46 @@
+{
+    "targetPlatforms": [
+        "aplite", 
+        "basalt", 
+        "chalk", 
+        "diorite"
+    ], 
+    "displayName": "pms", 
+    "name": "PebbleMediaSecretary", 
+    "messageKeys": {
+        "ISSETUP": 10004, 
+        "JSREADY": 10003, 
+        "REQUESTTIMELINE": 10005, 
+        "SonarrResult": 10002, 
+        "SonarrShow": 10001, 
+        "SERVERURL": 10006, 
+        "SonarrApi": 10000, 
+        "SERVERSECRET": 10007
+    }, 
+    "companyName": "Dawn Nowell", 
+    "enableMultiJS": true, 
+    "versionLabel": "0.0", 
+    "capabilities": [
+        "configurable"
+    ], 
+    "sdkVersion": "3", 
+    "appKeys": {
+        "ISSETUP": 10004, 
+        "JSREADY": 10003, 
+        "REQUESTTIMELINE": 10005, 
+        "SonarrResult": 10002, 
+        "SonarrShow": 10001, 
+        "SERVERURL": 10006, 
+        "SonarrApi": 10000, 
+        "SERVERSECRET": 10007
+    }, 
+    "longName": "pms", 
+    "shortName": "pms", 
+    "watchapp": {
+        "watchface": false
+    }, 
+    "resources": {
+        "media": []
+    }, 
+    "uuid": "badd1a9b-a1b4-457c-9ff2-3d3634e24d75"
+}

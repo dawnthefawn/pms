@@ -1,0 +1,10 @@
+{
+    "ISSETUP": 10004,
+    "JSREADY": 10003,
+    "REQUESTTIMELINE": 10005,
+    "SERVERSECRET": 10007,
+    "SERVERURL": 10006,
+    "SonarrApi": 10000,
+    "SonarrResult": 10002,
+    "SonarrShow": 10001
+}
