@@ -2,9 +2,13 @@
   "name": "pms",
   "author": "MakeAwesomeHappen",
   "version": "1.0.0",
-  "keywords": ["pebble-app"],
+  "keywords": [
+    "pebble-app"
+  ],
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "pebble-clay": "^1.0.4"
+  },
   "pebble": {
     "displayName": "pms",
     "uuid": "badd1a9b-a1b4-457c-9ff2-3d3634e24d75",

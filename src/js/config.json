@@ -1,0 +1,28 @@
+{
+	{
+		"type": "heading",
+		"defaultValue": "Pebble Media Secretary"
+	},
+	{
+		"type": "section",
+		"items": [
+		{
+			"type": "heading",
+			"defaultValue": "API Keys"
+		},
+		{
+			"type": "input",
+			"messageKey": "sonarr_api",
+			"label": "Sonarr Api Key"
+		},
+		{
+			"type": "input",
+			"messageKey": "radarr_api",
+			"label": "Radarr Api Key"
+		}]
+	},
+	{	"type": "submit",
+		"defaultValue": "Save Settings"
+	}
+};
+
