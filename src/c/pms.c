@@ -12,14 +12,14 @@ static char s_last_text[512];
 enum pmsmode{
 	PMS_MENU,
 	PMS_DICTATE,
-	PMS_REQUEST,
-	PMS_SUCCESS,
-	PMS_FAILURE,
+//	PMS_REQUEST,
+//	PMS_SUCCESS,
+//	PMS_FAILURE,
 };
 
 enum pmsmode current_mode;
 
-}
+
 enum menu_items {
 	PMS_SONARR,
 	PMS_RADARR,
@@ -31,6 +31,17 @@ enum menu_items {
 
 static void dictation_session_callback(DictationSession *session, DictationSessionStatus status, char *transcription, void *context) {
      APP_LOG(APP_LOG_LEVEL_INFO, "Dictation Status: %d", (int)status);
+
+     if(status == DictationSessionStatusSuccess) {
+        snprintf(s_last_text, sizeof(s_last_text), "Add show:\n\n%s", transcription);
+        text_layer_set_text(s_text_layer, s_last_text);
+        dictation_session_stop(session);
+   } else {
+       static char s_failed_buff[128];
+       snprintf(s_failed_buff, sizeof(s_failed_buff), "Transcription Failed!\n\nReason:\n%d", (int)status);
+       text_layer_set_text(s_text_layer, s_failed_buff);
+       dictation_session_stop(session);
+     }
 }
 
 
@@ -56,22 +67,12 @@ static void menu_draw_row_callback(GContext* ctx, const Layer *cell_layer, MenuI
 static void pms_voice_command(DictationSession *dictation) {
   dictation_session_start(dictation);
   
-  if(status == DictationSessionStatusSuccess) {
-        snprintf(s_last_text, sizeof(s_last_text), "Add show:\n\n%s", transcription);
-        text_layer_set_text(s_text_layer, s_last_text);
-        dictation_session_stop(dictation);
-} else {
-    static char s_failed_buff[128];
-    snprintf(s_failed_buff, sizeof(s_failed_buff), "Transcription Failed!\n\nReason:\n%d", (int)status);
-    text_layer_set_text(s_text_layer, s_failed_buff);
-    dictation_session_stop(dictation);
-	}
 }
 
 
 
 
-static void pms_select_click_handler(ClickRecognizerRef recognizer, void *context, int *mode) {
+static void pms_select_click_handler(ClickRecognizerRef recognizer, void *context) {
   switch (current_mode) {
       case PMS_MENU:
 	  pms_voice_command(s_dictation_session);
@@ -87,7 +88,8 @@ static void pms_up_click_handler(ClickRecognizerRef recognizer, void *context) {
     case PMS_MENU:
 	menu_layer_set_selected_next(s_main_menu, true, MenuRowAlignCenter, true);
         break;
-
+    case PMS_DICTATE:
+        break;
 	}
 }
 
@@ -95,6 +97,9 @@ static void pms_down_click_handler(ClickRecognizerRef recognizer, void *context)
   switch (current_mode) {
       case PMS_MENU:  
 	menu_layer_set_selected_next(s_main_menu, false, MenuRowAlignCenter, true);
+        break;
+
+      case PMS_DICTATE:
         break;
 	}
 }
