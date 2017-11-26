@@ -91,7 +91,21 @@ Pebble.addEventListener('appmessage', function(message) {
   if (dict.PMS_SERVICE_SONARR) {
     pms_service = 'SONARR';
     pms_request_type = 'SEARCH';
+
+    console.log('got service request: ' + JSON.stringify(dict));
   }
-  console.log('got service request: ' + JSON.stringify(dict));
+  if (dict.SERVER_URL) {
+    server_base_url = dict.SERVER_URL;
+    console.log('set server url as: ' + server_base_url);
+  }
+  if (dict.SONARR_API) {
+    sonarr_api_key = dict.SONARR_API;
+    console.log('set sonarr api as: ' + sonarr_api_key);
+  }
+  if (dict.SONARR_PORT) {
+    sonarr_port = dict.SONARR_PORT;   
+    sonarr_postfix = '&apikey=' + sonarr_api_key;
+    console.log('set sonarr port as: ' + sonarr_port);
+  }
 });
 
