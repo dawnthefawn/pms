@@ -79,6 +79,32 @@ static char* transcription_process() {
 //      break;
 //  }
 //}
+static void pms_handle_request() {
+  DictionaryIterator *out_iter;
+  const char *out_request = s_request;
+  AppMessageResult result = app_message_outbox_begin(&out_iter);
+  if (result == APP_MSG_OK) {
+    dict_write_cstring(out_iter, MESSAGE_KEY_PMS_REQUEST, out_request);
+  }
+}
+
+static void pms_initialize_request() {
+  DictionaryIterator *out_iter;
+  AppMessageResult result = app_message_outbox_begin(&out_iter);
+  if (result == APP_MSG_OK) {
+    int value = 1;
+    switch (mode) {
+      case NONE:
+        break;
+      case SONARR:
+        dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_SONARR, &value, sizeof(int), true);
+        break;
+      case RADARR:
+        dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_RADARR, &value, sizeof(int), true);
+        break;
+    }
+  }
+}
 
 static void dictation_session_callback(DictationSession *session, DictationSessionStatus status, char *transcription, void *context) {
   if(status == DictationSessionStatusSuccess) {
@@ -87,9 +113,10 @@ static void dictation_session_callback(DictationSession *session, DictationSessi
 //    char *temp = transcription_process(s_last_text); 
     s_request = transcription_process(s_last_text);
 //    url_builder(s_request);
-    text_layer_set_text(s_text_layer, s_request);
+//    text_layer_set_text(s_text_layer, s_request);
     
     APP_LOG(APP_LOG_LEVEL_DEBUG, "Processed request as: %p", s_request);
+    pms_handle_request();
 //    layer_set_hidden(s_text_layer, true);
   } else {
 // Display the reason for any error
@@ -121,11 +148,13 @@ static void pms_up_click_handler(ClickRecognizerRef recognizer, void *context) {
   text_layer_set_text(s_text_layer, "\n\n\n\n\nShow:\nPress Select to Dictate");
 //  s_request_url = PMS_BASE_URL + PMS_SONARR_ROOT + PMS_SONARR_REQUEST;
   mode = SONARR;
+  pms_initialize_request();
 }
 
 static void pms_down_click_handler(ClickRecognizerRef recognizer, void *context) {
   text_layer_set_text(s_text_layer, "\n\n\n\n\nMovie:\nPress Select to Dictate");
   mode = RADARR;
+  pms_initialize_request();
 }
 
 static void pms_click_config_provider(void *context) {

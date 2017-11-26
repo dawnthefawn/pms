@@ -1,7 +1,11 @@
 {
-    "JSReady": 10003,
-    "SonarrApi": 10000,
-    "SonarrResult": 10002,
-    "SonarrShow": 10001,
-    "SonarrURL": 10004
+    "JSReady": 10005,
+    "PMS_REQUEST": 10006,
+    "PMS_SERVICE_RADARR": 10008,
+    "PMS_SERVICE_SONARR": 10007,
+    "RADARR_API": 10003,
+    "RADARR_PORT": 10004,
+    "SERVER_URL": 10000,
+    "SONARR_API": 10001,
+    "SONARR_PORT": 10002
 }

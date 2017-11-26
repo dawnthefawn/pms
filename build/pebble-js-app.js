@@ -82,8 +82,11 @@
 	var clayConfig = __webpack_require__(6);
 	var clay = new Clay(clayConfig);
 	
-	var sonarr_api_key = 'd8b01e33441bb82e0d9b0083b453';
-	var sonarr_search_url = 'http://192.168.1.100:8989/api/series/lookup?term=';
+	var server_base_url = Clay.getItemsByMessageKey('SERVER_URL');
+	var sonarr_api_key = Clay.getItemsByMessageKey('SONARR_API');
+	var sonarr_port = Clay.getItemsByMessageKey('SONARR_PORT');
+	var pms_service;
+	var pms_request_type;
 	
 	
 	Pebble.AddEventListener('ready', function(e) {
@@ -98,6 +101,14 @@
 	  console.log('got request from pebble app: ' + JSON.stringify(dict));
 	});
 	
+	Pebble.addEventListener('appmessage', function(message) {
+	  var dict = message.payload;
+	  if (dict.PMS_SERVICE_SONARR) {
+	    pms_service = 'SONARR';
+	    pms_request_type = 'SEARCH';
+	  }
+	  console.log('got sonarr search: ' + JSON.stringify(dict));
+	});
 	
 	Pebble.addEventListener('appmessage', function(message) {
 	  var dict = message.payload;
@@ -146,13 +157,13 @@
 /* 5 */
 /***/ (function(module, exports) {
 
-	module.exports = {"JSReady":10003,"SonarrApi":10000,"SonarrResult":10002,"SonarrShow":10001,"SonarrURL":10004}
+	module.exports = {"JSReady":10005,"PMS_REQUEST":10006,"PMS_SERVICE_RADARR":10008,"PMS_SERVICE_SONARR":10007,"RADARR_API":10003,"RADARR_PORT":10004,"SERVER_URL":10000,"SONARR_API":10001,"SONARR_PORT":10002}
 
 /***/ }),
 /* 6 */
 /***/ (function(module, exports) {
 
-	module.exports = [{"type":"heading","defaultValue":"Pebble Media Secretary"},{"type":"section","items":[{"type":"heading","defaultValue":"API Keys"},{"type":"input","messageKey":"sonarr_api","label":"Sonarr Api Key"},{"type":"input","messageKey":"radarr_api","label":"Radarr Api Key"}]},{"type":"submit","defaultValue":"Save Settings"}]
+	module.exports = [{"type":"heading","defaultValue":"Pebble Media Secretary"},{"type":"section","items":[{"type":"heading","defaultValue":"API Keys"},{"type":"input","messageKey":"SERVER_URL","label":"Server Base URL"},{"type":"input","messageKey":"SONARR_PORT","label":"Sonarr Port"},{"type":"input","messageKey":"SONARR_API","label":"Sonarr Api Key"},{"type":"input","messageKey":"RADARR_PORT","label":"Radarr Port"},{"type":"input","messageKey":"RADARR_API","label":"Radarr Api Key"}]},{"type":"submit","defaultValue":"Save Settings"}]
 
 /***/ })
 /******/ ]);

@@ -12,12 +12,27 @@
 		},
 		{
 			"type": "input",
-			"messageKey": "sonarr_api",
+			"messageKey": "SERVER_URL",
+			"label": "Server Base URL"
+		},
+		{
+			"type": "input",
+			"messageKey": "SONARR_PORT",
+			"label": "Sonarr Port"
+		},
+		{
+			"type": "input",
+			"messageKey": "SONARR_API",
 			"label": "Sonarr Api Key"
 		},
 		{
 			"type": "input",
-			"messageKey": "radarr_api",
+			"messageKey": "RADARR_PORT",
+			"label": "Radarr Port"
+		},
+		{
+			"type": "input",
+			"messageKey": "RADARR_API",
 			"label": "Radarr Api Key"
 		}]
 	},

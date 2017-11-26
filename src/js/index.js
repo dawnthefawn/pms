@@ -2,8 +2,11 @@ var Clay = require('pebble-clay');
 var clayConfig = require('./config.json');
 var clay = new Clay(clayConfig);
 
-var sonarr_api_key = 'd8b01e33441bb82e0d9b0083b453';
-var sonarr_search_url = 'http://192.168.1.100:8989/api/series/lookup?term=';
+var server_base_url = Clay.getItemsByMessageKey('SERVER_URL');
+var sonarr_api_key = Clay.getItemsByMessageKey('SONARR_API');
+var sonarr_port = Clay.getItemsByMessageKey('SONARR_PORT');
+var pms_service;
+var pms_request_type;
 
 
 Pebble.AddEventListener('ready', function(e) {
@@ -18,6 +21,14 @@ Pebble.addEventListener('appmessage', function(message) {
   console.log('got request from pebble app: ' + JSON.stringify(dict));
 });
 
+Pebble.addEventListener('appmessage', function(message) {
+  var dict = message.payload;
+  if (dict.PMS_SERVICE_SONARR) {
+    pms_service = 'SONARR';
+    pms_request_type = 'SEARCH';
+  }
+  console.log('got sonarr search: ' + JSON.stringify(dict));
+});
 
 Pebble.addEventListener('appmessage', function(message) {
   var dict = message.payload;

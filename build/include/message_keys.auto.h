@@ -7,7 +7,11 @@
 //
 
 extern uint32_t MESSAGE_KEY_JSReady;
-extern uint32_t MESSAGE_KEY_SonarrApi;
-extern uint32_t MESSAGE_KEY_SonarrResult;
-extern uint32_t MESSAGE_KEY_SonarrShow;
-extern uint32_t MESSAGE_KEY_SonarrURL;
+extern uint32_t MESSAGE_KEY_PMS_REQUEST;
+extern uint32_t MESSAGE_KEY_PMS_SERVICE_RADARR;
+extern uint32_t MESSAGE_KEY_PMS_SERVICE_SONARR;
+extern uint32_t MESSAGE_KEY_RADARR_API;
+extern uint32_t MESSAGE_KEY_RADARR_PORT;
+extern uint32_t MESSAGE_KEY_SERVER_URL;
+extern uint32_t MESSAGE_KEY_SONARR_API;
+extern uint32_t MESSAGE_KEY_SONARR_PORT;

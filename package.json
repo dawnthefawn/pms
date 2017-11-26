@@ -24,11 +24,15 @@
       "watchface": false
     },
     "messageKeys": [
-      "SonarrApi",
-      "SonarrShow",
-      "SonarrResult",
+      "SERVER_URL",
+      "SONARR_API",
+      "SONARR_PORT",
+      "RADARR_API",
+      "RADARR_PORT",
       "JSReady",
-      "SonarrURL"
+      "PMS_REQUEST",
+      "PMS_SERVICE_SONARR",
+      "PMS_SERVICE_RADARR"
     ],
     "resources": {
       "media": []
