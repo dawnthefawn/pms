@@ -1,14 +1,23 @@
 #include <pebble.h>
+#include <stdio.h> 
+#include <string.h>
 #define PMS_BASE_URL = "http://192.168.1.100:" 
 #define PMS_SONARR_ROOT = "8989/api/"
+#define PMS_SONARR_API_KEY = "d8b01e33441bb82e0d9b0083b453"
+#define PMS_SONARR_REQUEST = "series/lookup?term="
+#define PMS_SONARR_API_POSTFIX = "&apikey=" + PMS_SONARR_API_KEY
 static Window *s_window;
 static TextLayer *s_text_layer;
 static DictationSession *s_dictation_session; 
 static char s_last_text[512];
 static char *s_transcription_header;
 static bool s_js_ready;
-
-
+static char *s_request_url;
+static const char *s_sonarr_api_key;
+static const char *s_pms_base_url =  "http://192.168.1.100:";
+static const char *s_pms_sonarr_root = "8989/api/";
+static const char *s_pms_sonarr_request = "series/lookup?term=";
+static const char *s_request;
 enum modes {
 	NONE,
 	SONARR,
@@ -42,11 +51,50 @@ static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
    APP_LOG(APP_LOG_LEVEL_INFO, "Outbox send success!");
 }
 
+static char* transcription_process() {
+  int j = 0;
+  static char output[512];
+ 
+  for (int i = 0; s_last_text[i] != '\0'; i++) {
+    if (s_last_text[i] != ' ') {output[j] = s_last_text[i]; }
+    if (s_last_text[i] == ' ') {
+    output[j] = '%';
+    j++;
+    output[j] = '2';
+    j++;
+    output[j] = '0';
+    }
+    j++;
+  }
+  return &output[0];
+}
+
+static void url_builder(const char *request) {
+  strcpy(s_request_url, s_pms_base_url);
+  switch (mode) {
+    case NONE:
+      break;
+    case SONARR:
+      strcat(s_request_url, s_pms_sonarr_root);
+      strcat(s_request_url, s_pms_sonarr_request); 
+      strcat(s_request_url, request);
+      strcat(s_request_url, s_sonarr_api_key);
+      break;
+    case RADARR:
+      break;
+  }
+}
+
 static void dictation_session_callback(DictationSession *session, DictationSessionStatus status, char *transcription, void *context) {
   if(status == DictationSessionStatusSuccess) {
 // Display the dictated text
     snprintf(s_last_text, sizeof(s_last_text),s_transcription_header, transcription);
-    text_layer_set_text(s_text_layer, s_last_text);
+    char *temp = transcription_process(s_last_text); 
+    s_request = temp;
+    url_builder(s_request);
+    text_layer_set_text(s_text_layer, s_request_url);
+    
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Built url: %p", s_request_url);
 //    layer_set_hidden(s_text_layer, true);
   } else {
 // Display the reason for any error
@@ -76,6 +124,7 @@ static void pms_select_click_handler(ClickRecognizerRef recognizer, void *contex
 
 static void pms_up_click_handler(ClickRecognizerRef recognizer, void *context) {
   text_layer_set_text(s_text_layer, "\n\n\n\n\nShow:\nPress Select to Dictate");
+//  s_request_url = PMS_BASE_URL + PMS_SONARR_ROOT + PMS_SONARR_REQUEST;
   mode = SONARR;
 }
 
@@ -135,7 +184,7 @@ static void pms_deinit(void) {
 
 int main(void) {
   pms_init();
-
+  s_sonarr_api_key = "&apikey=d8b01e33441bb82e0d9b0083b453";
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Done initializing, pushed window: %p", s_window);
 
   app_event_loop();
