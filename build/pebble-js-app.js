@@ -98,12 +98,12 @@
 	var method;
 	var request = new XMLHttpRequest();
 	
-	function InitializeDefaults() {
-	  server_base_url = clay.getItemByMessageKey('SERVER_URL');
-	  sonarr_api_key = clay.getItemByMessageKey('SONARR_API');
-	  sonarr_port = clay.getItemByMessageKey('SONARR_PORT');
-	  sonarr_postfix = '&apikey=' + sonarr_api_key;
-	}
+	//function InitializeDefaults() {
+	//  server_base_url = clay.getItemByMessageKey('SERVER_URL');
+	//  sonarr_api_key = clay.getItemByMessageKey('SONARR_API');
+	//  sonarr_port = clay.getItemByMessageKey('SONARR_PORT');
+	//  sonarr_postfix = '&apikey=' + sonarr_api_key;
+	//}
 	
 	function BuildURL() {
 	  switch (pms_request_type) {
@@ -150,7 +150,7 @@
 	Pebble.addEventListener('ready', function(e) {
 	     console.log('PebbleKit JS ready!');
 	     Pebble.sendAppMessage({'JSReady': 1});
-	     InitializeDefaults();
+	     //InitializeDefaults();
 	   } );  // Listen for when an AppMessage is received Pebble.addEventListener('appmessage',   function(e) {     console.log('AppMessage received!');   } );
 	
 	Pebble.addEventListener('appmessage', function(message) {
@@ -214,7 +214,7 @@
 /* 5 */
 /***/ (function(module, exports) {
 
-	module.exports = {"JSReady":10005,"PMS_REQUEST":10006,"PMS_SERVICE_RADARR":10008,"PMS_SERVICE_SONARR":10007,"RADARR_API":10003,"RADARR_PORT":10004,"SERVER_URL":10000,"SONARR_API":10001,"SONARR_PORT":10002}
+	module.exports = {"JSReady":10005,"PMS_IS_CONFIGURED":10009,"PMS_REQUEST":10006,"PMS_SERVICE_RADARR":10008,"PMS_SERVICE_SONARR":10007,"RADARR_API":10003,"RADARR_PORT":10004,"SERVER_URL":10000,"SONARR_API":10001,"SONARR_PORT":10002}
 
 /***/ }),
 /* 6 */

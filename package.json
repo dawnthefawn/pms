@@ -32,7 +32,8 @@
       "JSReady",
       "PMS_REQUEST",
       "PMS_SERVICE_SONARR",
-      "PMS_SERVICE_RADARR"
+      "PMS_SERVICE_RADARR",
+      "PMS_IS_CONFIGURED"
     ],
     "resources": {
       "media": []

@@ -8,9 +8,10 @@ static char s_last_text[512];
 static char *s_transcription_header;
 static bool s_js_ready;
 //static char *s_request_url;
-//static char *s_sonarr_api_key;
-//static const char *s_pms_base_url =  "http://192.168.1.100:";
+static char s_pms_sonarr_api_key[PERSIST_DATA_MAX_LENGTH];
+static char s_pms_base_url[PERSIST_DATA_MAX_LENGTH]; //=  "http://192.168.1.100:";
 //static const char *s_pms_sonarr_root = "8989/api/";
+static char s_pms_sonarr_port[PERSIST_DATA_MAX_LENGTH];
 //static const char *s_pms_sonarr_request = "series/lookup?term=";
 static AppTimer *s_timeout_timer;
 static char *s_request;
@@ -24,17 +25,73 @@ enum modes mode;
 
 
 //*********************************************************************************************
-bool comm_is_js_ready() {
-  return s_js_ready;
+//bool comm_is_js_ready() {
+//  return s_js_ready;
+//}
+
+
+static void pms_verify_setup() {
+  DictionaryIterator *out_iter;
+  AppMessageResult result = app_message_outbox_begin(&out_iter);
+  if (result == APP_MSG_OK) {
+    dict_write_cstring(out_iter, MESSAGE_KEY_SERVER_URL, s_pms_base_url);
+    
+    dict_write_cstring(out_iter, MESSAGE_KEY_SONARR_PORT, s_pms_sonarr_port);
+    dict_write_cstring(out_iter, MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key);
+    result = app_message_outbox_send();
+    if(result != APP_MSG_OK) {
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Error sending outbox message");
+    }
+  } else {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "outbox unreachable");
+  }
+
 }
+
 
 static void inbox_received_callback(DictionaryIterator *iter, void *context) {  
   Tuple *ready_tuple = dict_find(iter, MESSAGE_KEY_JSReady);
   if(ready_tuple) {
     s_js_ready = true;
   }
-  if (!ready_tuple) { s_js_ready = false;}
+//  if (!ready_tuple) { s_js_ready = false;}
+  
+  Tuple *setup_tuple = dict_find(iter, MESSAGE_KEY_PMS_IS_CONFIGURED);
+  if(setup_tuple) {
+    persist_write_bool(MESSAGE_KEY_PMS_IS_CONFIGURED, true);
+    pms_verify_setup();
+    return;
+  }
+  
+  Tuple *server_url = dict_find(iter, MESSAGE_KEY_SERVER_URL);
+  if(server_url) {
+    strcpy(s_pms_base_url, server_url->value->cstring);
+    persist_write_string(MESSAGE_KEY_SERVER_URL, s_pms_base_url);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "server url is set to %s", s_pms_base_url);
+  }
+  Tuple *sonarr_port = dict_find(iter, MESSAGE_KEY_SONARR_PORT);
+  if(sonarr_port) {
+    strcpy(s_pms_sonarr_port, sonarr_port->value->cstring);
+    persist_write_string(MESSAGE_KEY_SONARR_PORT, s_pms_sonarr_port);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "sonarr port is set to %s", s_pms_sonarr_port);
+  }
+
+  Tuple *sonarr_api = dict_find(iter, MESSAGE_KEY_SONARR_API);
+  if (sonarr_api) {
+    strcpy(s_pms_sonarr_api_key, sonarr_api->value->cstring);
+    persist_write_string(MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "sonarr api key set to %s", s_pms_sonarr_api_key);
+
+  }
+
+  if(!persist_read_bool(MESSAGE_KEY_PMS_IS_CONFIGURED)) {
+    pms_verify_setup();
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "attempting to verify setup");
+  }  
+
 }
+
+
 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
    APP_LOG(APP_LOG_LEVEL_ERROR, "Message dropped!"); 
@@ -210,6 +267,7 @@ static void pms_window_unload(Window *window) {
 }
 
 static void pms_init(void) {
+  persist_write_bool(MESSAGE_KEY_PMS_IS_CONFIGURED, false);
   s_window = window_create();
   window_set_click_config_provider(s_window, pms_click_config_provider);
   window_set_window_handlers(s_window, (WindowHandlers) {
@@ -222,8 +280,8 @@ static void pms_init(void) {
   app_message_register_inbox_dropped(inbox_dropped_callback);
   app_message_register_outbox_failed(outbox_failed_callback);
   app_message_register_outbox_sent(outbox_sent_callback);  
-  const int inbox_size = 128;
-  const int outbox_size = 128;
+  const int inbox_size = 512;
+  const int outbox_size = 512;
   app_message_open(inbox_size, outbox_size);
 }
 
