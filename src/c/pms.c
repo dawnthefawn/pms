@@ -12,6 +12,7 @@ static bool s_js_ready;
 //static const char *s_pms_base_url =  "http://192.168.1.100:";
 //static const char *s_pms_sonarr_root = "8989/api/";
 //static const char *s_pms_sonarr_request = "series/lookup?term=";
+static AppTimer *s_timeout_timer;
 static char *s_request;
 enum modes {
 	NONE,
@@ -32,6 +33,7 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
   if(ready_tuple) {
     s_js_ready = true;
   }
+  if (!ready_tuple) { s_js_ready = false;}
 }
 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
@@ -43,7 +45,8 @@ static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResul
 }  
 
 static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
-   APP_LOG(APP_LOG_LEVEL_INFO, "Outbox send success!");
+ APP_LOG(APP_LOG_LEVEL_INFO, "Outbox send success!");
+ app_timer_cancel(s_timeout_timer); 
 }
 
 static char* transcription_process() {
@@ -79,33 +82,55 @@ static char* transcription_process() {
 //      break;
 //  }
 //}
+
+static void timeout_timer_handler(void *context) {
+  text_layer_set_text(s_text_layer, "Failed");
+  
+}
+
+
 static void pms_handle_request() {
-  DictionaryIterator *out_iter;
-  const char *out_request = s_request;
-  AppMessageResult result = app_message_outbox_begin(&out_iter);
-  if (result == APP_MSG_OK) {
-    dict_write_cstring(out_iter, MESSAGE_KEY_PMS_REQUEST, out_request);
+  if (s_js_ready == true) {
+    DictionaryIterator *out_iter;
+    const char *out_request = s_request;
+    AppMessageResult result = app_message_outbox_begin(&out_iter);
+    if (result == APP_MSG_OK) {
+      dict_write_cstring(out_iter, MESSAGE_KEY_PMS_REQUEST, out_request);
+      app_message_outbox_send();
+    }
   }
+  const int interval = 1000;
+  s_timeout_timer = app_timer_register(interval, timeout_timer_handler, NULL); 
+//  if (comm_is_js_ready == false) { APP_LOG(APP_LOG_LEVEL_DEBUG, "js is not ready");}  
+
 }
 
 static void pms_initialize_request() {
-  DictionaryIterator *out_iter;
-  AppMessageResult result = app_message_outbox_begin(&out_iter);
-  if (result == APP_MSG_OK) {
-    int value = 1;
-    switch (mode) {
-      case NONE:
-        break;
-      case SONARR:
-        dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_SONARR, &value, sizeof(int), true);
-        break;
-      case RADARR:
-        dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_RADARR, &value, sizeof(int), true);
-        break;
+  if (s_js_ready == true) {
+    DictionaryIterator *out_iter;
+    AppMessageResult result = app_message_outbox_begin(&out_iter);
+    if (result == APP_MSG_OK) {
+      int value = 1;
+      switch (mode) {
+        case NONE:
+          break;
+        case SONARR:
+          dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_SONARR, &value, sizeof(int), true);
+          break;
+        case RADARR:
+          dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_RADARR, &value, sizeof(int), true);
+          break;
+      
+      } 
+      app_message_outbox_send();
     }
-  }
-}
+    const int interval = 1000;
 
+    s_timeout_timer = app_timer_register(interval, timeout_timer_handler, NULL); 
+  }
+
+//  if (comm_is_js_ready == false) { APP_LOG(APP_LOG_LEVEL_DEBUG, "js is not ready");}  
+}
 static void dictation_session_callback(DictationSession *session, DictationSessionStatus status, char *transcription, void *context) {
   if(status == DictationSessionStatusSuccess) {
 // Display the dictated text
