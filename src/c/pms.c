@@ -1,23 +1,18 @@
 #include <pebble.h>
 #include <stdio.h> 
 #include <string.h>
-#define PMS_BASE_URL = "http://192.168.1.100:" 
-#define PMS_SONARR_ROOT = "8989/api/"
-#define PMS_SONARR_API_KEY = "d8b01e33441bb82e0d9b0083b453"
-#define PMS_SONARR_REQUEST = "series/lookup?term="
-#define PMS_SONARR_API_POSTFIX = "&apikey=" + PMS_SONARR_API_KEY
 static Window *s_window;
 static TextLayer *s_text_layer;
 static DictationSession *s_dictation_session; 
 static char s_last_text[512];
 static char *s_transcription_header;
 static bool s_js_ready;
-static char *s_request_url;
-static const char *s_sonarr_api_key;
-static const char *s_pms_base_url =  "http://192.168.1.100:";
-static const char *s_pms_sonarr_root = "8989/api/";
-static const char *s_pms_sonarr_request = "series/lookup?term=";
-static const char *s_request;
+//static char *s_request_url;
+//static char *s_sonarr_api_key;
+//static const char *s_pms_base_url =  "http://192.168.1.100:";
+//static const char *s_pms_sonarr_root = "8989/api/";
+//static const char *s_pms_sonarr_request = "series/lookup?term=";
+static char *s_request;
 enum modes {
 	NONE,
 	SONARR,
@@ -69,32 +64,32 @@ static char* transcription_process() {
   return &output[0];
 }
 
-static void url_builder(const char *request) {
-  strcpy(s_request_url, s_pms_base_url);
-  switch (mode) {
-    case NONE:
-      break;
-    case SONARR:
-      strcat(s_request_url, s_pms_sonarr_root);
-      strcat(s_request_url, s_pms_sonarr_request); 
-      strcat(s_request_url, request);
-      strcat(s_request_url, s_sonarr_api_key);
-      break;
-    case RADARR:
-      break;
-  }
-}
+//static void url_builder(const char *request) {
+//  strcpy(s_request_url, s_pms_base_url);
+//  switch (mode) {
+//    case NONE:
+//      break;
+//    case SONARR:
+//      strcat(s_request_url, s_pms_sonarr_root);
+//      strcat(s_request_url, s_pms_sonarr_request); 
+//      strcat(s_request_url, request);
+//      strcat(s_request_url, s_sonarr_api_key);
+//      break;
+//    case RADARR:
+//      break;
+//  }
+//}
 
 static void dictation_session_callback(DictationSession *session, DictationSessionStatus status, char *transcription, void *context) {
   if(status == DictationSessionStatusSuccess) {
 // Display the dictated text
     snprintf(s_last_text, sizeof(s_last_text),s_transcription_header, transcription);
-    char *temp = transcription_process(s_last_text); 
-    s_request = temp;
-    url_builder(s_request);
-    text_layer_set_text(s_text_layer, s_request_url);
+//    char *temp = transcription_process(s_last_text); 
+    s_request = transcription_process(s_last_text);
+//    url_builder(s_request);
+    text_layer_set_text(s_text_layer, s_request);
     
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Built url: %p", s_request_url);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Processed request as: %p", s_request);
 //    layer_set_hidden(s_text_layer, true);
   } else {
 // Display the reason for any error
@@ -184,7 +179,7 @@ static void pms_deinit(void) {
 
 int main(void) {
   pms_init();
-  s_sonarr_api_key = "&apikey=d8b01e33441bb82e0d9b0083b453";
+//  s_sonarr_api_key = "&apikey=d8b01e33441bb82e0d9b0083b453";
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Done initializing, pushed window: %p", s_window);
 
   app_event_loop();
