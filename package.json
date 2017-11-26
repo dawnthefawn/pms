@@ -27,11 +27,8 @@
       "SonarrApi",
       "SonarrShow",
       "SonarrResult",
-      "JSREADY",
-      "ISSETUP",
-      "REQUESTTIMELINE",
-      "SERVERURL",
-      "SERVERSECRET"
+      "JSReady",
+      "SonarrURL"
     ],
     "resources": {
       "media": []

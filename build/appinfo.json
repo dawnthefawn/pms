@@ -8,14 +8,11 @@
     "displayName": "pms", 
     "name": "PebbleMediaSecretary", 
     "messageKeys": {
-        "ISSETUP": 10004, 
-        "JSREADY": 10003, 
-        "REQUESTTIMELINE": 10005, 
-        "SonarrResult": 10002, 
+        "SonarrURL": 10004, 
         "SonarrShow": 10001, 
-        "SERVERURL": 10006, 
+        "SonarrResult": 10002, 
         "SonarrApi": 10000, 
-        "SERVERSECRET": 10007
+        "JSReady": 10003
     }, 
     "companyName": "Dawn Nowell", 
     "enableMultiJS": true, 
@@ -25,14 +22,11 @@
     ], 
     "sdkVersion": "3", 
     "appKeys": {
-        "ISSETUP": 10004, 
-        "JSREADY": 10003, 
-        "REQUESTTIMELINE": 10005, 
-        "SonarrResult": 10002, 
+        "SonarrURL": 10004, 
         "SonarrShow": 10001, 
-        "SERVERURL": 10006, 
+        "SonarrResult": 10002, 
         "SonarrApi": 10000, 
-        "SERVERSECRET": 10007
+        "JSReady": 10003
     }, 
     "longName": "pms", 
     "shortName": "pms", 

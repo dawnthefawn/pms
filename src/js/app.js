@@ -2,37 +2,22 @@ var Clay = require('pebble-clay');
 var clayConfig = require('./config.json');
 var clay = new Clay(clayConfig);
 
-var requestTimeline = function(url, secret) {
-    Pebble.getTimelineToken(function(token) {
-      registerWithToken(token, url, secret);
-    }, function(error) {
-      console.log('Error getting timeline token: ' + error);
-    });
-};
+var sonarr_api_key = 'd8b01e33441bb82e0d9b0083b453';
+var sonarr_search_url = 'http://192.168.1.100:8989/api/series/lookup?term=';
 
-var registerWithToken = function(token, url, secret) {
-  console.log('calling registerWithToken ' + token);
-  var req = new XMLHttpRequest();
-  req.setRequestHeader('psecret', secret);
-  req.open('GET', url + '/register/' + token, true);
-  req.onload = function() {
-    console.log('Sonarr server registration response: ' + req.responseText);
-    //Tell watch app about success
-  };
-  req.onerror = function() {
-    console.log('Sonarr server registration response: ' + req.responseText);
-    //Tell watch app about failure
-  };
-  req.send();
-};
 
-Pebble.addEventListener('ready', function() {
-  // PebbleKit JS is ready!
-  console.log('PebbleKit JS ready!');
-
-  // Update s_js_ready on watch
-  Pebble.sendAppMessage({'JSREADY': 1});
+Pebble.AddEventListener('ready', function(e) {
+     console.log('PebbleKit JS ready!');
+     Pebble.sendAppMessage({'JSReady': 1});
+   } );  // Listen for when an AppMessage is received Pebble.addEventListener('appmessage',   function(e) {     console.log('AppMessage received!');   } );
+Pebble.addEventListener('appmessage', function(message) {
+  var dict = message.payload;
+  if (dict.REQUESTTIMELINE) {
+    requestTimeline(dict.SERVERURL, dict.SERVERSECRET);
+  }
+  console.log('got request from pebble app: ' + JSON.stringify(dict));
 });
+
 
 Pebble.addEventListener('appmessage', function(message) {
   var dict = message.payload;
@@ -41,3 +26,4 @@ Pebble.addEventListener('appmessage', function(message) {
   }
   console.log('got request from pebble app: ' + JSON.stringify(dict));
 });
+

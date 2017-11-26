@@ -6,11 +6,8 @@
 // DO NOT MODIFY - CHANGES WILL BE OVERWRITTEN
 //
 
-extern uint32_t MESSAGE_KEY_ISSETUP;
-extern uint32_t MESSAGE_KEY_JSREADY;
-extern uint32_t MESSAGE_KEY_REQUESTTIMELINE;
-extern uint32_t MESSAGE_KEY_SERVERSECRET;
-extern uint32_t MESSAGE_KEY_SERVERURL;
+extern uint32_t MESSAGE_KEY_JSReady;
 extern uint32_t MESSAGE_KEY_SonarrApi;
 extern uint32_t MESSAGE_KEY_SonarrResult;
 extern uint32_t MESSAGE_KEY_SonarrShow;
+extern uint32_t MESSAGE_KEY_SonarrURL;
