@@ -7,14 +7,10 @@ static DictationSession *s_dictation_session;
 static char s_last_text[512];
 static char *s_transcription_header;
 static bool s_js_ready;
-//static char *s_request_url;
 static char s_pms_sonarr_api_key[PERSIST_DATA_MAX_LENGTH];
-static char s_pms_base_url[PERSIST_DATA_MAX_LENGTH]; //=  "http://192.168.1.100:";
-//static const char *s_pms_sonarr_root = "8989/api/";
+static char s_pms_base_url[PERSIST_DATA_MAX_LENGTH]; 
 static char s_pms_sonarr_port[PERSIST_DATA_MAX_LENGTH];
-//static const char *s_pms_sonarr_request = "series/lookup?term=";
 static AppTimer *s_timeout_timer;
-//static char *s_request;
 enum modes {
 	NONE,
 	SONARR,
@@ -25,9 +21,6 @@ enum modes mode;
 
 
 //*********************************************************************************************
-//bool comm_is_js_ready() {
-//  return s_js_ready;
-//}
 
 static void pms_verify_setup();
 
@@ -55,7 +48,6 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
   if(ready_tuple) {
     s_js_ready = true;
   }
-//  if (!ready_tuple) { s_js_ready = false;}
   
   Tuple *setup_tuple = dict_find(iter, MESSAGE_KEY_PMS_IS_CONFIGURED);
   if(setup_tuple) {
@@ -130,7 +122,6 @@ static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
 
 
 static void timeout_timer_handler(void *context) {
-//  text_layer_set_text(s_text_layer, "Failed");
   if (s_timeout_timer) {
     app_timer_cancel(s_timeout_timer); 
     s_timeout_timer = NULL;
@@ -141,8 +132,6 @@ static void timeout_timer_handler(void *context) {
 static void pms_handle_request() {
   if (s_js_ready == true) {
     DictionaryIterator *out_iter;
-//    const char *out_request = transcription_process(s_last_text);
-//    APP_LOG(APP_LOG_LEVEL_DEBUG, "pms.c out_request = %s", out_request);
     AppMessageResult result = app_message_outbox_begin(&out_iter);
     if (result == APP_MSG_OK) {
       dict_write_cstring(out_iter, MESSAGE_KEY_PMS_REQUEST, s_last_text);
@@ -151,7 +140,6 @@ static void pms_handle_request() {
   }
   const int interval = 5000;
   s_timeout_timer = app_timer_register(interval, timeout_timer_handler, NULL); 
-//  if (comm_is_js_ready == false) { APP_LOG(APP_LOG_LEVEL_DEBUG, "js is not ready");}  
   if (s_timeout_timer) {
     s_timeout_timer = NULL;
   }
@@ -183,20 +171,16 @@ static void pms_initialize_request() {
   if (s_timeout_timer) {
     s_timeout_timer = NULL;
   }
-//  if (comm_is_js_ready == false) { APP_LOG(APP_LOG_LEVEL_DEBUG, "js is not ready");}  
 }
 static void dictation_session_callback(DictationSession *session, DictationSessionStatus status, char *transcription, void *context) {
   if(status == DictationSessionStatusSuccess) {
+
     snprintf(s_last_text, sizeof(s_last_text), transcription);
-//    s_request = transcription_process(s_last_text);
-//    url_builder(s_request);
-//    text_layer_set_text(s_text_layer, s_request);
-    
     APP_LOG(APP_LOG_LEVEL_DEBUG, "Processed request as: %p", s_last_text);
     pms_handle_request();
-//    layer_set_hidden(s_text_layer, true);
+
   } else {
-// Display the reason for any error
+
     static char s_failed_buff[128];
     snprintf(s_failed_buff, sizeof(s_failed_buff), "Transcription failed.\n\nError ID:\n%d", (int)status);
     APP_LOG(APP_LOG_LEVEL_ERROR, "Transcription failed: %s", s_failed_buff);
@@ -222,7 +206,6 @@ static void pms_select_click_handler(ClickRecognizerRef recognizer, void *contex
 
 static void pms_up_click_handler(ClickRecognizerRef recognizer, void *context) {
   text_layer_set_text(s_text_layer, "\n\n\n\n\nShow:\nPress Select to Dictate");
-//  s_request_url = PMS_BASE_URL + PMS_SONARR_ROOT + PMS_SONARR_REQUEST;
   mode = SONARR;
   pms_initialize_request();
 }
@@ -247,7 +230,6 @@ static void pms_window_load(Window *window) {
   text_layer_set_overflow_mode(s_text_layer, GTextOverflowModeWordWrap);
   text_layer_set_background_color(s_text_layer, GColorBlack);
   text_layer_set_text_color(s_text_layer, GColorGreen);
-//  font_get_system_font(FONT_KEY_GOTHIC_24_BOLD);
   text_layer_set_text(s_text_layer, "\n\nPress Up to \nAdd a Show\n\n\n\nPress Down to\nAdd a Movie");
   text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(s_text_layer));
@@ -285,7 +267,6 @@ static void pms_deinit(void) {
 
 int main(void) {
   pms_init();
-//  s_sonarr_api_key = "&apikey=d8b01e33441bb82e0d9b0083b453";
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Done initializing, pushed window: %p", s_window);
 
   app_event_loop();

@@ -16,7 +16,6 @@ var pms_request_url;
 var pms_request;
 var request_type_string;
 var method;
-var request = new XMLHttpRequest();
 
 //function InitializeDefaults() {
 //  server_base_url = clay.getItemByMessageKey('SERVER_URL');
@@ -52,21 +51,33 @@ function BuildURL() {
 
 function SendServerRequest() {
   if (BuildURL() == true) {
+    var request = new XMLHttpRequest();
+    console.log('Opening request, method: ' + method + 'URL: ' + pms_request_url);
+    request.open(method, pms_request_url, true);
     request.onload = function() {
       try {
         
         var json = JSON.parse(this.responseText);
+	console.log(json);
         //console.log('Got this response: ' + json;
       } catch(err) {
-        console.log('Unable to parse JSON response');
-      }
-    };
-    request.open(method, pms_request_url);
-    request.send();
+        console.log('Unable to parse JSON response: ' + err);
+      };
     
-  } 
+    
+    } 
+    request.onerror = function() {
+      try {
+        var json = JSON.parse(this.responseText);
+        console.log(json);
+      } catch(err) {
+        console.log('Unable to parse JSON Error Message');
+        }
+    }
+    console.log('sending request');
+    request.send();
+  }
 }
-
 Pebble.addEventListener('ready', function(e) {
      console.log('PebbleKit JS ready!');
      Pebble.sendAppMessage({'JSReady': 1});
@@ -76,7 +87,7 @@ Pebble.addEventListener('ready', function(e) {
 Pebble.addEventListener('appmessage', function(message) {
   var dict = message.payload;
   if (dict.PMS_REQUEST) {
-    console.log('dict.PMS_REQUEST= ' + escape(dict.PMS_REQUEST));
+    console.log('dict.PMS_REQUEST= ' + encodeURI(dict.PMS_REQUEST));
     pms_request = escape(dict.PMS_REQUEST);
   }
   console.log('got request string: ' + pms_request);
