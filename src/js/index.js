@@ -24,6 +24,8 @@ var method;
 //  sonarr_postfix = '&apikey=' + sonarr_api_key;
 //}
 
+
+
 function BuildURL() {
   switch (pms_request_type) {
     case 'SEARCH':
@@ -47,6 +49,26 @@ function BuildURL() {
       break;
   }
   console.log(pms_request_url);
+  return true;
+}
+
+function ProcessServerResponse(json) {
+  var dict = {};
+  for (var x = 0; x <= 8; x++) {
+
+    var key = messageKeys.PMS_RESPONSE + x;
+    if (x < json.length) {
+      var object = json[x]
+      dict[key] = object.title;
+      console.log(object.title);
+      Pebble.sendAppMessage(dict);
+    }
+    if (x >= json.length) {  
+      dict[key] = 'NOTHING';
+      Pebble.sendAppMessage(dict);
+    }
+  }
+  console.log('sent last item');
 }
 
 function SendServerRequest() {
@@ -78,6 +100,8 @@ function SendServerRequest() {
     request.send();
   }
 }
+
+
 Pebble.addEventListener('ready', function(e) {
      console.log('PebbleKit JS ready!');
      Pebble.sendAppMessage({'JSReady': 1});
@@ -92,7 +116,9 @@ Pebble.addEventListener('appmessage', function(message) {
   }
   console.log('got request string: ' + pms_request);
   SendServerRequest();
+
 });
+
   
       
   

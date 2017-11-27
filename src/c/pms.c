@@ -11,6 +11,8 @@ static char s_pms_sonarr_api_key[PERSIST_DATA_MAX_LENGTH];
 static char s_pms_base_url[PERSIST_DATA_MAX_LENGTH]; 
 static char s_pms_sonarr_port[PERSIST_DATA_MAX_LENGTH];
 static AppTimer *s_timeout_timer;
+static int s_pms_response_index;
+static char **s_pms_response[8];
 enum modes {
 	NONE,
 	SONARR,
@@ -21,8 +23,6 @@ enum modes mode;
 
 
 //*********************************************************************************************
-
-static void pms_verify_setup();
 
 static void pms_verify_setup() {
   DictionaryIterator *out_iter;
@@ -42,11 +42,25 @@ static void pms_verify_setup() {
 
 }
 
+static void read_stored_values() {
+  
+  persist_read_string(MESSAGE_KEY_SERVER_URL, s_pms_base_url, 256);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "stored url: %s", s_pms_base_url);
+
+  persist_read_string(MESSAGE_KEY_SONARR_PORT, s_pms_sonarr_port, 7);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "stored sonarr port: %s", s_pms_sonarr_port);
+
+  persist_read_string(MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key, 34);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "stored sonarr api: %s", s_pms_sonarr_api_key);
+  pms_verify_setup();
+}
 
 static void inbox_received_callback(DictionaryIterator *iter, void *context) {  
   Tuple *ready_tuple = dict_find(iter, MESSAGE_KEY_JSReady);
   if(ready_tuple) {
     s_js_ready = true;
+    s_pms_response_index = 0;
+    read_stored_values();
   }
   
   Tuple *setup_tuple = dict_find(iter, MESSAGE_KEY_PMS_IS_CONFIGURED);
@@ -56,6 +70,15 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
     return;
   }
   
+  Tuple *server_response = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE + s_pms_response_index);
+  if (server_response) {
+    s_pms_response[s_pms_response_index] = (char)server_response;
+    s_pms_response_index ++;
+    if(s_pms_response_index > 8) {
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "Received All Items");
+    }
+  }
+
   Tuple *server_url = dict_find(iter, MESSAGE_KEY_SERVER_URL);
   if(server_url) {
     strcpy(s_pms_base_url, server_url->value->cstring);
@@ -81,7 +104,8 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
     pms_verify_setup();
     APP_LOG(APP_LOG_LEVEL_DEBUG, "attempting to verify setup");
   }  
-
+  
+  
 }
 
 
@@ -241,7 +265,6 @@ static void pms_window_unload(Window *window) {
   text_layer_destroy(s_text_layer);
   dictation_session_destroy(s_dictation_session);
 }
-
 static void pms_init(void) {
   persist_write_bool(MESSAGE_KEY_PMS_IS_CONFIGURED, false);
   s_window = window_create();
