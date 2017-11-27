@@ -76,9 +76,10 @@ Pebble.addEventListener('ready', function(e) {
 Pebble.addEventListener('appmessage', function(message) {
   var dict = message.payload;
   if (dict.PMS_REQUEST) {
-    pms_request = JSON.stringify(dict);
+    console.log('dict.PMS_REQUEST= ' + escape(dict.PMS_REQUEST));
+    pms_request = escape(dict.PMS_REQUEST);
   }
-  console.log('got request string: ' + JSON.stringify(dict));
+  console.log('got request string: ' + pms_request);
   SendServerRequest();
 });
   

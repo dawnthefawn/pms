@@ -14,7 +14,7 @@ static char s_pms_base_url[PERSIST_DATA_MAX_LENGTH]; //=  "http://192.168.1.100:
 static char s_pms_sonarr_port[PERSIST_DATA_MAX_LENGTH];
 //static const char *s_pms_sonarr_request = "series/lookup?term=";
 static AppTimer *s_timeout_timer;
-static char *s_request;
+//static char *s_request;
 enum modes {
 	NONE,
 	SONARR,
@@ -29,6 +29,7 @@ enum modes mode;
 //  return s_js_ready;
 //}
 
+static void pms_verify_setup();
 
 static void pms_verify_setup() {
   DictionaryIterator *out_iter;
@@ -102,64 +103,58 @@ static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResul
 }  
 
 static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
- APP_LOG(APP_LOG_LEVEL_INFO, "Outbox send success!");
- app_timer_cancel(s_timeout_timer); 
-}
-
-static char* transcription_process() {
-  int j = 0;
-  static char output[512];
- 
-  for (int i = 0; s_last_text[i] != '\0'; i++) {
-    if (s_last_text[i] != ' ') {output[j] = s_last_text[i]; }
-    if (s_last_text[i] == ' ') {
-    output[j] = '%';
-    j++;
-    output[j] = '2';
-    j++;
-    output[j] = '0';
-    }
-    j++;
+  APP_LOG(APP_LOG_LEVEL_INFO, "Outbox send success!");
+  if (s_timeout_timer) {
+    app_timer_cancel(s_timeout_timer); 
   }
-  return &output[0];
 }
 
-//static void url_builder(const char *request) {
-//  strcpy(s_request_url, s_pms_base_url);
-//  switch (mode) {
-//    case NONE:
-//      break;
-//    case SONARR:
-//      strcat(s_request_url, s_pms_sonarr_root);
-//      strcat(s_request_url, s_pms_sonarr_request); 
-//      strcat(s_request_url, request);
-//      strcat(s_request_url, s_sonarr_api_key);
-//      break;
-//    case RADARR:
-//      break;
+//static char* transcription_process() {
+//  int j = 0;
+//  static char output[512];
+//  APP_LOG(APP_LOG_LEVEL_DEBUG, "transcription_process(): s_last_text = %s", s_last_text); 
+//  for (int i = 0; s_last_text[i] != '\0'; i++) {
+//    if (s_last_text[i] != ' ') {output[j] = s_last_text[i]; }
+//    if (s_last_text[i] == ' ') {
+//    output[j] = '%';
+//    j++;
+//    output[j] = '2';
+//    j++;
+//    output[j] = '0';
+//    }
+//    j++;
 //  }
+//  APP_LOG(APP_LOG_LEVEL_DEBUG, "output = %s", output);
+//  return output;
 //}
 
+
 static void timeout_timer_handler(void *context) {
-  text_layer_set_text(s_text_layer, "Failed");
-  
+//  text_layer_set_text(s_text_layer, "Failed");
+  if (s_timeout_timer) {
+    app_timer_cancel(s_timeout_timer); 
+    s_timeout_timer = NULL;
+  }
 }
 
 
 static void pms_handle_request() {
   if (s_js_ready == true) {
     DictionaryIterator *out_iter;
-    const char *out_request = s_request;
+//    const char *out_request = transcription_process(s_last_text);
+//    APP_LOG(APP_LOG_LEVEL_DEBUG, "pms.c out_request = %s", out_request);
     AppMessageResult result = app_message_outbox_begin(&out_iter);
     if (result == APP_MSG_OK) {
-      dict_write_cstring(out_iter, MESSAGE_KEY_PMS_REQUEST, out_request);
+      dict_write_cstring(out_iter, MESSAGE_KEY_PMS_REQUEST, s_last_text);
       app_message_outbox_send();
     }
   }
-  const int interval = 1000;
+  const int interval = 5000;
   s_timeout_timer = app_timer_register(interval, timeout_timer_handler, NULL); 
 //  if (comm_is_js_ready == false) { APP_LOG(APP_LOG_LEVEL_DEBUG, "js is not ready");}  
-
+  if (s_timeout_timer) {
+    s_timeout_timer = NULL;
+  }
 }
 
 static void pms_initialize_request() {
@@ -185,27 +180,26 @@ static void pms_initialize_request() {
 
     s_timeout_timer = app_timer_register(interval, timeout_timer_handler, NULL); 
   }
-
+  if (s_timeout_timer) {
+    s_timeout_timer = NULL;
+  }
 //  if (comm_is_js_ready == false) { APP_LOG(APP_LOG_LEVEL_DEBUG, "js is not ready");}  
 }
 static void dictation_session_callback(DictationSession *session, DictationSessionStatus status, char *transcription, void *context) {
   if(status == DictationSessionStatusSuccess) {
-// Display the dictated text
-    snprintf(s_last_text, sizeof(s_last_text),s_transcription_header, transcription);
-//    char *temp = transcription_process(s_last_text); 
-    s_request = transcription_process(s_last_text);
+    snprintf(s_last_text, sizeof(s_last_text), transcription);
+//    s_request = transcription_process(s_last_text);
 //    url_builder(s_request);
 //    text_layer_set_text(s_text_layer, s_request);
     
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Processed request as: %p", s_request);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Processed request as: %p", s_last_text);
     pms_handle_request();
 //    layer_set_hidden(s_text_layer, true);
   } else {
 // Display the reason for any error
     static char s_failed_buff[128];
     snprintf(s_failed_buff, sizeof(s_failed_buff), "Transcription failed.\n\nError ID:\n%d", (int)status);
-//    text_layer_set_text(s_text_layer, s_failed_buff);
-
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Transcription failed: %s", s_failed_buff);
     text_layer_set_text(s_text_layer, "\n\nPress Up to \nAdd a Show\n\n\n\nPress Down to\nAdd a Movie");
   }
 }
