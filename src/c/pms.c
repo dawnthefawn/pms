@@ -12,7 +12,10 @@ static char s_pms_base_url[PERSIST_DATA_MAX_LENGTH];
 static char s_pms_sonarr_port[PERSIST_DATA_MAX_LENGTH];
 static AppTimer *s_timeout_timer;
 static int s_pms_response_index;
-static char **s_pms_response[8];
+static char *s_pms_response[8];
+static int s_pms_response_items;
+static MenuLayer *s_menu_layer;
+static GRect *s_bounds;
 enum modes {
 	NONE,
 	SONARR,
@@ -23,6 +26,42 @@ enum modes mode;
 
 
 //*********************************************************************************************
+static uint16_t get_num_rows() {
+  const uint16_t numrows = s_pms_response_items;
+  return numrows;
+}
+
+static void draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_index, void *context) {
+  static char s_buff[16];
+  snprintf(s_buff, sizeof(s_buff), "Row %d", (int)cell_index->row);
+  menu_cell_basic_draw(ctx, cell_layer, s_buff, NULL, NULL);
+}
+
+static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
+  const int16_t cell_height = 44;
+  return cell_height;
+}
+
+static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
+  APP_LOG(APP_LOG_LEVEL_DEFAULT, "SELECTED!");
+}
+
+
+static void initialize_menu() {
+  layer_remove_from_parent(s_text_layer);
+  text_layer_destroy(s_text_layer);
+  s_menu_layer = menu_layer_create(s_bounds);
+  menu_layer_set_click_config_onto_window(s_menu_layer, s_window);
+  menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
+    .get_num_rows = get_num_rows_callback,
+    .draw_row = draw_row_callback,
+    .get_cell_height = get_cell_height_callback,
+    .select_click = select_callback,
+  });
+  
+  layer_add_child(s_window, s_menu_layer);
+
+}
 
 static void pms_verify_setup() {
   DictionaryIterator *out_iter;
@@ -35,10 +74,13 @@ static void pms_verify_setup() {
     result = app_message_outbox_send();
     if(result != APP_MSG_OK) {
       APP_LOG(APP_LOG_LEVEL_ERROR, "Error sending outbox message");
+        return;
     }
   } else {
     APP_LOG(APP_LOG_LEVEL_ERROR, "outbox unreachable");
+    return;
   }
+  persist_write_bool(MESSAGE_KEY_PMS_IS_CONFIGURED, true);
 
 }
 
@@ -61,22 +103,26 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
     s_js_ready = true;
     s_pms_response_index = 0;
     read_stored_values();
-  }
-  
-  Tuple *setup_tuple = dict_find(iter, MESSAGE_KEY_PMS_IS_CONFIGURED);
-  if(setup_tuple) {
-    persist_write_bool(MESSAGE_KEY_PMS_IS_CONFIGURED, true);
-    pms_verify_setup();
     return;
   }
   
+  
   Tuple *server_response = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE + s_pms_response_index);
   if (server_response) {
-    s_pms_response[s_pms_response_index] = (char)server_response;
+    s_pms_response[s_pms_response_index] = server_response->value->cstring;
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "received response: %s", s_pms_response[s_pms_response_index]);
     s_pms_response_index ++;
     if(s_pms_response_index > 8) {
-      APP_LOG(APP_LOG_LEVEL_DEBUG, "Received All Items");
     }
+    return;
+  }
+  Tuple *response_sent = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE);
+  if (response_sent) {
+    s_pms_response_items = s_pms_response_index-1;
+    s_pms_response_index = 0;
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Received All Items");
+    initialize_menu();
+    return;
   }
 
   Tuple *server_url = dict_find(iter, MESSAGE_KEY_SERVER_URL);
@@ -111,7 +157,7 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
 
 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
-   APP_LOG(APP_LOG_LEVEL_ERROR, "Message dropped!"); 
+   APP_LOG(APP_LOG_LEVEL_ERROR, "Message dropped! "); 
 }  
 
 static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context) {
@@ -248,9 +294,9 @@ static void pms_click_config_provider(void *context) {
 
 static void pms_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
-  GRect bounds = layer_get_bounds(window_layer);
+  s_bounds = layer_get_bounds(window);
 
-  s_text_layer = text_layer_create(bounds);
+  s_text_layer = text_layer_create(s_bounds);
   text_layer_set_overflow_mode(s_text_layer, GTextOverflowModeWordWrap);
   text_layer_set_background_color(s_text_layer, GColorBlack);
   text_layer_set_text_color(s_text_layer, GColorGreen);
@@ -264,6 +310,7 @@ static void pms_window_load(Window *window) {
 static void pms_window_unload(Window *window) {
   text_layer_destroy(s_text_layer);
   dictation_session_destroy(s_dictation_session);
+  menu_layer_destroy(s_menu_layer);
 }
 static void pms_init(void) {
   persist_write_bool(MESSAGE_KEY_PMS_IS_CONFIGURED, false);

@@ -30,6 +30,8 @@ Discarded input sections
  .bss           0x0000000000000000        0x0 aplite/src/resource_ids.auto.c.33.o
  .text          0x0000000000000000        0x0 src/message_keys.auto.c.33.o
  .bss           0x0000000000000000        0x0 src/message_keys.auto.c.33.o
+ .data.MESSAGE_KEY_PMS_RESPONSE_SENT
+                0x0000000000000000        0x4 src/message_keys.auto.c.33.o
  .data.MESSAGE_KEY_RADARR_PORT
                 0x0000000000000000        0x4 src/message_keys.auto.c.33.o
  .data.MESSAGE_KEY_RADARR_API
@@ -1177,7 +1179,7 @@ LOAD /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/ar
  .note.gnu.build-id
                 0x0000000000000084       0x24 linker stubs
 
-.text           0x00000000000000a8      0xb13
+.text           0x00000000000000a8      0xbc1
  *(.text)
  .text          0x00000000000000a8       0x14 /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
  *(.text.*)
@@ -1189,248 +1191,257 @@ LOAD /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/ar
                 0x00000000000000ec       0x30 src/c/pms.c.33.o
  .text.timeout_timer_handler
                 0x000000000000011c       0x18 src/c/pms.c.33.o
- .text.pms_window_unload
-                0x0000000000000134       0x24 src/c/pms.c.33.o
- .text.pms_window_load
-                0x0000000000000158       0x94 src/c/pms.c.33.o
- .text.pms_click_config_provider
-                0x00000000000001ec       0x30 src/c/pms.c.33.o
- .text.pms_initialize_request
-                0x000000000000021c       0x90 src/c/pms.c.33.o
- .text.pms_down_click_handler
-                0x00000000000002ac       0x34 src/c/pms.c.33.o
- .text.pms_up_click_handler
-                0x00000000000002e0       0x34 src/c/pms.c.33.o
  .text.pms_verify_setup
-                0x0000000000000314       0x90 src/c/pms.c.33.o
+                0x0000000000000134       0xa4 src/c/pms.c.33.o
+ .text.pms_window_unload
+                0x00000000000001d8       0x24 src/c/pms.c.33.o
+ .text.pms_window_load
+                0x00000000000001fc       0x94 src/c/pms.c.33.o
+ .text.pms_click_config_provider
+                0x0000000000000290       0x30 src/c/pms.c.33.o
+ .text.pms_initialize_request
+                0x00000000000002c0       0x90 src/c/pms.c.33.o
+ .text.pms_down_click_handler
+                0x0000000000000350       0x34 src/c/pms.c.33.o
+ .text.pms_up_click_handler
+                0x0000000000000384       0x34 src/c/pms.c.33.o
  .text.inbox_received_callback
-                0x00000000000003a4      0x1ec src/c/pms.c.33.o
+                0x00000000000003b8      0x25c src/c/pms.c.33.o
  .text.dictation_session_callback
-                0x0000000000000590       0xe4 src/c/pms.c.33.o
+                0x0000000000000614       0xe4 src/c/pms.c.33.o
  .text.pms_select_click_handler
-                0x0000000000000674       0x50 src/c/pms.c.33.o
+                0x00000000000006f8       0x50 src/c/pms.c.33.o
  .text.startup.main
-                0x00000000000006c4       0xd4 src/c/pms.c.33.o
-                0x00000000000006c4                main
+                0x0000000000000748       0xd4 src/c/pms.c.33.o
+                0x0000000000000748                main
  .text.app_event_loop
-                0x0000000000000798        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000798                app_event_loop
- .text.app_log  0x00000000000007a4        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000007a4                app_log
- .text.app_message_open
-                0x00000000000007b0        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000007b0                app_message_open
- .text.app_timer_cancel
-                0x00000000000007bc        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000007bc                app_timer_cancel
- .text.app_timer_register
-                0x00000000000007c8        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000007c8                app_timer_register
- .text.dict_find
-                0x00000000000007d4        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000007d4                dict_find
- .text.dict_write_cstring
-                0x00000000000007e0        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000007e0                dict_write_cstring
- .text.dict_write_int
-                0x00000000000007ec        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000007ec                dict_write_int
- .text.layer_add_child
-                0x00000000000007f8        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000007f8                layer_add_child
- .text.layer_get_bounds
-                0x0000000000000804        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000804                layer_get_bounds
- .text.memset   0x0000000000000810        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000810                memset
- .text.persist_read_bool
                 0x000000000000081c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000000000000081c                persist_read_bool
- .text.persist_write_bool
-                0x0000000000000828        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000828                persist_write_bool
- .text.persist_write_string
+                0x000000000000081c                app_event_loop
+ .text.app_log  0x0000000000000828        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000000828                app_log
+ .text.app_message_open
                 0x0000000000000834        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000834                persist_write_string
- .text.snprintf
+                0x0000000000000834                app_message_open
+ .text.app_timer_cancel
                 0x0000000000000840        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000840                snprintf
- .text.strcpy   0x000000000000084c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000000000000084c                strcpy
- .text.window_create
+                0x0000000000000840                app_timer_cancel
+ .text.app_timer_register
+                0x000000000000084c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000000000000084c                app_timer_register
+ .text.dict_find
                 0x0000000000000858        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000858                window_create
- .text.window_destroy
+                0x0000000000000858                dict_find
+ .text.dict_write_cstring
                 0x0000000000000864        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000864                window_destroy
- .text.window_get_root_layer
+                0x0000000000000864                dict_write_cstring
+ .text.dict_write_int
                 0x0000000000000870        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000870                window_get_root_layer
- .text.window_set_click_config_provider
+                0x0000000000000870                dict_write_int
+ .text.layer_add_child
                 0x000000000000087c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000000000000087c                window_set_click_config_provider
- .text.window_set_window_handlers
+                0x000000000000087c                layer_add_child
+ .text.layer_get_bounds
                 0x0000000000000888        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000888                window_set_window_handlers
- .text.window_stack_push
-                0x0000000000000894        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000894                window_stack_push
- .text.app_message_outbox_begin
+                0x0000000000000888                layer_get_bounds
+ .text.memset   0x0000000000000894        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000000894                memset
+ .text.persist_read_bool
                 0x00000000000008a0        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000008a0                app_message_outbox_begin
- .text.app_message_outbox_send
+                0x00000000000008a0                persist_read_bool
+ .text.persist_write_bool
                 0x00000000000008ac        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000008ac                app_message_outbox_send
- .text.app_message_register_inbox_dropped
+                0x00000000000008ac                persist_write_bool
+ .text.persist_write_string
                 0x00000000000008b8        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000008b8                app_message_register_inbox_dropped
- .text.app_message_register_inbox_received
+                0x00000000000008b8                persist_write_string
+ .text.snprintf
                 0x00000000000008c4        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000008c4                app_message_register_inbox_received
- .text.app_message_register_outbox_failed
-                0x00000000000008d0        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000008d0                app_message_register_outbox_failed
- .text.app_message_register_outbox_sent
+                0x00000000000008c4                snprintf
+ .text.strcpy   0x00000000000008d0        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000008d0                strcpy
+ .text.window_create
                 0x00000000000008dc        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000008dc                app_message_register_outbox_sent
- .text.window_single_click_subscribe
+                0x00000000000008dc                window_create
+ .text.window_destroy
                 0x00000000000008e8        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000008e8                window_single_click_subscribe
- .text.persist_read_string
+                0x00000000000008e8                window_destroy
+ .text.window_get_root_layer
                 0x00000000000008f4        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000008f4                persist_read_string
- .text.text_layer_create
+                0x00000000000008f4                window_get_root_layer
+ .text.window_set_click_config_provider
                 0x0000000000000900        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000900                text_layer_create
- .text.text_layer_destroy
+                0x0000000000000900                window_set_click_config_provider
+ .text.window_set_window_handlers
                 0x000000000000090c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000000000000090c                text_layer_destroy
- .text.text_layer_get_layer
+                0x000000000000090c                window_set_window_handlers
+ .text.window_stack_push
                 0x0000000000000918        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000918                text_layer_get_layer
- .text.text_layer_set_background_color
+                0x0000000000000918                window_stack_push
+ .text.app_message_outbox_begin
                 0x0000000000000924        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000924                text_layer_set_background_color
- .text.text_layer_set_overflow_mode
+                0x0000000000000924                app_message_outbox_begin
+ .text.app_message_outbox_send
                 0x0000000000000930        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000930                text_layer_set_overflow_mode
- .text.text_layer_set_text
+                0x0000000000000930                app_message_outbox_send
+ .text.app_message_register_inbox_dropped
                 0x000000000000093c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000000000000093c                text_layer_set_text
- .text.text_layer_set_text_alignment
+                0x000000000000093c                app_message_register_inbox_dropped
+ .text.app_message_register_inbox_received
                 0x0000000000000948        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000948                text_layer_set_text_alignment
- .text.text_layer_set_text_color
+                0x0000000000000948                app_message_register_inbox_received
+ .text.app_message_register_outbox_failed
                 0x0000000000000954        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000954                text_layer_set_text_color
- .text.dictation_session_create
+                0x0000000000000954                app_message_register_outbox_failed
+ .text.app_message_register_outbox_sent
                 0x0000000000000960        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000960                dictation_session_create
- .text.dictation_session_destroy
+                0x0000000000000960                app_message_register_outbox_sent
+ .text.window_single_click_subscribe
                 0x000000000000096c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000000000000096c                dictation_session_destroy
- .text.dictation_session_start
+                0x000000000000096c                window_single_click_subscribe
+ .text.persist_read_string
                 0x0000000000000978        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000000978                dictation_session_start
+                0x0000000000000978                persist_read_string
+ .text.text_layer_create
+                0x0000000000000984        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000000984                text_layer_create
+ .text.text_layer_destroy
+                0x0000000000000990        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000000990                text_layer_destroy
+ .text.text_layer_get_layer
+                0x000000000000099c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000000000000099c                text_layer_get_layer
+ .text.text_layer_set_background_color
+                0x00000000000009a8        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000009a8                text_layer_set_background_color
+ .text.text_layer_set_overflow_mode
+                0x00000000000009b4        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000009b4                text_layer_set_overflow_mode
+ .text.text_layer_set_text
+                0x00000000000009c0        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000009c0                text_layer_set_text
+ .text.text_layer_set_text_alignment
+                0x00000000000009cc        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000009cc                text_layer_set_text_alignment
+ .text.text_layer_set_text_color
+                0x00000000000009d8        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000009d8                text_layer_set_text_color
+ .text.dictation_session_create
+                0x00000000000009e4        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000009e4                dictation_session_create
+ .text.dictation_session_destroy
+                0x00000000000009f0        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000009f0                dictation_session_destroy
+ .text.dictation_session_start
+                0x00000000000009fc        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000009fc                dictation_session_start
  *(.rodata)
  *(.rodata*)
  .rodata.str1.1
-                0x0000000000000984      0x237 src/c/pms.c.33.o
+                0x0000000000000a08      0x261 src/c/pms.c.33.o
 
-.glue_7         0x0000000000000bbc        0x0
+.glue_7         0x0000000000000c6c        0x0
  .glue_7        0x0000000000000000        0x0 linker stubs
 
-.glue_7t        0x0000000000000bbc        0x0
+.glue_7t        0x0000000000000c6c        0x0
  .glue_7t       0x0000000000000000        0x0 linker stubs
 
-.vfp11_veneer   0x0000000000000bbc        0x0
+.vfp11_veneer   0x0000000000000c6c        0x0
  .vfp11_veneer  0x0000000000000000        0x0 linker stubs
 
-.v4_bx          0x0000000000000bbc        0x0
+.v4_bx          0x0000000000000c6c        0x0
  .v4_bx         0x0000000000000000        0x0 linker stubs
 
-.iplt           0x0000000000000bbc        0x0
+.iplt           0x0000000000000c6c        0x0
  .iplt          0x0000000000000000        0x0 /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb2/crtbegin.o
 
-.rel.dyn        0x0000000000000bbc        0x0
+.rel.dyn        0x0000000000000c6c        0x0
  .rel.iplt      0x0000000000000000        0x0 /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb2/crtbegin.o
  .rel.got       0x0000000000000000        0x0 /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb2/crtbegin.o
 
-.data           0x0000000000000bbc       0x24
+.data           0x0000000000000c6c       0x28
  *(.data)
- .data          0x0000000000000bbc        0x0 /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb2/crti.o
- .data          0x0000000000000bbc        0x4 /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb2/crtbegin.o
-                0x0000000000000bbc                __dso_handle
- .data          0x0000000000000bc0        0x0 src/c/pms.c.33.o
- .data          0x0000000000000bc0        0x0 aplite/appinfo.auto.c.33.o
- .data          0x0000000000000bc0        0x0 aplite/src/resource_ids.auto.c.33.o
- .data          0x0000000000000bc0        0x0 src/message_keys.auto.c.33.o
- .data          0x0000000000000bc0        0x0 /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
- .data          0x0000000000000bc0        0x0 /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb2/crtend.o
- .data          0x0000000000000bc0        0x0 /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb2/crtn.o
+ .data          0x0000000000000c6c        0x0 /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb2/crti.o
+ .data          0x0000000000000c6c        0x4 /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb2/crtbegin.o
+                0x0000000000000c6c                __dso_handle
+ .data          0x0000000000000c70        0x0 src/c/pms.c.33.o
+ .data          0x0000000000000c70        0x0 aplite/appinfo.auto.c.33.o
+ .data          0x0000000000000c70        0x0 aplite/src/resource_ids.auto.c.33.o
+ .data          0x0000000000000c70        0x0 src/message_keys.auto.c.33.o
+ .data          0x0000000000000c70        0x0 /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+ .data          0x0000000000000c70        0x0 /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb2/crtend.o
+ .data          0x0000000000000c70        0x0 /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb2/crtn.o
  *(.data.*)
  .data.MESSAGE_KEY_PMS_IS_CONFIGURED
-                0x0000000000000bc0        0x4 src/message_keys.auto.c.33.o
-                0x0000000000000bc0                MESSAGE_KEY_PMS_IS_CONFIGURED
+                0x0000000000000c70        0x4 src/message_keys.auto.c.33.o
+                0x0000000000000c70                MESSAGE_KEY_PMS_IS_CONFIGURED
  .data.MESSAGE_KEY_PMS_REQUEST
-                0x0000000000000bc4        0x4 src/message_keys.auto.c.33.o
-                0x0000000000000bc4                MESSAGE_KEY_PMS_REQUEST
+                0x0000000000000c74        0x4 src/message_keys.auto.c.33.o
+                0x0000000000000c74                MESSAGE_KEY_PMS_REQUEST
+ .data.MESSAGE_KEY_PMS_RESPONSE
+                0x0000000000000c78        0x4 src/message_keys.auto.c.33.o
+                0x0000000000000c78                MESSAGE_KEY_PMS_RESPONSE
  .data.MESSAGE_KEY_PMS_SERVICE_RADARR
-                0x0000000000000bc8        0x4 src/message_keys.auto.c.33.o
-                0x0000000000000bc8                MESSAGE_KEY_PMS_SERVICE_RADARR
+                0x0000000000000c7c        0x4 src/message_keys.auto.c.33.o
+                0x0000000000000c7c                MESSAGE_KEY_PMS_SERVICE_RADARR
  .data.MESSAGE_KEY_SERVER_URL
-                0x0000000000000bcc        0x4 src/message_keys.auto.c.33.o
-                0x0000000000000bcc                MESSAGE_KEY_SERVER_URL
+                0x0000000000000c80        0x4 src/message_keys.auto.c.33.o
+                0x0000000000000c80                MESSAGE_KEY_SERVER_URL
  .data.MESSAGE_KEY_SONARR_API
-                0x0000000000000bd0        0x4 src/message_keys.auto.c.33.o
-                0x0000000000000bd0                MESSAGE_KEY_SONARR_API
+                0x0000000000000c84        0x4 src/message_keys.auto.c.33.o
+                0x0000000000000c84                MESSAGE_KEY_SONARR_API
  .data.MESSAGE_KEY_PMS_SERVICE_SONARR
-                0x0000000000000bd4        0x4 src/message_keys.auto.c.33.o
-                0x0000000000000bd4                MESSAGE_KEY_PMS_SERVICE_SONARR
+                0x0000000000000c88        0x4 src/message_keys.auto.c.33.o
+                0x0000000000000c88                MESSAGE_KEY_PMS_SERVICE_SONARR
  .data.MESSAGE_KEY_JSReady
-                0x0000000000000bd8        0x4 src/message_keys.auto.c.33.o
-                0x0000000000000bd8                MESSAGE_KEY_JSReady
+                0x0000000000000c8c        0x4 src/message_keys.auto.c.33.o
+                0x0000000000000c8c                MESSAGE_KEY_JSReady
  .data.MESSAGE_KEY_SONARR_PORT
-                0x0000000000000bdc        0x4 src/message_keys.auto.c.33.o
-                0x0000000000000bdc                MESSAGE_KEY_SONARR_PORT
+                0x0000000000000c90        0x4 src/message_keys.auto.c.33.o
+                0x0000000000000c90                MESSAGE_KEY_SONARR_PORT
 
-.igot.plt       0x0000000000000be0        0x0
+.igot.plt       0x0000000000000c94        0x0
  .igot.plt      0x0000000000000000        0x0 /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb2/crtbegin.o
 
-.got            0x0000000000000be0       0x24
- .got           0x0000000000000be0       0x24 /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb2/crtbegin.o
+.got            0x0000000000000c94       0x28
+ .got           0x0000000000000c94       0x28 /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb2/crtbegin.o
 
-.got.plt        0x0000000000000c04        0xc
- .got.plt       0x0000000000000c04        0xc /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb2/crtbegin.o
-                0x0000000000000c04                _GLOBAL_OFFSET_TABLE_
+.got.plt        0x0000000000000cbc        0xc
+ .got.plt       0x0000000000000cbc        0xc /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb2/crtbegin.o
+                0x0000000000000cbc                _GLOBAL_OFFSET_TABLE_
 
-.bss            0x0000000000000c10      0x599
+.bss            0x0000000000000cc8      0x5c1
  *(.bss)
  *(.bss.*)
  .bss.s_js_ready
-                0x0000000000000c10        0x1 src/c/pms.c.33.o
+                0x0000000000000cc8        0x1 src/c/pms.c.33.o
  .bss.s_last_text
-                0x0000000000000c11      0x200 src/c/pms.c.33.o
- *fill*         0x0000000000000e11        0x3 
+                0x0000000000000cc9      0x200 src/c/pms.c.33.o
+ *fill*         0x0000000000000ec9        0x3 
  .bss.s_timeout_timer
-                0x0000000000000e14        0x4 src/c/pms.c.33.o
+                0x0000000000000ecc        0x4 src/c/pms.c.33.o
+ .bss.s_window  0x0000000000000ed0        0x4 src/c/pms.c.33.o
  .bss.s_text_layer
-                0x0000000000000e18        0x4 src/c/pms.c.33.o
+                0x0000000000000ed4        0x4 src/c/pms.c.33.o
  .bss.s_pms_base_url
-                0x0000000000000e1c      0x100 src/c/pms.c.33.o
- .bss.s_failed_buff.7546
-                0x0000000000000f1c       0x80 src/c/pms.c.33.o
- .bss.s_transcription_header
-                0x0000000000000f9c        0x4 src/c/pms.c.33.o
+                0x0000000000000ed8      0x100 src/c/pms.c.33.o
+ .bss.s_failed_buff.7552
+                0x0000000000000fd8       0x80 src/c/pms.c.33.o
+ .bss.s_pms_response
+                0x0000000000001058       0x20 src/c/pms.c.33.o
  .bss.s_pms_sonarr_api_key
-                0x0000000000000fa0      0x100 src/c/pms.c.33.o
- .bss.s_window  0x00000000000010a0        0x4 src/c/pms.c.33.o
+                0x0000000000001078      0x100 src/c/pms.c.33.o
+ .bss.s_transcription_header
+                0x0000000000001178        0x4 src/c/pms.c.33.o
+ .bss.s_pms_response_index
+                0x000000000000117c        0x4 src/c/pms.c.33.o
+ .bss.s_pms_response_items
+                0x0000000000001180        0x4 src/c/pms.c.33.o
  .bss.s_dictation_session
-                0x00000000000010a4        0x4 src/c/pms.c.33.o
+                0x0000000000001184        0x4 src/c/pms.c.33.o
  .bss.s_pms_sonarr_port
-                0x00000000000010a8      0x100 src/c/pms.c.33.o
- COMMON         0x00000000000011a8        0x1 src/c/pms.c.33.o
-                0x00000000000011a8                mode
+                0x0000000000001188      0x100 src/c/pms.c.33.o
+ COMMON         0x0000000000001288        0x1 src/c/pms.c.33.o
+                0x0000000000001288                mode
 
 DISCARD
  libc.a(*)
@@ -1469,20 +1480,20 @@ OUTPUT(/home/dawn/pebble-dev/pebble-sdk-4.5-linux64/pms/build/aplite/pebble-app.
  .comment       0x0000000000000000       0x4f src/message_keys.auto.c.33.o
  .comment       0x0000000000000000       0x4f /home/dawn/pebble-dev/pebble-sdk-4.5-linux64/arm-cs-tools/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb2/crtend.o
 
-.debug_info     0x0000000000000000     0x1e0d
- .debug_info    0x0000000000000000     0x196c src/c/pms.c.33.o
- .debug_info    0x000000000000196c      0x31a aplite/appinfo.auto.c.33.o
- .debug_info    0x0000000000001c86       0x64 aplite/src/resource_ids.auto.c.33.o
- .debug_info    0x0000000000001cea      0x123 src/message_keys.auto.c.33.o
+.debug_info     0x0000000000000000     0x1e81
+ .debug_info    0x0000000000000000     0x19bc src/c/pms.c.33.o
+ .debug_info    0x00000000000019bc      0x31a aplite/appinfo.auto.c.33.o
+ .debug_info    0x0000000000001cd6       0x64 aplite/src/resource_ids.auto.c.33.o
+ .debug_info    0x0000000000001d3a      0x147 src/message_keys.auto.c.33.o
 
-.debug_abbrev   0x0000000000000000      0x51e
- .debug_abbrev  0x0000000000000000      0x416 src/c/pms.c.33.o
- .debug_abbrev  0x0000000000000416       0x9e aplite/appinfo.auto.c.33.o
- .debug_abbrev  0x00000000000004b4       0x26 aplite/src/resource_ids.auto.c.33.o
- .debug_abbrev  0x00000000000004da       0x44 src/message_keys.auto.c.33.o
+.debug_abbrev   0x0000000000000000      0x574
+ .debug_abbrev  0x0000000000000000      0x46c src/c/pms.c.33.o
+ .debug_abbrev  0x000000000000046c       0x9e aplite/appinfo.auto.c.33.o
+ .debug_abbrev  0x000000000000050a       0x26 aplite/src/resource_ids.auto.c.33.o
+ .debug_abbrev  0x0000000000000530       0x44 src/message_keys.auto.c.33.o
 
-.debug_loc      0x0000000000000000      0x68d
- .debug_loc     0x0000000000000000      0x68d src/c/pms.c.33.o
+.debug_loc      0x0000000000000000      0x6e7
+ .debug_loc     0x0000000000000000      0x6e7 src/c/pms.c.33.o
 
 .debug_aranges  0x0000000000000000       0xd8
  .debug_aranges
@@ -1494,24 +1505,24 @@ OUTPUT(/home/dawn/pebble-dev/pebble-sdk-4.5-linux64/pms/build/aplite/pebble-app.
  .debug_aranges
                 0x00000000000000c0       0x18 src/message_keys.auto.c.33.o
 
-.debug_ranges   0x0000000000000000      0x120
- .debug_ranges  0x0000000000000000      0x120 src/c/pms.c.33.o
+.debug_ranges   0x0000000000000000      0x138
+ .debug_ranges  0x0000000000000000      0x138 src/c/pms.c.33.o
 
-.debug_line     0x0000000000000000      0x5b0
- .debug_line    0x0000000000000000      0x3b3 src/c/pms.c.33.o
- .debug_line    0x00000000000003b3      0x11d aplite/appinfo.auto.c.33.o
- .debug_line    0x00000000000004d0       0x1d aplite/src/resource_ids.auto.c.33.o
- .debug_line    0x00000000000004ed       0xc3 src/message_keys.auto.c.33.o
+.debug_line     0x0000000000000000      0x5bd
+ .debug_line    0x0000000000000000      0x3c0 src/c/pms.c.33.o
+ .debug_line    0x00000000000003c0      0x11d aplite/appinfo.auto.c.33.o
+ .debug_line    0x00000000000004dd       0x1d aplite/src/resource_ids.auto.c.33.o
+ .debug_line    0x00000000000004fa       0xc3 src/message_keys.auto.c.33.o
 
-.debug_str      0x0000000000000000     0x113c
- .debug_str     0x0000000000000000      0xea7 src/c/pms.c.33.o
-                                        0xf6d (size before relaxing)
- .debug_str     0x0000000000000ea7      0x22f aplite/appinfo.auto.c.33.o
+.debug_str      0x0000000000000000     0x11be
+ .debug_str     0x0000000000000000      0xf0b src/c/pms.c.33.o
+                                        0xfd1 (size before relaxing)
+ .debug_str     0x0000000000000f0b      0x22f aplite/appinfo.auto.c.33.o
                                         0x325 (size before relaxing)
- .debug_str     0x00000000000010d6       0x1f aplite/src/resource_ids.auto.c.33.o
+ .debug_str     0x000000000000113a       0x1f aplite/src/resource_ids.auto.c.33.o
                                          0xe6 (size before relaxing)
- .debug_str     0x00000000000010f5       0x47 src/message_keys.auto.c.33.o
-                                        0x1e5 (size before relaxing)
+ .debug_str     0x0000000000001159       0x65 src/message_keys.auto.c.33.o
+                                        0x21c (size before relaxing)
 
 .debug_frame    0x0000000000000000      0x18c
  .debug_frame   0x0000000000000000      0x18c src/c/pms.c.33.o

@@ -34,7 +34,8 @@
       "PMS_SERVICE_SONARR",
       "PMS_SERVICE_RADARR",
       "PMS_IS_CONFIGURED",
-      "PMS_RESPONSE[8]"
+      "PMS_RESPONSE[8]",
+      "PMS_RESPONSE_SENT"
     ],
     "resources": {
       "media": []

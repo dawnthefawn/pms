@@ -64,8 +64,8 @@ function ProcessServerResponse(json) {
       Pebble.sendAppMessage(dict);
     }
     if (x >= json.length) {  
-      dict[key] = 'NOTHING';
-      Pebble.sendAppMessage(dict);
+      Pebble.sendAppMessage({'PMS_RESPONSE_SENT':1});
+      return; 
     }
   }
   console.log('sent last item');
@@ -81,7 +81,7 @@ function SendServerRequest() {
         
         var json = JSON.parse(this.responseText);
 	console.log(json);
-        //console.log('Got this response: ' + json;
+        ProcessServerResponse(json);
       } catch(err) {
         console.log('Unable to parse JSON response: ' + err);
       };
@@ -93,7 +93,7 @@ function SendServerRequest() {
         var json = JSON.parse(this.responseText);
         console.log(json);
       } catch(err) {
-        console.log('Unable to parse JSON Error Message');
+        console.log('Unable to parse JSON Error Message: %s', err);
         }
     }
     console.log('sending request');
@@ -116,7 +116,7 @@ Pebble.addEventListener('appmessage', function(message) {
   }
   console.log('got request string: ' + pms_request);
   SendServerRequest();
-
+  dict.PMS_REQUEST = undefined;
 });
 
   

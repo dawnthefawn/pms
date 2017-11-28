@@ -132,6 +132,25 @@
 	  return true;
 	}
 	
+	function ProcessServerResponse(json) {
+	  var dict = {};
+	  for (var x = 0; x <= 8; x++) {
+	
+	    var key = messageKeys.PMS_RESPONSE + x;
+	    if (x < json.length) {
+	      var object = json[x]
+	      dict[key] = object.title;
+	      console.log(object.title);
+	      Pebble.sendAppMessage(dict);
+	    }
+	    if (x >= json.length) {  
+	      Pebble.sendAppMessage({'PMS_RESPONSE_SENT':1});
+	      return; 
+	    }
+	  }
+	  console.log('sent last item');
+	}
+	
 	function SendServerRequest() {
 	  if (BuildURL() == true) {
 	    var request = new XMLHttpRequest();
@@ -142,11 +161,7 @@
 	        
 	        var json = JSON.parse(this.responseText);
 		console.log(json);
-	        for (var x = 0; x < json.length; x++) {
-	          var object = json[x]
-	          console.log(object.title);
-	        }
-	        //console.log('Got this response: ' + json;
+	        ProcessServerResponse(json);
 	      } catch(err) {
 	        console.log('Unable to parse JSON response: ' + err);
 	      };
@@ -158,7 +173,7 @@
 	        var json = JSON.parse(this.responseText);
 	        console.log(json);
 	      } catch(err) {
-	        console.log('Unable to parse JSON Error Message');
+	        console.log('Unable to parse JSON Error Message: %s', err);
 	        }
 	    }
 	    console.log('sending request');
@@ -181,7 +196,7 @@
 	  }
 	  console.log('got request string: ' + pms_request);
 	  SendServerRequest();
-	
+	  dict.PMS_REQUEST = undefined;
 	});
 	
 	  
@@ -251,7 +266,7 @@
 /* 5 */
 /***/ (function(module, exports) {
 
-	module.exports = {"JSReady":10005,"PMS_IS_CONFIGURED":10009,"PMS_REQUEST":10006,"PMS_SERVICE_RADARR":10008,"PMS_SERVICE_SONARR":10007,"RADARR_API":10003,"RADARR_PORT":10004,"SERVER_URL":10000,"SONARR_API":10001,"SONARR_PORT":10002}
+	module.exports = {"JSReady":10013,"PMS_IS_CONFIGURED":10017,"PMS_REQUEST":10014,"PMS_RESPONSE":10000,"PMS_RESPONSE_SENT":10018,"PMS_SERVICE_RADARR":10016,"PMS_SERVICE_SONARR":10015,"RADARR_API":10011,"RADARR_PORT":10012,"SERVER_URL":10008,"SONARR_API":10009,"SONARR_PORT":10010}
 
 /***/ }),
 /* 6 */
