@@ -15,26 +15,31 @@ static int s_pms_response_index;
 static char *s_pms_response[8];
 static int s_pms_response_items;
 static MenuLayer *s_menu_layer;
-static GRect *s_bounds;
+static GRect s_bounds;
+static bool *s_response_sent;
+static int *s_pms_choice;
 enum modes {
 	NONE,
 	SONARR,
 	RADARR,
+	MENU,
 };
 
 enum modes mode;
 
 
 //*********************************************************************************************
-static uint16_t get_num_rows() {
+static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) {
   const uint16_t numrows = s_pms_response_items;
   return numrows;
 }
 
 static void draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_index, void *context) {
-  static char s_buff[16];
-  snprintf(s_buff, sizeof(s_buff), "Row %d", (int)cell_index->row);
-  menu_cell_basic_draw(ctx, cell_layer, s_buff, NULL, NULL);
+  static char s_buff[24];
+  for(int x = 0; x < s_pms_response_items; x++) {
+    snprintf(s_buff, sizeof(s_buff), "%s", s_pms_response[x]);
+    menu_cell_basic_draw(ctx, cell_layer, s_buff, NULL, NULL);
+  }
 }
 
 static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
@@ -43,12 +48,31 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
 }
 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
-  APP_LOG(APP_LOG_LEVEL_DEFAULT, "SELECTED!");
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "SELECTED!");
+  
+  DictionaryIterator *out_iter;
+  AppMessageResult result = app_message_outbox_begin(&out_iter);
+  if (result == APP_MSG_OK) {
+    s_pms_choice = (void*)(int)cell_index->row;
+    
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "%d", (int)cell_index->row);
+    dict_write_int(out_iter, MESSAGE_KEY_PMS_CHOICE, s_pms_choice, sizeof(int), true);
+    result = app_message_outbox_send();
+    if(result != APP_MSG_OK) {
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Error sending outbox message");
+        return;
+    }
+  } else {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "outbox unreachable");
+    return;
+  }
 }
 
 
 static void initialize_menu() {
-  layer_remove_from_parent(s_text_layer);
+
+  Layer *window_layer = window_get_root_layer(s_window); 
+  layer_remove_from_parent(text_layer_get_layer(s_text_layer));
   text_layer_destroy(s_text_layer);
   s_menu_layer = menu_layer_create(s_bounds);
   menu_layer_set_click_config_onto_window(s_menu_layer, s_window);
@@ -58,8 +82,9 @@ static void initialize_menu() {
     .get_cell_height = get_cell_height_callback,
     .select_click = select_callback,
   });
-  
-  layer_add_child(s_window, s_menu_layer);
+  menu_layer_set_click_config_onto_window(s_menu_layer, s_window);
+  layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
+  mode= MENU;
 
 }
 
@@ -114,11 +139,12 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
     s_pms_response_index ++;
     if(s_pms_response_index > 8) {
     }
-    return;
+    
   }
+
   Tuple *response_sent = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE);
   if (response_sent) {
-    s_pms_response_items = s_pms_response_index-1;
+    s_pms_response_items = s_pms_response_index;
     s_pms_response_index = 0;
     APP_LOG(APP_LOG_LEVEL_DEBUG, "Received All Items");
     initialize_menu();
@@ -230,6 +256,8 @@ static void pms_initialize_request() {
         case RADARR:
           dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_RADARR, &value, sizeof(int), true);
           break;
+        case MENU:
+	  break;
       
       } 
       app_message_outbox_send();
@@ -271,6 +299,10 @@ static void pms_select_click_handler(ClickRecognizerRef recognizer, void *contex
     case RADARR:
       s_transcription_header = "\n\nSearching Movie:\n\n%s";
       break;      
+    case MENU:
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Click Handler Error");
+      break;
+
   }
 }
 
@@ -293,8 +325,8 @@ static void pms_click_config_provider(void *context) {
 }
 
 static void pms_window_load(Window *window) {
-  Layer *window_layer = window_get_root_layer(window);
-  s_bounds = layer_get_bounds(window);
+  Layer *window_layer = window_get_root_layer(s_window);
+  s_bounds = layer_get_bounds(window_layer);
 
   s_text_layer = text_layer_create(s_bounds);
   text_layer_set_overflow_mode(s_text_layer, GTextOverflowModeWordWrap);

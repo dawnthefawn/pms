@@ -16,7 +16,9 @@ var pms_request_url;
 var pms_request;
 var request_type_string;
 var method;
-
+var pms_items;
+var pms_tvdbids = {};
+var pms_choice;
 //function InitializeDefaults() {
 //  server_base_url = clay.getItemByMessageKey('SERVER_URL');
 //  sonarr_api_key = clay.getItemByMessageKey('SONARR_API');
@@ -57,18 +59,27 @@ function ProcessServerResponse(json) {
   for (var x = 0; x <= 8; x++) {
 
     var key = messageKeys.PMS_RESPONSE + x;
-    if (x < json.length) {
+    if (x <= json.length) {
       var object = json[x]
       dict[key] = object.title;
       console.log(object.title);
       Pebble.sendAppMessage(dict);
+      pms_tvdbids[x] = object.tvdbId;
     }
-    if (x >= json.length) {  
+    if (x > json.length) {  
+
+      console.log('sent last item');
       Pebble.sendAppMessage({'PMS_RESPONSE_SENT':1});
+      pms_items = x
       return; 
     }
   }
-  console.log('sent last item');
+}
+
+function PmsAddShow(choice) {
+  console.log('pms_choice = ' + pms_choice);
+  
+  console.log(pms_tvdbids[pms_choice]);
 }
 
 function SendServerRequest() {
@@ -110,6 +121,12 @@ Pebble.addEventListener('ready', function(e) {
 
 Pebble.addEventListener('appmessage', function(message) {
   var dict = message.payload;
+  if (dict.PMS_CHOICE) {
+    console.log('dict.PMS_CHOICE= ' + dict.PMS_CHOICE);
+    pms_choice=dict.PMS_CHOICE;
+    PmsAddShow(pms_choice);
+    return;
+  }
   if (dict.PMS_REQUEST) {
     console.log('dict.PMS_REQUEST= ' + encodeURI(dict.PMS_REQUEST));
     pms_request = escape(dict.PMS_REQUEST);

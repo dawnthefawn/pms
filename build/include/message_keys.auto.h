@@ -7,6 +7,7 @@
 //
 
 extern uint32_t MESSAGE_KEY_JSReady;
+extern uint32_t MESSAGE_KEY_PMS_CHOICE;
 extern uint32_t MESSAGE_KEY_PMS_IS_CONFIGURED;
 extern uint32_t MESSAGE_KEY_PMS_REQUEST;
 extern uint32_t MESSAGE_KEY_PMS_RESPONSE;

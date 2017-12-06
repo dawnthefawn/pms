@@ -10,6 +10,7 @@
     "messageKeys": {
         "SONARR_PORT": 10010, 
         "RADARR_PORT": 10012, 
+        "PMS_CHOICE": 10019, 
         "SONARR_API": 10009, 
         "PMS_SERVICE_SONARR": 10015, 
         "PMS_RESPONSE_SENT": 10018, 
@@ -31,6 +32,7 @@
     "appKeys": {
         "SONARR_PORT": 10010, 
         "RADARR_PORT": 10012, 
+        "PMS_CHOICE": 10019, 
         "SONARR_API": 10009, 
         "PMS_SERVICE_SONARR": 10015, 
         "PMS_RESPONSE_SENT": 10018, 
