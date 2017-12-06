@@ -48,11 +48,9 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
 }
 static void pms_click_config_provider();
 static void pms_send_choice(int choice) {
-
   DictionaryIterator *out_iter;
   AppMessageResult result = app_message_outbox_begin(&out_iter);
   if (result == APP_MSG_OK) {
-    
     APP_LOG(APP_LOG_LEVEL_DEBUG, "%d", choice);
     dict_write_int(out_iter, MESSAGE_KEY_PMS_CHOICE, &choice, sizeof(int), true);
     result = app_message_outbox_send();
@@ -64,12 +62,9 @@ static void pms_send_choice(int choice) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "outbox unreachable");
     return;
   }
-
   Layer *window_layer = window_get_root_layer(s_window); 
   layer_remove_from_parent(menu_layer_get_layer(s_menu_layer));
-
   layer_add_child(window_layer, text_layer_get_layer(s_text_layer));
-  
   window_set_click_config_provider(s_window, pms_click_config_provider);
 }
 
@@ -80,7 +75,6 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 
 
 static void initialize_menu() {
-
   Layer *window_layer = window_get_root_layer(s_window); 
   layer_remove_from_parent(text_layer_get_layer(s_text_layer));
 //  text_layer_destroy(s_text_layer);
@@ -95,7 +89,6 @@ static void initialize_menu() {
   menu_layer_set_click_config_onto_window(s_menu_layer, s_window);
   layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
   mode= MENU;
-
 }
 
 static void pms_verify_setup() {
@@ -103,7 +96,6 @@ static void pms_verify_setup() {
   AppMessageResult result = app_message_outbox_begin(&out_iter);
   if (result == APP_MSG_OK) {
     dict_write_cstring(out_iter, MESSAGE_KEY_SERVER_URL, s_pms_base_url);
-    
     dict_write_cstring(out_iter, MESSAGE_KEY_SONARR_PORT, s_pms_sonarr_port);
     dict_write_cstring(out_iter, MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key);
     result = app_message_outbox_send();
@@ -116,23 +108,20 @@ static void pms_verify_setup() {
     return;
   }
   persist_write_bool(MESSAGE_KEY_PMS_IS_CONFIGURED, true);
-
 }
 
 static void read_stored_values() {
-  
   persist_read_string(MESSAGE_KEY_SERVER_URL, s_pms_base_url, 256);
   APP_LOG(APP_LOG_LEVEL_DEBUG, "stored url: %s", s_pms_base_url);
-
   persist_read_string(MESSAGE_KEY_SONARR_PORT, s_pms_sonarr_port, 7);
   APP_LOG(APP_LOG_LEVEL_DEBUG, "stored sonarr port: %s", s_pms_sonarr_port);
-
   persist_read_string(MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key, 34);
   APP_LOG(APP_LOG_LEVEL_DEBUG, "stored sonarr api: %s", s_pms_sonarr_api_key);
   pms_verify_setup();
 }
 
 static void inbox_received_callback(DictionaryIterator *iter, void *context) {  
+
   Tuple *ready_tuple = dict_find(iter, MESSAGE_KEY_JSReady);
   if(ready_tuple) {
     s_js_ready = true;
@@ -140,57 +129,52 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
     read_stored_values();
     return;
   }
-  
-  
-  Tuple *server_response = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE + s_pms_response_index);
-  if (server_response) {
-    s_pms_response[s_pms_response_index] = server_response->value->cstring;
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "received response: %s", s_pms_response[s_pms_response_index]);
-    s_pms_response_index ++;
-    if(s_pms_response_index > 8) {
+
+  if (!mode = MENU) { 
+    Tuple *server_response = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE + s_pms_response_index);
+    if (server_response) {
+      s_pms_response[s_pms_response_index] = server_response->value->cstring;
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "received response: %s", s_pms_response[s_pms_response_index]);
+      s_pms_response_index ++;
+      if(s_pms_response_index > 8) {
+      }
     }
-    
-  }
-
-  Tuple *response_sent = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE);
-  if (response_sent) {
-    s_pms_response_items = s_pms_response_index;
-    s_pms_response_index = 0;
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Received All Items");
-    initialize_menu();
-    return;
-  }
-
-  Tuple *server_url = dict_find(iter, MESSAGE_KEY_SERVER_URL);
-  if(server_url) {
-    strcpy(s_pms_base_url, server_url->value->cstring);
-    persist_write_string(MESSAGE_KEY_SERVER_URL, s_pms_base_url);
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "server url is set to %s", s_pms_base_url);
-  }
-  Tuple *sonarr_port = dict_find(iter, MESSAGE_KEY_SONARR_PORT);
-  if(sonarr_port) {
-    strcpy(s_pms_sonarr_port, sonarr_port->value->cstring);
-    persist_write_string(MESSAGE_KEY_SONARR_PORT, s_pms_sonarr_port);
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "sonarr port is set to %s", s_pms_sonarr_port);
-  }
-
-  Tuple *sonarr_api = dict_find(iter, MESSAGE_KEY_SONARR_API);
-  if (sonarr_api) {
-    strcpy(s_pms_sonarr_api_key, sonarr_api->value->cstring);
-    persist_write_string(MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key);
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "sonarr api key set to %s", s_pms_sonarr_api_key);
-
+    Tuple *response_sent = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE);
+    if (response_sent) {
+      s_pms_response_items = s_pms_response_index;
+      s_pms_response_index = 0;
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "Received All Items");
+      initialize_menu();
+      return;
+    }
   }
 
   if(!persist_read_bool(MESSAGE_KEY_PMS_IS_CONFIGURED)) {
+    Tuple *server_url = dict_find(iter, MESSAGE_KEY_SERVER_URL);
+    if(server_url) {
+      strcpy(s_pms_base_url, server_url->value->cstring);
+      persist_write_string(MESSAGE_KEY_SERVER_URL, s_pms_base_url);
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "server url is set to %s", s_pms_base_url);
+    }
+    Tuple *sonarr_port = dict_find(iter, MESSAGE_KEY_SONARR_PORT);
+    if(sonarr_port) {
+      strcpy(s_pms_sonarr_port, sonarr_port->value->cstring);
+      persist_write_string(MESSAGE_KEY_SONARR_PORT, s_pms_sonarr_port);
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "sonarr port is set to %s", s_pms_sonarr_port);
+    }
+  
+    Tuple *sonarr_api = dict_find(iter, MESSAGE_KEY_SONARR_API);
+    if (sonarr_api) {
+      strcpy(s_pms_sonarr_api_key, sonarr_api->value->cstring);
+      persist_write_string(MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key);
+      APP_LOG(APP_LOG_LEVEL_DEBUG, "sonarr api key set to %s", s_pms_sonarr_api_key);
+    }
     pms_verify_setup();
     APP_LOG(APP_LOG_LEVEL_DEBUG, "attempting to verify setup");
+    return;
   }  
-  
-  
+  return;  
 }
-
-
 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
    APP_LOG(APP_LOG_LEVEL_ERROR, "Message dropped! "); 
@@ -268,35 +252,29 @@ static void pms_initialize_request() {
           break;
         case MENU:
 	  break;
-      
       } 
       app_message_outbox_send();
     }
     const int interval = 1000;
-
     s_timeout_timer = app_timer_register(interval, timeout_timer_handler, NULL); 
   }
   if (s_timeout_timer) {
     s_timeout_timer = NULL;
   }
 }
+
 static void dictation_session_callback(DictationSession *session, DictationSessionStatus status, char *transcription, void *context) {
   if(status == DictationSessionStatusSuccess) {
-
     snprintf(s_last_text, sizeof(s_last_text), transcription);
     APP_LOG(APP_LOG_LEVEL_DEBUG, "Processed request as: %p", s_last_text);
     pms_handle_request();
-
   } else {
-
     static char s_failed_buff[128];
     snprintf(s_failed_buff, sizeof(s_failed_buff), "Transcription failed.\n\nError ID:\n%d", (int)status);
     APP_LOG(APP_LOG_LEVEL_ERROR, "Transcription failed: %s", s_failed_buff);
     text_layer_set_text(s_text_layer, "\n\nPress Up to \nAdd a Show\n\n\n\nPress Down to\nAdd a Movie");
   }
 }
-
-
 
 static void pms_select_click_handler(ClickRecognizerRef recognizer, void *context) {
   switch (mode) {
@@ -312,7 +290,6 @@ static void pms_select_click_handler(ClickRecognizerRef recognizer, void *contex
     case MENU:
       APP_LOG(APP_LOG_LEVEL_ERROR, "Click Handler Error");
       break;
-
   }
 }
 
@@ -337,7 +314,6 @@ static void pms_click_config_provider(void *context) {
 static void pms_window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(s_window);
   s_bounds = layer_get_bounds(window_layer);
-
   s_text_layer = text_layer_create(s_bounds);
   text_layer_set_overflow_mode(s_text_layer, GTextOverflowModeWordWrap);
   text_layer_set_background_color(s_text_layer, GColorBlack);
@@ -380,7 +356,6 @@ static void pms_deinit(void) {
 int main(void) {
   pms_init();
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Done initializing, pushed window: %p", s_window);
-
   app_event_loop();
   pms_deinit();
 }
