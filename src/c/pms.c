@@ -46,17 +46,15 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
   const int16_t cell_height = 44;
   return cell_height;
 }
+static void pms_click_config_provider();
+static void pms_send_choice(int choice) {
 
-static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "SELECTED!");
-  
   DictionaryIterator *out_iter;
   AppMessageResult result = app_message_outbox_begin(&out_iter);
   if (result == APP_MSG_OK) {
-    s_pms_choice = (void*)(int)cell_index->row;
     
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "%d", (int)cell_index->row);
-    dict_write_int(out_iter, MESSAGE_KEY_PMS_CHOICE, s_pms_choice, sizeof(int), true);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "%d", choice);
+    dict_write_int(out_iter, MESSAGE_KEY_PMS_CHOICE, &choice, sizeof(int), true);
     result = app_message_outbox_send();
     if(result != APP_MSG_OK) {
       APP_LOG(APP_LOG_LEVEL_ERROR, "Error sending outbox message");
@@ -66,6 +64,18 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
     APP_LOG(APP_LOG_LEVEL_ERROR, "outbox unreachable");
     return;
   }
+
+  Layer *window_layer = window_get_root_layer(s_window); 
+  layer_remove_from_parent(menu_layer_get_layer(s_menu_layer));
+
+  layer_add_child(window_layer, text_layer_get_layer(s_text_layer));
+  
+  window_set_click_config_provider(s_window, pms_click_config_provider);
+}
+
+static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "SELECTED!");
+  pms_send_choice((int)cell_index->row);
 }
 
 
@@ -73,7 +83,7 @@ static void initialize_menu() {
 
   Layer *window_layer = window_get_root_layer(s_window); 
   layer_remove_from_parent(text_layer_get_layer(s_text_layer));
-  text_layer_destroy(s_text_layer);
+//  text_layer_destroy(s_text_layer);
   s_menu_layer = menu_layer_create(s_bounds);
   menu_layer_set_click_config_onto_window(s_menu_layer, s_window);
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
