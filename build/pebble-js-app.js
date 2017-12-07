@@ -89,16 +89,19 @@
 	var sonarr_api_key;// = Clay.getItemByMessageKey('SONARR_API');
 	var sonarr_port;// = Clay.getItemByMessageKey('SONARR_PORT');
 	var sonarr_search_string = '/api/series/lookup?term=';
+	var sonarr_add_string = '/api/series'
 	var sonarr_postfix;// = '&apikey=' + sonarr_api_key;
 	var pms_service;
 	var pms_request_type;
 	var pms_request_url;
+	var pms_add_url;
 	var pms_request;
 	var request_type_string;
 	var method;
 	var pms_items;
 	var pms_tvdbids = {};
 	var pms_choice;
+	var json;
 	//function InitializeDefaults() {
 	//  server_base_url = clay.getItemByMessageKey('SERVER_URL');
 	//  sonarr_api_key = clay.getItemByMessageKey('SONARR_API');
@@ -106,6 +109,35 @@
 	//  sonarr_postfix = '&apikey=' + sonarr_api_key;
 	//}
 	
+	function AddSeries(request) {
+	  var serverrequest = new XMLHttpRequest();
+	    method = 'POST';
+	    pms_add_url = server_base_url + sonarr_port + sonarr_add_string + sonarr_postfix;
+	
+	    console.log(JSON.parse(request));
+	    serverrequest.open(method, pms_add_url, true);
+	    serverrequest.onload = function() {
+	      try {
+	        
+	        var reply = JSON.parse(this.responseText);
+		console.log(reply);
+	      } catch(err) {
+	        console.log('Unable to parse JSON response: ' + err);
+	      };
+	    
+	    
+	    } 
+	    serverrequest.onerror = function() {
+	      try {
+	        var reply = JSON.parse(this.responseText);
+	        console.log(reply);
+	      } catch(err) {
+	        console.log('Unable to parse JSON Error Message: %s', err);
+	        }
+	    }
+	    console.log('sending request');
+	    serverrequest.send(request);
+	  }
 	
 	
 	function BuildURL() {
@@ -139,27 +171,35 @@
 	  for (var x = 0; x <= 8; x++) {
 	
 	    var key = messageKeys.PMS_RESPONSE + x;
-	    if (x <= json.length) {
+	    if (x < json.length) {
 	      var object = json[x]
 	      dict[key] = object.title;
 	      console.log(object.title);
 	      Pebble.sendAppMessage(dict);
 	      pms_tvdbids[x] = object.tvdbId;
+	      console.log(pms_tvdbids[x]);
 	    }
-	    if (x > json.length) {  
+	    else if (x >= json.length) {  
 	
-	      console.log('sent last item');
-	      Pebble.sendAppMessage({'PMS_RESPONSE_SENT':1});
 	      pms_items = x
-	      return; 
+	      break; 
 	    }
 	  }
+	
+	  console.log('sent last item');
+	  Pebble.sendAppMessage({'PMS_RESPONSE_SENT':1});
 	}
 	
 	function PmsAddShow(choice) {
 	  console.log('pms_choice = ' + pms_choice);
 	  
 	  console.log(pms_tvdbids[pms_choice]);
+	  var searchresult = json[pms_choice];
+	  var request = JSON.stringify({"tvdbId": searchresult.tvdbId, "title": searchresult.title, "qualityProfileId": searchresult.qualityProfileId, "titleSlug": searchresult.titleSlug, "images": searchresult.images, "seasons": searchresult.seasons, "rootFolderPath": "/ldm/TV/", "addOptions": {"monitored": true}}, null, "\t");
+	
+	  console.log(JSON.parse(request));
+	  console.log(request);
+	  AddSeries(request);
 	}
 	
 	function SendServerRequest() {
@@ -170,8 +210,9 @@
 	    request.onload = function() {
 	      try {
 	        
-	        var json = JSON.parse(this.responseText);
+	        json = JSON.parse(this.responseText);
 		console.log(json);
+	        pms_request_type = 'ADD';
 	        ProcessServerResponse(json);
 	      } catch(err) {
 	        console.log('Unable to parse JSON response: ' + err);
@@ -181,7 +222,7 @@
 	    } 
 	    request.onerror = function() {
 	      try {
-	        var json = JSON.parse(this.responseText);
+	        json = JSON.parse(this.responseText);
 	        console.log(json);
 	      } catch(err) {
 	        console.log('Unable to parse JSON Error Message: %s', err);
@@ -205,6 +246,7 @@
 	    console.log('dict.PMS_CHOICE= ' + dict.PMS_CHOICE);
 	    pms_choice=dict.PMS_CHOICE;
 	    PmsAddShow(pms_choice);
+	    dict.PMS_CHOICE = undefined;
 	    return;
 	  }
 	  if (dict.PMS_REQUEST) {

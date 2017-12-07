@@ -12,7 +12,7 @@ static char s_pms_base_url[PERSIST_DATA_MAX_LENGTH];
 static char s_pms_sonarr_port[PERSIST_DATA_MAX_LENGTH];
 static AppTimer *s_timeout_timer;
 static int s_pms_response_index;
-static char *s_pms_response[8];
+static char s_pms_response[8][16];
 static int s_pms_response_items;
 static MenuLayer *s_menu_layer;
 static GRect s_bounds;
@@ -23,30 +23,48 @@ enum modes {
 	SONARR,
 	RADARR,
 	MENU,
+	PROCESS,
 };
 
 enum modes mode;
 
 
 //*********************************************************************************************
+
+static void pms_click_config_provider();
+
 static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) {
   const uint16_t numrows = s_pms_response_items;
   return numrows;
 }
 
 static void draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_index, void *context) {
-  static char s_buff[24];
-  for(int x = 0; x < s_pms_response_items; x++) {
-    snprintf(s_buff, sizeof(s_buff), "%s", s_pms_response[x]);
+  static char s_buff[16];
+    snprintf(s_buff, sizeof(s_buff), "%s", s_pms_response[(int)cell_index->row]);
     menu_cell_basic_draw(ctx, cell_layer, s_buff, NULL, NULL);
-  }
 }
 
 static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   const int16_t cell_height = 44;
   return cell_height;
 }
-static void pms_click_config_provider();
+
+static void pms_init_result(int choice) {
+  Layer *window_layer = window_get_root_layer(s_window); 
+  layer_remove_from_parent(menu_layer_get_layer(s_menu_layer));
+  s_text_layer = text_layer_create(s_bounds);
+  layer_add_child(window_layer, text_layer_get_layer(s_text_layer));
+  text_layer_set_overflow_mode(s_text_layer, GTextOverflowModeWordWrap);
+  text_layer_set_background_color(s_text_layer, GColorBlack);
+  text_layer_set_text_color(s_text_layer, GColorGreen);
+  char result[52];
+  snprintf(result, sizeof(result), "Adding %s to your media library", s_pms_response[choice]);
+  menu_layer_destroy(s_menu_layer);
+  text_layer_set_text(s_text_layer, result);
+  window_set_click_config_provider(s_window, pms_click_config_provider);
+  mode = PROCESS;
+}
+
 static void pms_send_choice(int choice) {
   DictionaryIterator *out_iter;
   AppMessageResult result = app_message_outbox_begin(&out_iter);
@@ -62,11 +80,9 @@ static void pms_send_choice(int choice) {
     APP_LOG(APP_LOG_LEVEL_ERROR, "outbox unreachable");
     return;
   }
-  Layer *window_layer = window_get_root_layer(s_window); 
-  layer_remove_from_parent(menu_layer_get_layer(s_menu_layer));
-  layer_add_child(window_layer, text_layer_get_layer(s_text_layer));
-  window_set_click_config_provider(s_window, pms_click_config_provider);
+pms_init_result(choice);
 }
+
 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "SELECTED!");
@@ -77,7 +93,7 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 static void initialize_menu() {
   Layer *window_layer = window_get_root_layer(s_window); 
   layer_remove_from_parent(text_layer_get_layer(s_text_layer));
-//  text_layer_destroy(s_text_layer);
+  text_layer_destroy(s_text_layer);
   s_menu_layer = menu_layer_create(s_bounds);
   menu_layer_set_click_config_onto_window(s_menu_layer, s_window);
   menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) {
@@ -121,25 +137,25 @@ static void read_stored_values() {
 }
 
 static void inbox_received_callback(DictionaryIterator *iter, void *context) {  
-
-  Tuple *ready_tuple = dict_find(iter, MESSAGE_KEY_JSReady);
-  if(ready_tuple) {
-    s_js_ready = true;
-    s_pms_response_index = 0;
-    read_stored_values();
-    return;
+  if (!s_js_ready) {
+    Tuple *ready_tuple = dict_find(iter, MESSAGE_KEY_JSReady);
+    if(ready_tuple) {
+      s_js_ready = true;
+      s_pms_response_index = 0;
+      read_stored_values();
+      return;
+    }
   }
-
-  if (!mode = MENU) { 
+//  if (`mode == MENU) { 
     Tuple *server_response = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE + s_pms_response_index);
     if (server_response) {
-      s_pms_response[s_pms_response_index] = server_response->value->cstring;
-      APP_LOG(APP_LOG_LEVEL_DEBUG, "received response: %s", s_pms_response[s_pms_response_index]);
+      strcpy(s_pms_response[s_pms_response_index], server_response->value->cstring);
+      APP_LOG(APP_LOG_LEVEL_DEBUG, s_pms_response[s_pms_response_index]);
       s_pms_response_index ++;
       if(s_pms_response_index > 8) {
       }
     }
-    Tuple *response_sent = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE);
+    Tuple *response_sent = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE_SENT);
     if (response_sent) {
       s_pms_response_items = s_pms_response_index;
       s_pms_response_index = 0;
@@ -147,28 +163,29 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
       initialize_menu();
       return;
     }
+  //}
+
+  Tuple *server_url = dict_find(iter, MESSAGE_KEY_SERVER_URL);
+  if(server_url) {
+    strcpy(s_pms_base_url, server_url->value->cstring);
+    persist_write_string(MESSAGE_KEY_SERVER_URL, s_pms_base_url);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "server url is set to %s", s_pms_base_url);
+  }
+  Tuple *sonarr_port = dict_find(iter, MESSAGE_KEY_SONARR_PORT);
+  if(sonarr_port) {
+    strcpy(s_pms_sonarr_port, sonarr_port->value->cstring);
+    persist_write_string(MESSAGE_KEY_SONARR_PORT, s_pms_sonarr_port);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "sonarr port is set to %s", s_pms_sonarr_port);
+  }
+
+  Tuple *sonarr_api = dict_find(iter, MESSAGE_KEY_SONARR_API);
+  if (sonarr_api) {
+    strcpy(s_pms_sonarr_api_key, sonarr_api->value->cstring);
+    persist_write_string(MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "sonarr api key set to %s", s_pms_sonarr_api_key);
   }
 
   if(!persist_read_bool(MESSAGE_KEY_PMS_IS_CONFIGURED)) {
-    Tuple *server_url = dict_find(iter, MESSAGE_KEY_SERVER_URL);
-    if(server_url) {
-      strcpy(s_pms_base_url, server_url->value->cstring);
-      persist_write_string(MESSAGE_KEY_SERVER_URL, s_pms_base_url);
-      APP_LOG(APP_LOG_LEVEL_DEBUG, "server url is set to %s", s_pms_base_url);
-    }
-    Tuple *sonarr_port = dict_find(iter, MESSAGE_KEY_SONARR_PORT);
-    if(sonarr_port) {
-      strcpy(s_pms_sonarr_port, sonarr_port->value->cstring);
-      persist_write_string(MESSAGE_KEY_SONARR_PORT, s_pms_sonarr_port);
-      APP_LOG(APP_LOG_LEVEL_DEBUG, "sonarr port is set to %s", s_pms_sonarr_port);
-    }
-  
-    Tuple *sonarr_api = dict_find(iter, MESSAGE_KEY_SONARR_API);
-    if (sonarr_api) {
-      strcpy(s_pms_sonarr_api_key, sonarr_api->value->cstring);
-      persist_write_string(MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key);
-      APP_LOG(APP_LOG_LEVEL_DEBUG, "sonarr api key set to %s", s_pms_sonarr_api_key);
-    }
     pms_verify_setup();
     APP_LOG(APP_LOG_LEVEL_DEBUG, "attempting to verify setup");
     return;
@@ -252,6 +269,8 @@ static void pms_initialize_request() {
           break;
         case MENU:
 	  break;
+        case PROCESS:
+          break;
       } 
       app_message_outbox_send();
     }
@@ -289,6 +308,8 @@ static void pms_select_click_handler(ClickRecognizerRef recognizer, void *contex
       break;      
     case MENU:
       APP_LOG(APP_LOG_LEVEL_ERROR, "Click Handler Error");
+      break;
+    case PROCESS:
       break;
   }
 }
@@ -332,6 +353,7 @@ static void pms_window_unload(Window *window) {
 }
 static void pms_init(void) {
   persist_write_bool(MESSAGE_KEY_PMS_IS_CONFIGURED, false);
+  s_js_ready = false;
   s_window = window_create();
   window_set_click_config_provider(s_window, pms_click_config_provider);
   window_set_window_handlers(s_window, (WindowHandlers) {
@@ -347,6 +369,7 @@ static void pms_init(void) {
   const int inbox_size = 512;
   const int outbox_size = 512;
   app_message_open(inbox_size, outbox_size);
+  s_response_sent = false;
 }
 
 static void pms_deinit(void) {
