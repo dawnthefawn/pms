@@ -11,6 +11,7 @@ var sonarr_port;// = Clay.getItemByMessageKey('SONARR_PORT');
 var sonarr_search_string = '/api/series/lookup?term=';
 var sonarr_add_string = '/api/series'
 var sonarr_postfix;// = '&apikey=' + sonarr_api_key;
+var sonarr_search_postfix;
 var pms_service;
 var pms_request_type;
 var pms_request_url;
@@ -32,15 +33,15 @@ var json;
 function AddSeries(request) {
   var serverrequest = new XMLHttpRequest();
     method = 'POST';
-    pms_add_url = server_base_url + sonarr_port + sonarr_add_string + sonarr_postfix;
-
+    pms_add_url = server_base_url + sonarr_port + sonarr_add_string + sonarr_search_postfix;
+    console.log(pms_add_url);
     console.log(JSON.parse(request));
     serverrequest.open(method, pms_add_url, true);
     serverrequest.onload = function() {
       try {
         
         var reply = JSON.parse(this.responseText);
-	console.log(reply);
+	console.log(this.responseText);
       } catch(err) {
         console.log('Unable to parse JSON response: ' + err);
       };
@@ -115,7 +116,7 @@ function PmsAddShow(choice) {
   
   console.log(pms_tvdbids[pms_choice]);
   var searchresult = json[pms_choice];
-  var request = JSON.stringify({"tvdbId": searchresult.tvdbId, "title": searchresult.title, "qualityProfileId": searchresult.qualityProfileId, "titleSlug": searchresult.titleSlug, "images": searchresult.images, "seasons": searchresult.seasons, "rootFolderPath": "/ldm/TV/", "addOptions": {"monitored": true}}, null, "\t");
+  var request = JSON.stringify({"tvdbId": searchresult.tvdbId, "title": searchresult.title, "qualityProfileId": 1, "titleSlug": searchresult.titleSlug, "images": searchresult.images, "seasons": searchresult.seasons, "rootFolderPath": "/ldm/TV/"}, null, "\t");
 
   console.log(JSON.parse(request));
   console.log(request);
@@ -202,6 +203,7 @@ Pebble.addEventListener('appmessage', function(message) {
   if (dict.SONARR_PORT) {
     sonarr_port = dict.SONARR_PORT;   
     sonarr_postfix = '&apikey=' + sonarr_api_key;
+    sonarr_search_postfix = '?apikey=' + sonarr_api_key;
     console.log('set sonarr port as: ' + sonarr_port);
   }
 });
