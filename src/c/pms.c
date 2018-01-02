@@ -10,6 +10,8 @@ static bool s_js_ready;
 static char s_pms_sonarr_api_key[PERSIST_DATA_MAX_LENGTH];
 static char s_pms_base_url[PERSIST_DATA_MAX_LENGTH]; 
 static char s_pms_sonarr_port[PERSIST_DATA_MAX_LENGTH];
+static char s_pms_radarr_api_key[PERSIST_DATA_MAX_LENGTH];
+static char s_pms_radarr_port[PERSIST_DATA_MAX_LENGTH];
 static AppTimer *s_timeout_timer;
 static int s_pms_response_index;
 static char s_pms_response[8][16];
@@ -38,6 +40,13 @@ static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_in
   return numrows;
 }
 
+static void timeout_timer_handler(void *context) {
+  if (s_timeout_timer) {
+    app_timer_cancel(s_timeout_timer); 
+    s_timeout_timer = NULL;
+  }
+}
+
 static void draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_index, void *context) {
   static char s_buff[16];
     snprintf(s_buff, sizeof(s_buff), "%s", s_pms_response[(int)cell_index->row]);
@@ -49,46 +58,80 @@ static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex 
   return cell_height;
 }
 
-static void pms_init_result(int choice) {
-  Layer *window_layer = window_get_root_layer(s_window); 
-  layer_remove_from_parent(menu_layer_get_layer(s_menu_layer));
+static void pms_handle_request() {
+  if (s_js_ready == true) {
+    DictionaryIterator *out_iter;
+    AppMessageResult result = app_message_outbox_begin(&out_iter);
+    if (result == APP_MSG_OK) {
+      dict_write_cstring(out_iter, MESSAGE_KEY_PMS_REQUEST, s_last_text);
+      app_message_outbox_send();
+    }
+  }
+  const int interval = 5000;
+  s_timeout_timer = app_timer_register(interval, timeout_timer_handler, NULL); 
+  if (s_timeout_timer) {
+    s_timeout_timer = NULL;
+  }
+}
+
+static void dictation_session_callback(DictationSession *session, DictationSessionStatus status, char *transcription, void *context) {
+  if(status == DictationSessionStatusSuccess) {
+    snprintf(s_last_text, sizeof(s_last_text), transcription);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Processed request as: %p", s_last_text);
+    pms_handle_request();
+  } else {
+    static char s_failed_buff[128];
+    snprintf(s_failed_buff, sizeof(s_failed_buff), "Transcription failed.\n\nError ID:\n%d", (int)status);
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Transcription failed: %s", s_failed_buff);
+    text_layer_set_text(s_text_layer, "\n\nPress Up to \nAdd a Show\n\n\n\nPress Down to\nAdd a Movie");
+  }
+}
+static void pms_init_cards() {
+  Layer *window_layer = window_get_root_layer(s_window);
+  s_bounds = layer_get_bounds(window_layer);
   s_text_layer = text_layer_create(s_bounds);
-  layer_add_child(window_layer, text_layer_get_layer(s_text_layer));
   text_layer_set_overflow_mode(s_text_layer, GTextOverflowModeWordWrap);
   text_layer_set_background_color(s_text_layer, GColorBlack);
   text_layer_set_text_color(s_text_layer, GColorGreen);
-  char result[52];
-  snprintf(result, sizeof(result), "Adding %s to your media library", s_pms_response[choice]);
+  text_layer_set_text(s_text_layer, "\n\nPress Up to \nAdd a Show\n\n\n\nPress Down to\nAdd a Movie");
+  text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);
+  layer_add_child(window_layer, text_layer_get_layer(s_text_layer));
+  s_dictation_session = dictation_session_create(sizeof(s_last_text), dictation_session_callback, NULL);
+  mode = NONE;
+}
+
+static void deinitialize_menu() {
+  Layer *window_layer = window_get_root_layer(s_window);
+  layer_remove_from_parent(menu_layer_get_layer(s_menu_layer));
   menu_layer_destroy(s_menu_layer);
-  text_layer_set_text(s_text_layer, result);
-  window_set_click_config_provider(s_window, pms_click_config_provider);
-  mode = PROCESS;
+  pms_init_cards();
 }
 
 static void pms_send_choice(int choice) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "sending choice: %d", choice);
   DictionaryIterator *out_iter;
   AppMessageResult result = app_message_outbox_begin(&out_iter);
   if (result == APP_MSG_OK) {
     APP_LOG(APP_LOG_LEVEL_DEBUG, "%d", choice);
     dict_write_int(out_iter, MESSAGE_KEY_PMS_CHOICE, &choice, sizeof(int), true);
+    dict_write_cstring(out_iter, MESSAGE_KEY_PMS_REQUEST, NULL);
     result = app_message_outbox_send();
     if(result != APP_MSG_OK) {
       APP_LOG(APP_LOG_LEVEL_ERROR, "Error sending outbox message");
         return;
+    } else {
+      deinitialize_menu(); 
     }
   } else {
     APP_LOG(APP_LOG_LEVEL_ERROR, "outbox unreachable");
     return;
   }
-pms_init_result(choice);
 }
-
 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "SELECTED!");
-  pms_send_choice((int)cell_index->row);
+  pms_send_choice((int)cell_index->row + 1);
 }
-
 
 static void initialize_menu() {
   Layer *window_layer = window_get_root_layer(s_window); 
@@ -107,6 +150,27 @@ static void initialize_menu() {
   mode= MENU;
 }
 
+//static void pms_init_result(int choice) {
+//  Layer *window_layer = window_get_root_layer(s_window); 
+//  layer_remove_from_parent(menu_layer_get_layer(s_menu_layer));
+//  menu_layer_destroy(s_menu_layer);
+//  s_text_layer = text_layer_create(s_bounds);
+//  layer_add_child(window_layer, text_layer_get_layer(s_text_layer));
+//  text_layer_set_overflow_mode(s_text_layer, GTextOverflowModeWordWrap);
+//  text_layer_set_background_color(s_text_layer, GColorBlack);
+//  text_layer_set_text_color(s_text_layer, GColorGreen);
+//  char result[52];
+//  snprintf(result, sizeof(result), "Adding %s to your media library", s_pms_response[choice]);
+//  text_layer_set_text(s_text_layer, result);
+//  window_set_click_config_provider(s_window, pms_click_config_provider);
+//  mode = PROCESS;
+//}
+
+
+
+
+
+
 static void pms_verify_setup() {
   DictionaryIterator *out_iter;
   AppMessageResult result = app_message_outbox_begin(&out_iter);
@@ -114,6 +178,8 @@ static void pms_verify_setup() {
     dict_write_cstring(out_iter, MESSAGE_KEY_SERVER_URL, s_pms_base_url);
     dict_write_cstring(out_iter, MESSAGE_KEY_SONARR_PORT, s_pms_sonarr_port);
     dict_write_cstring(out_iter, MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key);
+    dict_write_cstring(out_iter, MESSAGE_KEY_RADARR_PORT, s_pms_radarr_port);
+    dict_write_cstring(out_iter, MESSAGE_KEY_RADARR_API, s_pms_radarr_api_key);
     result = app_message_outbox_send();
     if(result != APP_MSG_OK) {
       APP_LOG(APP_LOG_LEVEL_ERROR, "Error sending outbox message");
@@ -133,6 +199,11 @@ static void read_stored_values() {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "stored sonarr port: %s", s_pms_sonarr_port);
   persist_read_string(MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key, 34);
   APP_LOG(APP_LOG_LEVEL_DEBUG, "stored sonarr api: %s", s_pms_sonarr_api_key);
+  persist_read_string(MESSAGE_KEY_RADARR_PORT, s_pms_radarr_port, 7);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "stored radarr port: %s", s_pms_radarr_port);
+  persist_read_string(MESSAGE_KEY_RADARR_API, s_pms_radarr_api_key, 34);
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "stored radarr api: %s", s_pms_radarr_api_key);
+
   pms_verify_setup();
 }
 
@@ -145,6 +216,7 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
       read_stored_values();
       return;
     }
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "inbox_callback_received");
   }
 //  if (`mode == MENU) { 
     Tuple *server_response = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE + s_pms_response_index);
@@ -161,7 +233,7 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
       s_pms_response_index = 0;
       APP_LOG(APP_LOG_LEVEL_DEBUG, "Received All Items");
       initialize_menu();
-      return;
+
     }
   //}
 
@@ -184,7 +256,18 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
     persist_write_string(MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key);
     APP_LOG(APP_LOG_LEVEL_DEBUG, "sonarr api key set to %s", s_pms_sonarr_api_key);
   }
-
+  Tuple *radarr_api = dict_find(iter, MESSAGE_KEY_RADARR_API);
+  if (radarr_api) {
+    strcpy(s_pms_radarr_api_key, radarr_api->value->cstring);
+    persist_write_string(MESSAGE_KEY_RADARR_API, s_pms_radarr_api_key);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "radarr api key set to %s", s_pms_radarr_api_key);
+  }
+  Tuple *radarr_port = dict_find(iter, MESSAGE_KEY_RADARR_PORT);
+  if (radarr_port) {
+    strcpy(s_pms_radarr_port, radarr_port->value->cstring);
+    persist_write_string(MESSAGE_KEY_RADARR_PORT, s_pms_radarr_port);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "radarr port set to %s", s_pms_radarr_port);
+  }
   if(!persist_read_bool(MESSAGE_KEY_PMS_IS_CONFIGURED)) {
     pms_verify_setup();
     APP_LOG(APP_LOG_LEVEL_DEBUG, "attempting to verify setup");
@@ -208,49 +291,8 @@ static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
   }
 }
 
-//static char* transcription_process() {
-//  int j = 0;
-//  static char output[512];
-//  APP_LOG(APP_LOG_LEVEL_DEBUG, "transcription_process(): s_last_text = %s", s_last_text); 
-//  for (int i = 0; s_last_text[i] != '\0'; i++) {
-//    if (s_last_text[i] != ' ') {output[j] = s_last_text[i]; }
-//    if (s_last_text[i] == ' ') {
-//    output[j] = '%';
-//    j++;
-//    output[j] = '2';
-//    j++;
-//    output[j] = '0';
-//    }
-//    j++;
-//  }
-//  APP_LOG(APP_LOG_LEVEL_DEBUG, "output = %s", output);
-//  return output;
-//}
 
 
-static void timeout_timer_handler(void *context) {
-  if (s_timeout_timer) {
-    app_timer_cancel(s_timeout_timer); 
-    s_timeout_timer = NULL;
-  }
-}
-
-
-static void pms_handle_request() {
-  if (s_js_ready == true) {
-    DictionaryIterator *out_iter;
-    AppMessageResult result = app_message_outbox_begin(&out_iter);
-    if (result == APP_MSG_OK) {
-      dict_write_cstring(out_iter, MESSAGE_KEY_PMS_REQUEST, s_last_text);
-      app_message_outbox_send();
-    }
-  }
-  const int interval = 5000;
-  s_timeout_timer = app_timer_register(interval, timeout_timer_handler, NULL); 
-  if (s_timeout_timer) {
-    s_timeout_timer = NULL;
-  }
-}
 
 static void pms_initialize_request() {
   if (s_js_ready == true) {
@@ -260,6 +302,7 @@ static void pms_initialize_request() {
       int value = 1;
       switch (mode) {
         case NONE:
+          return;
           break;
         case SONARR:
           dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_SONARR, &value, sizeof(int), true);
@@ -268,8 +311,10 @@ static void pms_initialize_request() {
           dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_RADARR, &value, sizeof(int), true);
           break;
         case MENU:
+          return;
 	  break;
         case PROCESS:
+          return;
           break;
       } 
       app_message_outbox_send();
@@ -282,22 +327,11 @@ static void pms_initialize_request() {
   }
 }
 
-static void dictation_session_callback(DictationSession *session, DictationSessionStatus status, char *transcription, void *context) {
-  if(status == DictationSessionStatusSuccess) {
-    snprintf(s_last_text, sizeof(s_last_text), transcription);
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Processed request as: %p", s_last_text);
-    pms_handle_request();
-  } else {
-    static char s_failed_buff[128];
-    snprintf(s_failed_buff, sizeof(s_failed_buff), "Transcription failed.\n\nError ID:\n%d", (int)status);
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Transcription failed: %s", s_failed_buff);
-    text_layer_set_text(s_text_layer, "\n\nPress Up to \nAdd a Show\n\n\n\nPress Down to\nAdd a Movie");
-  }
-}
 
 static void pms_select_click_handler(ClickRecognizerRef recognizer, void *context) {
   switch (mode) {
     case NONE:
+      return;
       break;
     case SONARR:
       s_transcription_header = "\n\nSearching Show:\n\n%s";
@@ -305,25 +339,76 @@ static void pms_select_click_handler(ClickRecognizerRef recognizer, void *contex
       break;
     case RADARR:
       s_transcription_header = "\n\nSearching Movie:\n\n%s";
+      dictation_session_start(s_dictation_session);
       break;      
     case MENU:
       APP_LOG(APP_LOG_LEVEL_ERROR, "Click Handler Error");
+      return;
       break;
     case PROCESS:
+      return;
       break;
   }
 }
 
 static void pms_up_click_handler(ClickRecognizerRef recognizer, void *context) {
-  text_layer_set_text(s_text_layer, "\n\n\n\n\nShow:\nPress Select to Dictate");
-  mode = SONARR;
-  pms_initialize_request();
+  switch (mode) {
+    case NONE:
+      text_layer_set_text(s_text_layer, "\n\n\n\n\nShow:\nPress Select to Dictate");
+      mode = SONARR;
+      pms_initialize_request();
+      return;
+      break;
+    case SONARR:
+      pms_initialize_request();
+      return;
+      break;
+    case RADARR:
+      
+      text_layer_set_text(s_text_layer, "\n\n\n\n\nShow:\nPress Select to Dictate");
+      mode = SONARR;
+      pms_initialize_request();
+      return;
+      break;
+    case MENU:
+
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Click Handler Error");
+      return;
+      break;
+    case PROCESS:
+      return;
+      break;
+  }
 }
 
 static void pms_down_click_handler(ClickRecognizerRef recognizer, void *context) {
-  text_layer_set_text(s_text_layer, "\n\n\n\n\nMovie:\nPress Select to Dictate");
-  mode = RADARR;
-  pms_initialize_request();
+
+  switch (mode) {
+    case NONE:
+
+      text_layer_set_text(s_text_layer, "\n\n\n\n\nMovie:\nPress Select to Dictate");
+      mode = RADARR;
+      pms_initialize_request();
+      return;
+      break;
+    case SONARR:
+      text_layer_set_text(s_text_layer, "\n\n\n\n\nMovie:\nPress Select to Dictate");
+      mode = RADARR;
+      pms_initialize_request();
+      return;
+      break;
+    case RADARR:
+      pms_initialize_request();
+      return;
+      break;
+    case MENU:
+      APP_LOG(APP_LOG_LEVEL_ERROR, "Click Handler Error");
+      return;
+      break;
+    case PROCESS:
+      return;
+      break;
+  }
 }
 
 static void pms_click_config_provider(void *context) {
@@ -332,18 +417,10 @@ static void pms_click_config_provider(void *context) {
   window_single_click_subscribe(BUTTON_ID_DOWN, pms_down_click_handler);
 }
 
+
+
 static void pms_window_load(Window *window) {
-  Layer *window_layer = window_get_root_layer(s_window);
-  s_bounds = layer_get_bounds(window_layer);
-  s_text_layer = text_layer_create(s_bounds);
-  text_layer_set_overflow_mode(s_text_layer, GTextOverflowModeWordWrap);
-  text_layer_set_background_color(s_text_layer, GColorBlack);
-  text_layer_set_text_color(s_text_layer, GColorGreen);
-  text_layer_set_text(s_text_layer, "\n\nPress Up to \nAdd a Show\n\n\n\nPress Down to\nAdd a Movie");
-  text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);
-  layer_add_child(window_layer, text_layer_get_layer(s_text_layer));
-  s_dictation_session = dictation_session_create(sizeof(s_last_text), dictation_session_callback, NULL);
-  mode = NONE;
+  pms_init_cards();
 }
 
 static void pms_window_unload(Window *window) {

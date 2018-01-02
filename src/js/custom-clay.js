@@ -20,4 +20,7 @@ var request = new XMLHttpRequest();
   clayConfig.getItemByMessageKey('SONARR_PORT').enable();
   clayConfig.getItemByMessageKey('SONARR_API').enable;
 
+  clayConfig.getItemByMessageKey('RADARR_PORT').enable;
+
+  clayConfig.getItemByMessageKey('RADARR_API').enable;
 }
