@@ -14,12 +14,12 @@ static char s_pms_radarr_api_key[PERSIST_DATA_MAX_LENGTH];
 static char s_pms_radarr_port[PERSIST_DATA_MAX_LENGTH];
 static AppTimer *s_timeout_timer;
 static int s_pms_response_index;
-static char s_pms_response[8][16];
+static char s_pms_response[8][20];
 static int s_pms_response_items;
 static MenuLayer *s_menu_layer;
 static GRect s_bounds;
 static bool *s_response_sent;
-static int *s_pms_choice;
+
 enum modes {
 	NONE,
 	SONARR,
@@ -56,6 +56,11 @@ static void draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuIndex 
 static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) {
   const int16_t cell_height = 44;
   return cell_height;
+}
+
+static void pms_deinit(void) {
+  window_destroy(s_window);
+  window_stack_pop_all(true);
 }
 
 static void pms_handle_request() {
@@ -96,12 +101,17 @@ static void pms_init_cards() {
   text_layer_set_text(s_text_layer, "\n\nPress Up to \nAdd a Show\n\n\n\nPress Down to\nAdd a Movie");
   text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(s_text_layer));
+  window_set_click_config_provider(s_window, pms_click_config_provider);
   s_dictation_session = dictation_session_create(sizeof(s_last_text), dictation_session_callback, NULL);
   mode = NONE;
 }
 
+static void pms_deinit_cards() {
+  text_layer_destroy(s_text_layer);
+  dictation_session_destroy(s_dictation_session);
+}
+
 static void deinitialize_menu() {
-  Layer *window_layer = window_get_root_layer(s_window);
   layer_remove_from_parent(menu_layer_get_layer(s_menu_layer));
   menu_layer_destroy(s_menu_layer);
   pms_init_cards();
@@ -150,26 +160,6 @@ static void initialize_menu() {
   mode= MENU;
 }
 
-//static void pms_init_result(int choice) {
-//  Layer *window_layer = window_get_root_layer(s_window); 
-//  layer_remove_from_parent(menu_layer_get_layer(s_menu_layer));
-//  menu_layer_destroy(s_menu_layer);
-//  s_text_layer = text_layer_create(s_bounds);
-//  layer_add_child(window_layer, text_layer_get_layer(s_text_layer));
-//  text_layer_set_overflow_mode(s_text_layer, GTextOverflowModeWordWrap);
-//  text_layer_set_background_color(s_text_layer, GColorBlack);
-//  text_layer_set_text_color(s_text_layer, GColorGreen);
-//  char result[52];
-//  snprintf(result, sizeof(result), "Adding %s to your media library", s_pms_response[choice]);
-//  text_layer_set_text(s_text_layer, result);
-//  window_set_click_config_provider(s_window, pms_click_config_provider);
-//  mode = PROCESS;
-//}
-
-
-
-
-
 
 static void pms_verify_setup() {
   DictionaryIterator *out_iter;
@@ -207,6 +197,34 @@ static void read_stored_values() {
   pms_verify_setup();
 }
 
+static void pms_error_response_handler(char *error_message) {
+  vibes_long_pulse();
+  switch (mode) {
+    case NONE:
+      text_layer_set_text(s_text_layer, error_message);
+      return;
+      break;
+    case SONARR: 
+      text_layer_set_text(s_text_layer, error_message);
+      return;
+      break;
+    case RADARR:
+      text_layer_set_text(s_text_layer, error_message);
+      return;
+      break;
+    case MENU:
+      mode = NONE;
+      deinitialize_menu();
+      return;
+      break;
+    case PROCESS:
+      mode = NONE;
+      deinitialize_menu();
+      return;
+      break;
+  }
+}
+
 static void inbox_received_callback(DictionaryIterator *iter, void *context) {  
   if (!s_js_ready) {
     Tuple *ready_tuple = dict_find(iter, MESSAGE_KEY_JSReady);
@@ -217,6 +235,17 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
       return;
     }
     APP_LOG(APP_LOG_LEVEL_DEBUG, "inbox_callback_received");
+  }
+  Tuple *pms_error = dict_find(iter, MESSAGE_KEY_PMS_ERROR);
+  if (pms_error) {
+    pms_error_response_handler(pms_error->value->cstring);
+    return;
+  }
+  Tuple *pms_success = dict_find(iter, MESSAGE_KEY_PMS_SUCCESS);
+  if(pms_success) {
+    vibes_double_pulse(); 
+    mode = NONE;
+    return;
   }
 //  if (`mode == MENU) { 
     Tuple *server_response = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE + s_pms_response_index);
@@ -411,6 +440,31 @@ static void pms_down_click_handler(ClickRecognizerRef recognizer, void *context)
   }
 }
 
+static void pms_back_click_handler(ClickRecognizerRef recognizer, void *context) {
+  switch (mode) {
+    case NONE:
+      pms_deinit_cards();
+      pms_deinit();
+      break;
+    case SONARR:
+      pms_deinit_cards();
+      pms_deinit();
+      break;
+    case RADARR:
+      pms_deinit_cards();
+      pms_deinit();
+      break;
+    case MENU:
+      deinitialize_menu();
+      mode = NONE;
+      pms_init_cards();
+      break;
+    case PROCESS:
+      break;
+   
+  }
+} 
+
 static void pms_click_config_provider(void *context) {
   window_single_click_subscribe(BUTTON_ID_SELECT, pms_select_click_handler);
   window_single_click_subscribe(BUTTON_ID_UP, pms_up_click_handler);
@@ -449,9 +503,6 @@ static void pms_init(void) {
   s_response_sent = false;
 }
 
-static void pms_deinit(void) {
-  window_destroy(s_window);
-}
 
 int main(void) {
   pms_init();

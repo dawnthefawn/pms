@@ -31,14 +31,8 @@ var pms_items;
 var pms_tvdbids = {};
 var pms_choice;
 var json;
-//function InitializeDefaults() {
-//  server_base_url = clay.getItemByMessageKey('SERVER_URL');
-//  sonarr_api_key = clay.getItemByMessageKey('SONARR_API');
-//  sonarr_port = clay.getItemByMessageKey('SONARR_PORT');
-//  sonarr_search_postfix = '&apikey=' + sonarr_api_key;
-//}
 
-function AddMedia(request) {
+function AddMedia(request, choice) {
   console.log('AddMedia(): request = ' + request);
   var serverrequest = new XMLHttpRequest();
     pms_request_type = 'ADD';
@@ -51,9 +45,15 @@ function AddMedia(request) {
         try {
           
           var reply = JSON.parse(this.responseText);
-  	  console.log(this.responseText);
+  	  console.log(reply);
+	  if (reply.title == json[choice].title) {
+	    Pebble.sendAppMessage({'PMS_SUCCESS': 1});
+          } else {
+            Pebble.sendAppMessage({'PMS_ERROR': 'Item Added is not Item Selected'});
+          } 
         } catch(err) {
           console.log('Unable to parse JSON response: ' + err);
+          Pebble.sendAppMessage({'PMS_ERROR': 'Failed to parse server response'});
           return false;
         };
       
@@ -63,9 +63,11 @@ function AddMedia(request) {
         try {
           var reply = JSON.parse(this.responseText);
           console.log(reply);
+          Pebble.sendAppMessage({'PMS_ERROR': reply});
           return false;
         } catch(err) {
           console.log('Unable to parse JSON Error Message: ', err);
+          Pebble.sendAppMessage({'PMS_ERROR': 'Failed to parse error message'});
           return false;
           }
       }
@@ -83,7 +85,7 @@ function AddMedia(request) {
 function BuildURL() {
   console.log ('BuildURL(): pms_service = ' + pms_service + '; pms_request_type = ' + pms_request_type + ';');
   if (pms_service == 'SONARR') {
-    port = sonarr_port;
+    port = ':' + sonarr_port;
     api_key = sonarr_api_key;
     if (pms_request_type == 'ADD') {
       request_type_string = sonarr_add_string;
@@ -102,7 +104,7 @@ function BuildURL() {
     }
   }
   else if (pms_service == 'RADARR') {
-    port = radarr_port;
+    port = ':' + radarr_port;
     api_key = radarr_api_key;
 
     if (pms_request_type == 'ADD') {
@@ -129,29 +131,24 @@ function BuildURL() {
 }
 
 function ProcessServerResponse(dict, x) {
-//  var dict = {};
- // for (var x = 0; x <= 8; x++) {
 
     var key = messageKeys.PMS_RESPONSE + x;
     if (x < json.length) {
       var object = json[x];
       dict[key] = object.title;
-      console.log(object.title);
-      Pebble.sendAppMessage(dict);
-//      pms_tvdbids[x] = object.tvdbId;
-//      console.log(pms_tvdbids[x]);
-    }
-    else if (x >= json.length) {  
-
-      pms_items = x;
-    }
-    if (x <= 8) {
-      x = x + 1;
-      ProcessServerResponse(dict, x);
-    }
-    else {
-      console.log('sent last item');
-      Pebble.sendAppMessage({'PMS_RESPONSE_SENT':1});
+      Pebble.sendAppMessage(dict, function() {
+        
+        if (x <= 8) {
+          x = x + 1;
+          ProcessServerResponse(dict, x);
+        }
+        if (x >= json.length) {
+          pms_items = x;
+          console.log('sent last item');
+          Pebble.sendAppMessage({'PMS_RESPONSE_SENT':1});
+          return
+        }
+      });
     }
 }
 
@@ -176,7 +173,7 @@ function PmsBuildRequest(choice) {
   
 
   console.log(request);
-  if (AddMedia(request) == true) {
+  if (AddMedia(request, choice) == true) {
     return true;
   }
   else { 
@@ -194,7 +191,6 @@ function SendServerRequest() {
       try {
         
         json = JSON.parse(this.responseText);
-	console.log(this.responseText);
         pms_request_type = 'ADD';
         ProcessServerResponse({}, 0);
       } catch(err) {
@@ -223,8 +219,7 @@ function SendServerRequest() {
 Pebble.addEventListener('ready', function(e) {
      console.log('PebbleKit JS ready!');
      Pebble.sendAppMessage({'JSReady': 1});
-     //InitializeDefaults();
-   } );  // Listen for when an AppMessage is received Pebble.addEventListener('appmessage',   function(e) {     console.log('AppMessage received!');   } );
+   } );  
 
 Pebble.addEventListener('appmessage', function(message) {
   var dict = message.payload;

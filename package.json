@@ -36,7 +36,9 @@
       "PMS_IS_CONFIGURED",
       "PMS_RESPONSE[8]",
       "PMS_RESPONSE_SENT",
-      "PMS_CHOICE"
+      "PMS_CHOICE",
+      "PMS_SUCCESS",
+      "PMS_ERROR"
     ],
     "resources": {
       "media": []
