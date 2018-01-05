@@ -40,8 +40,65 @@ int get_mode()
 	return s_mode;
 }
 
-bool set_mode(enum modes mode)
+bool set_mode(int mode)
 {
 	s_mode = mode;
 	return true;
 }
+
+char strSonarrAPIKey()
+{
+	return s_pms_sonarr_api_key;
+}
+
+char strRadarrAPIKey()
+{
+	return s_pms_radarr_api_key;
+}
+
+char strSonarrPort() 
+{
+	return s_pms_sonarr_port;
+}
+
+char strRadarrPort()
+{
+	return s_pms_radarr_port;
+}
+
+char strBaseURL()
+{
+	return s_pms_base_url;
+}
+
+bool blnSonarrAPIKey_Set(char *sonarr_api)
+{
+	s_pms_sonarr_api_key = sonarr_api;
+	return true;
+}
+
+bool blnRadarrAPIKey_Set(char *radarr_api)
+{
+	s_pms_radarr_api_key = radarr_api;
+	return true;
+}
+
+bool blnSonarrPort_Set(char *sonarr_port)
+{
+	s_pms_sonarr_port = sonarr_port;
+	return true;
+}
+
+bool blnRadarrPort_Set(char *radarr_port)
+{
+	s_pms_radarr_port = radarr_port;
+	return true;
+}
+
+bool blnBaseURL_Set(char *base_url)
+{
+	s_pms_base_url = base_url;
+	return true;
+}
+
+

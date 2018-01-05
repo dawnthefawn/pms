@@ -1,13 +1,13 @@
-# project  configured on Tue Jan  2 23:47:50 2018 by
-# waf 1.7.11 (abi 98, python 2070cf0 on linux2)
+# project  configured on Fri Jan  5 23:12:10 2018 by
+# waf 1.7.11 (abi 98, python 2070ef0 on linux2)
 # using /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/waf configure
 #
 ----------------------------------------
 Setting top to
-/home/dawn/pebble-dev/pebble-sdk-4.5-linux64/pms
+/home/dawn/pebble-dev/pms
 ----------------------------------------
 Setting out to
-/home/dawn/pebble-dev/pebble-sdk-4.5-linux64/pms/build
+/home/dawn/pebble-dev/pms/build
 ----------------------------------------
 Checking for program webpack
 /home/dawn/.pebble-sdk/SDKs/current/node_modules/.bin/webpack
@@ -19,40 +19,4 @@ Found Pebble SDK for diorite in:
 Checking for program gcc,cc
 arm-none-eabi-gcc
 find program=['gcc', 'cc'] paths='' var='CC' -> 'arm-none-eabi-gcc'
-----------------------------------------
-Checking for program ar
-arm-none-eabi-ar
-find program=['ar'] paths='' var='AR' -> 'arm-none-eabi-ar'
-----------------------------------------
-Found Pebble SDK for chalk in:
-/home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/chalk
-----------------------------------------
-Checking for program gcc,cc
-arm-none-eabi-gcc
-find program=['gcc', 'cc'] paths='' var='CC' -> 'arm-none-eabi-gcc'
-----------------------------------------
-Checking for program ar
-arm-none-eabi-ar
-find program=['ar'] paths='' var='AR' -> 'arm-none-eabi-ar'
-----------------------------------------
-Found Pebble SDK for basalt in:
-/home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/basalt
-----------------------------------------
-Checking for program gcc,cc
-arm-none-eabi-gcc
-find program=['gcc', 'cc'] paths='' var='CC' -> 'arm-none-eabi-gcc'
-----------------------------------------
-Checking for program ar
-arm-none-eabi-ar
-find program=['ar'] paths='' var='AR' -> 'arm-none-eabi-ar'
-----------------------------------------
-Found Pebble SDK for aplite in:
-/home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite
-----------------------------------------
-Checking for program gcc,cc
-arm-none-eabi-gcc
-find program=['gcc', 'cc'] paths='' var='CC' -> 'arm-none-eabi-gcc'
-----------------------------------------
-Checking for program ar
-arm-none-eabi-ar
-find program=['ar'] paths='' var='AR' -> 'arm-none-eabi-ar'
+from /home/dawn/pebble-dev/pms: Could not determine the compiler version ['arm-none-eabi-gcc', '-dM', '-E', '-']

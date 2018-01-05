@@ -123,19 +123,40 @@ static void pms_error_response_handler(char *error_message)
 }
 
 
-static void pms_initialize_request(enum s_modes s_mode) 
-{
-	if (s_js_ready == true) 
+//static void pms_initialize_request(int mode) 
+//{
+//	static enum modes s_request_mode;
+//	s_request_mode = mode;
+//	if (s_js_ready == true) 
+//	{
+//		DictionaryIterator *out_iter;
+//		AppMessageResult result = app_message_outbox_begin(&out_iter);
+//		if (result == APP_MSG_OK) 
+//		{
+//			app_message_outbox_send();
+//		}
+//		const int interval = 1000;
+//		s_timeout_timer = app_timer_register(interval, timeout_timer_handler, NULL); 
+//	}
+//	if (s_timeout_timer) 
+//	{
+//		s_timeout_timer = NULL;
+//	}
+//}
+
+static bool pms_request_handler(int choice) 
+{   
+	enum modes mode = get_mode();	
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "sending choice: %d", choice);
+	DictionaryIterator *out_iter;
+	AppMessageResult result = app_message_outbox_begin(&out_iter);
+	if (result == APP_MSG_OK) 
 	{
-		DictionaryIterator *out_iter;
-		AppMessageResult result = app_message_outbox_begin(&out_iter);
-		if (result == APP_MSG_OK) 
-		{
 			int value = 1;
-			switch (s_mode) 
+			switch (mode) 
 			{
 				case NONE:
-					return;
+					return false;
 					break;
 				case SONARR:
 					dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_SONARR, &value, sizeof(int), true);
@@ -144,68 +165,79 @@ static void pms_initialize_request(enum s_modes s_mode)
 					dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_RADARR, &value, sizeof(int), true);
 					break;
 				case DICTATION:
+					return false;
+					break;
+				case MENU:
+					dict_write_int(out_iter, MESSAGE_KEY_PMS_CHOICE, &choice, sizeof(int), true);
+					dict_write_cstring(out_iter, MESSAGE_KEY_PMS_REQUEST, NULL);
+					return false;
+					break;
+				case PROCESS:
+					return false;
+					break;
+			} 
+		APP_LOG(APP_LOG_LEVEL_DEBUG, "%d", choice);
+		result = app_message_outbox_send();
+		if(result != APP_MSG_OK) 
+		{
+			APP_LOG(APP_LOG_LEVEL_ERROR, "Error sending outbox message");
+			return false;
+		} else 
+		{
+			switch (mode) 
+			{
+				case NONE:
+					return;
+					break;
+				case SONARR:
+					break;
+				case RADARR:
+					break;
+				case DICTATION:
 					return;
 					break;
 				case MENU:
-					return;
+					deinitialize_menu(); 
+					return true;
 					break;
 				case PROCESS:
 					return;
 					break;
 			} 
-			app_message_outbox_send();
-		}
-		const int interval = 1000;
-		s_timeout_timer = app_timer_register(interval, timeout_timer_handler, NULL); 
-	}
-	if (s_timeout_timer) 
-	{
-		s_timeout_timer = NULL;
-	}
-}
-
-static void pms_send_choice(int choice) 
-{
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "sending choice: %d", choice);
-	DictionaryIterator *out_iter;
-	AppMessageResult result = app_message_outbox_begin(&out_iter);
-	if (result == APP_MSG_OK) 
-	{
-		APP_LOG(APP_LOG_LEVEL_DEBUG, "%d", choice);
-		dict_write_int(out_iter, MESSAGE_KEY_PMS_CHOICE, &choice, sizeof(int), true);
-		dict_write_cstring(out_iter, MESSAGE_KEY_PMS_REQUEST, NULL);
-		result = app_message_outbox_send();
-		if(result != APP_MSG_OK) 
-		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Error sending outbox message");
-			return;
-		} else 
-		{
-			deinitialize_menu(); 
 		}
 	} else 
 	{
 		APP_LOG(APP_LOG_LEVEL_ERROR, "outbox unreachable");
-		return;
+		return false;
 	}
+	return false;
 }
 
-bool blnRunRoutines(enum s_modes s_mode) 
+//bool blnRunRoutines(enum s_modes s_mode) 
+//{
+//	switch (s_mode) 
+//	{
+//		case NONE:
+//			break;
+//		case SONARR:
+//			break;
+//		case RADARR:
+//			break;
+//		case DICTATION:
+//			break;
+//		case MENU:
+//			break;
+//		case PROCESS:
+//			break;
+//	}
+//}
+
+bool blnSendChoice(int choice) 
 {
-	switch (s_mode) 
-	{
-		case NONE:
-			break;
-		case SONARR:
-			break;
-		case RADARR:
-			break;
-		case DICTATION:
-			
-			break;
-		case MENU:
-			break;
-		case PROCESS:
-			break;
-	}
+	return pms_send_choice(choice);
+}
+
+bool blnInitializeRequestHandler(int choice)
+{
+	return pms_request_handler(choice);
 }

@@ -30,6 +30,7 @@ bool blnRunRoutines();
 int get_pms_response_items();
 int get_mode();
 bool set_mode();
+bool blnSendChoice();
 
 static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) 
 {
@@ -75,12 +76,12 @@ static void pms_deinit(void)
 static void dictation_session_callback(DictationSession *session, DictationSessionStatus status, char *transcription, void *context) 
 {
 	if(status == DictationSessionStatusSuccess) 
-{
+	{
 		snprintf(s_last_text, sizeof(s_last_text), transcription);
 		APP_LOG(APP_LOG_LEVEL_DEBUG, "Processed request as: %p", s_last_text);
 		pms_handle_request();
 	} else 
-{
+	{
 		static char s_failed_buff[128];
 		snprintf(s_failed_buff, sizeof(s_failed_buff), "Transcription failed.\n\nError ID:\n%d", (int)status);
 		APP_LOG(APP_LOG_LEVEL_ERROR, "Transcription failed: %s", s_failed_buff);
@@ -120,7 +121,7 @@ static void initialize_menu()
 	s_menu_layer = menu_layer_create(s_bounds);
 	menu_layer_set_click_config_onto_window(s_menu_layer, s_window);
 	menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) 
-{
+			{
 			.get_num_rows = get_num_rows_callback,
 			.draw_row = draw_row_callback,
 			.get_cell_height = get_cell_height_callback,
@@ -134,7 +135,7 @@ static void initialize_menu()
 static void pms_select_click_handler(ClickRecognizerRef recognizer, void *context) 
 {
 	switch (mode) 
-{
+	{
 		case NONE:
 			return;
 			break;
@@ -162,7 +163,7 @@ static void pms_select_click_handler(ClickRecognizerRef recognizer, void *contex
 static void pms_up_click_handler(ClickRecognizerRef recognizer, void *context) 
 {
 	switch (mode) 
-{
+	{
 		case NONE:
 			text_layer_set_text(s_text_layer, "\n\n\n\n\nShow:\nPress Select to Dictate");
 			mode = SONARR;
@@ -174,7 +175,6 @@ static void pms_up_click_handler(ClickRecognizerRef recognizer, void *context)
 			return;
 			break;
 		case RADARR:
-
 			text_layer_set_text(s_text_layer, "\n\n\n\n\nShow:\nPress Select to Dictate");
 			mode = SONARR;
 			pms_initialize_request();
@@ -184,7 +184,6 @@ static void pms_up_click_handler(ClickRecognizerRef recognizer, void *context)
 			return;
 			break;
 		case MENU:
-
 			APP_LOG(APP_LOG_LEVEL_ERROR, "Click Handler Error");
 			return;
 			break;
@@ -196,20 +195,17 @@ static void pms_up_click_handler(ClickRecognizerRef recognizer, void *context)
 
 static void pms_down_click_handler(ClickRecognizerRef recognizer, void *context) 
 {
-
 	switch (mode) 
-{
+	{
 		case NONE:
 
-			text_layer_set_text(s_text_layer, "\n\n\n\n\nMovie:\nPress Select to Dictate");
-			mode = RADARR;
-			pms_initialize_request();
+			//pms_initialize_request();
 			return;
 			break;
 		case SONARR:
 			text_layer_set_text(s_text_layer, "\n\n\n\n\nMovie:\nPress Select to Dictate");
 			mode = RADARR;
-			pms_initialize_request();
+			blnInitializeRequestHandler(NULL, mode);
 			return;
 			break;
 		case RADARR:
@@ -226,7 +222,7 @@ static void pms_down_click_handler(ClickRecognizerRef recognizer, void *context)
 		case PROCESS:
 			return;
 			break;
-}
+	}
 }
 
 static void pms_back_click_handler(ClickRecognizerRef recognizer, void *context) 
@@ -246,7 +242,6 @@ static void pms_back_click_handler(ClickRecognizerRef recognizer, void *context)
 			pms_deinit();
 		case DICTATION:
 			return;
-			break;
 			break;
 		case MENU:
 			deinitialize_menu();
@@ -279,6 +274,7 @@ static void pms_window_unload(Window *window)
 	dictation_session_destroy(s_dictation_session);
 	menu_layer_destroy(s_menu_layer);
 }
+
 static void pms_init(void) 
 {
 	persist_write_bool(MESSAGE_KEY_PMS_IS_CONFIGURED, false);
@@ -311,11 +307,17 @@ static void pms_deinit_cards()
 }
 
 
-
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) 
 {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "SELECTED!");
-	pms_send_choice((int)cell_index->row + 1);
+	if (blnSendChoice((int)cell_index->row + 1) == false 
+	{
+    	APP_LOG(APP_LOG_LEVEL_ERROR, "blnSendChoice returned false.");
+	}	
+	else 
+	{
+		APP_LOG(APP_LOG_LEVEL_DEBUG, "Successfully sent request index %d", (int)cell_index->row + 1);
+	}
 }
 
 
