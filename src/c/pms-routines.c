@@ -1,126 +1,136 @@
-#include <pebble.h>
-#include <stdio.h>
-#include <string.h>
-
+#include "pms-data.c"
 static AppTimer *s_timeout_timer;
-
 
 
 //**************************************************************************************
 
-void cancel_timer() 
+static bool bool_cancel_timer() 
 {
 	if (s_timeout_timer) 
 	{
 		app_timer_cancel(s_timeout_timer); 
 		s_timeout_timer = NULL;
+		return true;
 	}
+	return false;
 }
 
 static void timeout_timer_handler(void *context) 
 {
-	cancel_timer();
+	if (!bool_cancel_timer())
+	{
+		APP_LOG(APP_LOG_LEVEL_ERROR, "bool_cancel_timer failed: %s", context);
+	}
+}
+
+static void inbox_dropped_callback(AppMessageResult reason, void *context) 
+{
+	APP_LOG(APP_LOG_LEVEL_ERROR, "Message dropped! "); 
+}  
+
+static void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context) 
+{
+	APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox send failed!"); 
+	if (!bool_cancel_timer())
+	{
+		APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to cancel timer");
+	}
+}  
+
+
+static void outbox_sent_callback(DictionaryIterator *iterator, void *context) 
+{
+	APP_LOG(APP_LOG_LEVEL_INFO, "Outbox send success!");
+}
+
+static uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, void *context) 
+{
+	const uint16_t numrows = int_get_pms_response_items();
+	return numrows;
+}
+
+static void draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_index, void *context) 
+{
+	static char s_buff[16];
+	snprintf(s_buff, sizeof(s_buff), "%d", str_response_at_index((int)cell_index->row));
+	menu_cell_basic_draw(ctx, cell_layer, s_buff, NULL, NULL);
+}
+
+static int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) 
+{
+	const int16_t cell_height = 44;
+	return cell_height;
 }
 
 
-static void pms_handle_request() 
+
+static bool pms_handle_request() 
 {
-	if (s_js_ready == true) 
+	if (bool_get_js_ready()) 
 	{
 		DictionaryIterator *out_iter;
 		AppMessageResult result = app_message_outbox_begin(&out_iter);
 		if (result == APP_MSG_OK) 
 		{
-			dict_write_cstring(out_iter, MESSAGE_KEY_PMS_REQUEST, s_last_text);
-			app_message_outbox_send();
+			dict_write_cstring(out_iter, MESSAGE_KEY_PMS_REQUEST, str_get_last_text());
+			result = app_message_outbox_send();
+			if (result)
+			{
+				const int interval = 5000;
+				s_timeout_timer = app_timer_register(interval, timeout_timer_handler, NULL); 
+				return true;
+			}
+			else
+			{
+				APP_LOG(APP_LOG_LEVEL_ERROR, "Sending message failed: pms_handle_request();");
+			}
 		}
+		else
+		{
+
+			APP_LOG(APP_LOG_LEVEL_ERROR, "pms_handle_request() unable to open message outbox");
+		}
+
 	}
-	const int interval = 5000;
-	s_timeout_timer = app_timer_register(interval, timeout_timer_handler, NULL); 
-	if (s_timeout_timer) 
-	{
-		s_timeout_timer = NULL;
-	}
+//	if (s_timeout_timer) 
+//	{
+//		s_timeout_timer = NULL;
+//	}
+	return false;
 }
 
 
-static void pms_verify_setup() 
+static bool pms_verify_setup() 
 {
 	DictionaryIterator *out_iter;
 	AppMessageResult result = app_message_outbox_begin(&out_iter);
 	if (result == APP_MSG_OK) 
 	{
-		dict_write_cstring(out_iter, MESSAGE_KEY_SERVER_URL, s_pms_base_url);
-		dict_write_cstring(out_iter, MESSAGE_KEY_SONARR_PORT, s_pms_sonarr_port);
-		dict_write_cstring(out_iter, MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key);
-		dict_write_cstring(out_iter, MESSAGE_KEY_RADARR_PORT, s_pms_radarr_port);
-		dict_write_cstring(out_iter, MESSAGE_KEY_RADARR_API, s_pms_radarr_api_key);
+		dict_write_cstring(out_iter, MESSAGE_KEY_SERVER_URL, str_base_url());
+		dict_write_cstring(out_iter, MESSAGE_KEY_SONARR_PORT, str_sonarr_port());
+		dict_write_cstring(out_iter, MESSAGE_KEY_SONARR_API, str_sonarr_api_key());
+		dict_write_cstring(out_iter, MESSAGE_KEY_RADARR_PORT, str_radarr_port());
+		dict_write_cstring(out_iter, MESSAGE_KEY_RADARR_API, str_radarr_api_key());
 		result = app_message_outbox_send();
 		if(result != APP_MSG_OK) 
 		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Error sending outbox message");
-			return;
+			persist_write_bool(MESSAGE_KEY_PMS_IS_CONFIGURED, true);
+			return true;
+
 		}
-	} else 
+		else
+		{
+			APP_LOG(APP_LOG_LEVEL_ERROR, "pms_verify_setup(): Error sending outbox message");
+		}
+	} 
+	else 
 	{
-		APP_LOG(APP_LOG_LEVEL_ERROR, "outbox unreachable");
-		return;
+		APP_LOG(APP_LOG_LEVEL_ERROR, "pms_verify_setup(); outbox unreachable");
 	}
-	persist_write_bool(MESSAGE_KEY_PMS_IS_CONFIGURED, true);
+	return false;
 }
 
-static void read_stored_values() 
-{
-	persist_read_string(MESSAGE_KEY_SERVER_URL, s_pms_base_url, 256);
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored url: %s", s_pms_base_url);
-	persist_read_string(MESSAGE_KEY_SONARR_PORT, s_pms_sonarr_port, 7);
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored sonarr port: %s", s_pms_sonarr_port);
-	persist_read_string(MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key, 34);
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored sonarr api: %s", s_pms_sonarr_api_key);
-	persist_read_string(MESSAGE_KEY_RADARR_PORT, s_pms_radarr_port, 7);
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored radarr port: %s", s_pms_radarr_port);
-	persist_read_string(MESSAGE_KEY_RADARR_API, s_pms_radarr_api_key, 34);
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored radarr api: %s", s_pms_radarr_api_key);
 
-	pms_verify_setup();
-}
-
-static void pms_error_response_handler(char *error_message) 
-{
-	vibes_long_pulse();
-	switch (s_mode) 
-	{
-		case NONE:
-			text_layer_set_text(s_text_layer, error_message);
-			return;
-			break;
-		case SONARR: 
-			text_layer_set_text(s_text_layer, error_message);
-			return;
-			break;
-		case RADARR:
-			text_layer_set_text(s_text_layer, error_message);
-			return;
-			break;
-		case DICTATION:
-			return;
-			break;
-
-		case DICTATION:
-			return;
-			break;
-		case MENU:
-			s_mode = NONE;
-			deinitialize_menu();
-			return;
-			break;
-		case PROCESS:
-			s_mode = NONE;
-			deinitialize_menu();
-			return;
-			break;
-	}
-}
 
 
 //static void pms_initialize_request(int mode) 
@@ -146,8 +156,8 @@ static void pms_error_response_handler(char *error_message)
 
 static bool pms_request_handler(int choice) 
 {   
-	enum modes mode = get_mode();	
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "sending choice: %d", choice);
+	enum modes mode = int_get_mode();	
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "handling request: %d", choice);
 	DictionaryIterator *out_iter;
 	AppMessageResult result = app_message_outbox_begin(&out_iter);
 	if (result == APP_MSG_OK) 
@@ -170,7 +180,6 @@ static bool pms_request_handler(int choice)
 				case MENU:
 					dict_write_int(out_iter, MESSAGE_KEY_PMS_CHOICE, &choice, sizeof(int), true);
 					dict_write_cstring(out_iter, MESSAGE_KEY_PMS_REQUEST, NULL);
-					return false;
 					break;
 				case PROCESS:
 					return false;
@@ -187,21 +196,22 @@ static bool pms_request_handler(int choice)
 			switch (mode) 
 			{
 				case NONE:
-					return;
+					return false;
 					break;
-				case SONARR:
+				case SONARR: 
+					return true;
 					break;
 				case RADARR:
+					return true;
 					break;
 				case DICTATION:
-					return;
+					return false;
 					break;
 				case MENU:
-					deinitialize_menu(); 
 					return true;
 					break;
 				case PROCESS:
-					return;
+					return false;
 					break;
 			} 
 		}
@@ -232,12 +242,8 @@ static bool pms_request_handler(int choice)
 //	}
 //}
 
-bool blnSendChoice(int choice) 
+bool bool_send_choice(int choice) 
 {
-	return pms_send_choice(choice);
+	return pms_request_handler(choice + 1);
 }
 
-bool blnInitializeRequestHandler(int choice)
-{
-	return pms_request_handler(choice);
-}
