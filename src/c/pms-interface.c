@@ -113,6 +113,11 @@ static void dictation_session_callback(DictationSession *session, DictationSessi
 static bool initialize_menu() 
 {
 	Layer *window_layer = window_get_root_layer(s_window); 
+	if (!window_layer)
+	{
+		APP_LOG(APP_LOG_LEVEL_ERROR, "failed to return window_layer in initialize_menu()");
+		return false;
+	}
 	layer_remove_from_parent(text_layer_get_layer(s_text_layer));
 	text_layer_destroy(s_text_layer);
 	s_menu_layer = menu_layer_create(s_bounds);

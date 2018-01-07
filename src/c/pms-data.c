@@ -100,16 +100,16 @@ bool bool_get_js_ready()
 
 char str_response_at_index(int index)
 {
-	return *s_pms_response[index];
+	return *s_pms_response[index - 1];
 }
 
 bool bool_set_response_at_index(int index, char *response)
 {
 	if (response && index)
 	{
-		strcpy(s_pms_response[index],  response);
+		strcpy(s_pms_response[index - 1],  response);
 		s_pms_response_index = index;
-		APP_LOG(APP_LOG_LEVEL_DEBUG, s_pms_response[s_pms_response_index]);
+		APP_LOG(APP_LOG_LEVEL_DEBUG, s_pms_response[s_pms_response_index - 1]);
 		return true;
 	}
 	APP_LOG(APP_LOG_LEVEL_ERROR, "no response included in bool_set_response_at_index");

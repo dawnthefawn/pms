@@ -40,6 +40,22 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 		}
 		APP_LOG(APP_LOG_LEVEL_DEBUG, "inbox_callback_received");
 	}
+	
+	Tuple *server_response = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE + int_get_response_index() - 1);
+	if (server_response) 
+	{
+		APP_LOG(APP_LOG_LEVEL_DEBUG, "Received Server Response!");
+		if (!bool_set_response_at_index(int_get_response_index(), server_response->value->cstring))
+		{
+			APP_LOG(APP_LOG_LEVEL_ERROR, "Failed bool_set_response_at_index(%d)", int_get_response_index());
+		}
+
+		if(int_get_response_index() > 8) 
+		{
+			APP_LOG(APP_LOG_LEVEL_ERROR, "Over expected bounds for response array.");
+		}
+	}
+
 	Tuple *pms_error = dict_find(iter, MESSAGE_KEY_PMS_ERROR);
 	if (pms_error) 
 	{
@@ -56,20 +72,6 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 		set_mode(NONE);
 		return;
 	}
-	Tuple *server_response = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE + int_get_response_index());
-	if (server_response) 
-	{
-		APP_LOG(APP_LOG_LEVEL_DEBUG, "Received Server Response!");
-		if (!bool_set_response_at_index(int_get_response_index(), server_response->value->cstring))
-		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Failed bool_set_response_at_index(%d)", int_get_response_index() + 1);
-		}
-
-		if(int_get_response_index() > 8) 
-		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Over expected bounds for response array.");
-		}
-	}
 	Tuple *response_sent = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE_SENT);
 	if (response_sent) 
 	{
@@ -83,8 +85,10 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 		}
 		APP_LOG(APP_LOG_LEVEL_DEBUG, "Received All Items");
 
-		menu_initializer();
-
+		if (!menu_initializer())
+		{
+			APP_LOG(APP_LOG_LEVEL_ERROR, "menu_initializer() failed after receiving all items.");
+		}
 	}
 
 	Tuple *server_url = dict_find(iter, MESSAGE_KEY_SERVER_URL);

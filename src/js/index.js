@@ -189,7 +189,7 @@ function SendServerRequest() {
     request.open(method, pms_request_url, true);
     request.onload = function() {
       try {
-        
+       	console.log(this.responseText); 
         json = JSON.parse(this.responseText);
         pms_request_type = 'ADD';
         ProcessServerResponse({}, 0);
