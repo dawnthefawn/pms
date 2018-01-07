@@ -168,7 +168,6 @@ static bool initialize_menu()
 		s_text_layer = NULL;
 	}
 	s_menu_layer = menu_layer_create(s_bounds);
-	menu_layer_set_click_config_onto_window(s_menu_layer, s_window);
 	menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) 
 			{
 			.get_num_rows = get_num_rows_callback,
