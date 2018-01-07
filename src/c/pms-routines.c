@@ -1,12 +1,15 @@
 #ifndef PMS_DATA
 #define PMS_DATA
-#include <pms-data.h>
+#include "pms-data.h"
 #endif
 #ifndef CORE_LIBRARIES_INCLUDED
 #define CORE_LIBRARIES_INCLUDED
-#include <pebble.h>
 #include <stdio.h>
 #include <string.h>
+#endif
+#ifndef PEBBLE_INCLUDED
+#define PEBBLE_INCLUDED
+#include <pebble.h>
 #endif
 
 static AppTimer *s_timeout_timer;
@@ -29,7 +32,7 @@ void timeout_timer_handler(void *context)
 {
 	if (!bool_cancel_timer())
 	{
-		APP_LOG(APP_LOG_LEVEL_ERROR, "bool_cancel_timer failed: %s", context);
+		APP_LOG(APP_LOG_LEVEL_ERROR, "bool_cancel_timer failed");
 	}
 }
 
@@ -74,40 +77,6 @@ int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_i
 
 
 
-//bool pms_handle_request() 
-//{
-//	if (bool_get_js_ready()) 
-//	{
-//		DictionaryIterator *out_iter;
-//		AppMessageResult result = app_message_outbox_begin(&out_iter);
-//		if (result == APP_MSG_OK) 
-//		{
-//			result = app_message_outbox_send();
-//			if (result)
-//			{
-//				const int interval = 5000;
-//				s_timeout_timer = app_timer_register(interval, timeout_timer_handler, NULL); 
-//				return true;
-//			}
-//			else
-//			{
-//				APP_LOG(APP_LOG_LEVEL_ERROR, "Sending message failed: pms_handle_request();");
-//			}
-//		}
-//		else
-//		{
-//
-//			APP_LOG(APP_LOG_LEVEL_ERROR, "pms_handle_request() unable to open message outbox");
-//		}
-//
-//	}
-////	if (s_timeout_timer) 
-////	{
-////		s_timeout_timer = NULL;
-////	}
-//	return false;
-//}
-
 
 bool pms_verify_setup() 
 {
@@ -144,7 +113,6 @@ bool pms_request_handler(int *choice)
 {   
 	if (bool_get_js_ready())
 	{
-		APP_LOG(APP_LOG_LEVEL_DEBUG, "handling request: %d", choice);
 		DictionaryIterator *out_iter;
 		AppMessageResult result = app_message_outbox_begin(&out_iter);
 		if (result == APP_MSG_OK) 
@@ -172,7 +140,6 @@ bool pms_request_handler(int *choice)
 					return false;
 					break;
 			} 
-			APP_LOG(APP_LOG_LEVEL_DEBUG, "%d", choice);
 			result = app_message_outbox_send();
 			if(result != APP_MSG_OK) 
 			{

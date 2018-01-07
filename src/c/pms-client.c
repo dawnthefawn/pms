@@ -1,20 +1,23 @@
 #ifndef PMS_INTERFACE
 #define PMS_INTERFACE
-#include <pms-interface.h>
+#include "pms-interface.h"
 #endif
 #ifndef PMS_ROUTINES
 #define PMS_ROUTINES
-#include <pms-routines.h>
+#include "pms-routines.h"
 #endif
 #ifndef PMS_DATA
 #define PMS_DATA
-#include <pms-data.h>
+#include "pms-data.h"
 #endif
 #ifndef CORE_LIBRARIES_INCLUDED
 #define CORE_LIBRARIES_INCLUDED
-#include <pebble.h>
 #include <stdio.h>
 #include <string.h>
+#endif
+#ifndef PEBBLE_INCLUDED
+#define PEBBLE_INCLUDED
+#include <pebble.h>
 #endif
 
 //**************************************************************************************
@@ -52,7 +55,7 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 		set_mode(NONE);
 		return;
 	}
-	Tuple *server_response = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE + s_pms_response_index);
+	Tuple *server_response = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE + int_get_response_index());
 	if (server_response) 
 	{
 		if (!bool_set_response_at_index(int_get_response_index(), server_response->value->cstring))
@@ -81,7 +84,6 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 		menu_initializer();
 
 	}
-void pms_click_config_provider();
 
 	Tuple *server_url = dict_find(iter, MESSAGE_KEY_SERVER_URL);
 	if(server_url) 
@@ -98,7 +100,6 @@ void pms_click_config_provider();
 		{
 			APP_LOG(APP_LOG_LEVEL_ERROR, "failed to set sonar_port");
 		}
-		APP_LOG(APP_LOG_LEVEL_DEBUG, "sonarr port is set to %s", s_pms_sonarr_port);
 	}
 	
 	Tuple *sonarr_api = dict_find(iter, MESSAGE_KEY_SONARR_API);
@@ -134,8 +135,13 @@ void pms_click_config_provider();
 	return;  
 }
 
-void register_app_message_callbacks()
+bool initialize_client()
 {
+	if (!pms_init())
+	{
+		APP_LOG(APP_LOG_LEVEL_ERROR, "pms_init failed at initialize_client()");
+		return false;
+	}
 	persist_write_bool(MESSAGE_KEY_PMS_IS_CONFIGURED, false);
 	set_js_ready(false);
 	app_message_register_inbox_received(inbox_received_callback);
@@ -146,4 +152,5 @@ void register_app_message_callbacks()
 	const int outbox_size = 512;
 	app_message_open(inbox_size, outbox_size);
 	set_response_sent(false);
+	return true;
 }

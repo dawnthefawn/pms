@@ -1,16 +1,19 @@
 #ifndef PMS_ROUTINES
 #define PMS_ROUTINES
-#include <pms-routines.h>
+#include "pms-routines.h"
 #endif
 #ifndef PMS_DATA
 #define PMS_DATA
-#include <pms-data.h>
+#include "pms-data.h"
 #endif
 #ifndef CORE_LIBRARIES_INCLUDED
 #define CORE_LIBRARIES_INCLUDED
-#include <pebble.h>
 #include <stdio.h>
 #include <string.h>
+#endif
+#ifndef PEBBLE_INCLUDED
+#define PEBBLE_INCLUDED
+#include <pebble.h>
 #endif
 
 static Window *s_window;
@@ -265,6 +268,7 @@ static void pms_click_config_provider(void *context)
 	window_single_click_subscribe(BUTTON_ID_SELECT, pms_select_click_handler);
 	window_single_click_subscribe(BUTTON_ID_UP, pms_up_click_handler);
 	window_single_click_subscribe(BUTTON_ID_DOWN, pms_down_click_handler);
+	window_single_click_subscribe(BUTTON_ID_BACK, pms_back_click_handler);
 }
 
 
@@ -289,8 +293,19 @@ static void pms_window_unload(Window *window)
 static bool pms_init_cards() 
 {
 	Layer *window_layer = window_get_root_layer(s_window);
-	s_bounds = layer_get_bounds(window_layer);
+	if (!window_layer)
+	{
+		APP_LOG(APP_LOG_LEVEL_ERROR, "Error in pms_init_cards(): failed to return window_layer");
+		return false;
+	}
 	s_text_layer = text_layer_create(s_bounds);
+	if (!s_text_layer)
+	{
+
+		APP_LOG(APP_LOG_LEVEL_ERROR, "Error in pms_init_cards(): failed to return s_text_layer");
+		return false;
+	}
+
 	text_layer_set_overflow_mode(s_text_layer, GTextOverflowModeWordWrap);
 	text_layer_set_background_color(s_text_layer, GColorBlack);
 	text_layer_set_text_color(s_text_layer, GColorGreen);
@@ -298,8 +313,13 @@ static bool pms_init_cards()
 	text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);
 	layer_add_child(window_layer, text_layer_get_layer(s_text_layer));
 	window_set_click_config_provider(s_window, pms_click_config_provider);
-	//move back to pms.c
 	 s_dictation_session = dictation_session_create(sizeof(s_last_text), dictation_session_callback, NULL);
+	 if (!s_dictation_session)
+	 {
+
+		APP_LOG(APP_LOG_LEVEL_ERROR, "Error in pms_init_cards(): failed to return s_dictation_session");
+		return false;
+	 }
 	set_mode(NONE); 
 	return true;
 }
@@ -307,16 +327,19 @@ static bool pms_init_cards()
 bool pms_init() 
 {
 	s_window = window_create();
-	window_set_click_config_provider(s_window, pms_click_config_provider);
 	window_set_window_handlers(s_window, (WindowHandlers) 
 			{
 			.load = pms_window_load,
 			.unload = pms_window_unload,
 			});
 	const bool animated = true;
+	if (!pms_init_cards())
+	{
+		APP_LOG(APP_LOG_LEVEL_ERROR, "pms_init_cards() failed during pms_init()");
+		return false;
+	}
 	window_stack_push(s_window, animated);
 	return true;
-
 }
 
 

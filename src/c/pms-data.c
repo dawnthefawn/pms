@@ -1,9 +1,13 @@
 #ifndef CORE_LIBRARIES_INCLUDED
 #define CORE_LIBRARIES_INCLUDED
-#include <pebble.h>
 #include <stdio.h>
 #include <string.h>
 #endif
+#ifndef PEBBLE_INCLUDED
+#define PEBBLE_INCLUDED
+#include <pebble.h>
+#endif
+
 
 static int s_pms_response_index;
 static char s_pms_response[8][20];
