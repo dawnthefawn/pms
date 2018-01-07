@@ -92,20 +92,17 @@ bool pms_verify_setup()
 		result = app_message_outbox_send();
 		if(result != APP_MSG_OK) 
 		{
-			persist_write_bool(MESSAGE_KEY_PMS_IS_CONFIGURED, true);
-			return true;
-
-		}
-		else
-		{
 			APP_LOG(APP_LOG_LEVEL_ERROR, "pms_verify_setup(): Error sending outbox message");
+			return false;
 		}
 	} 
 	else 
 	{
 		APP_LOG(APP_LOG_LEVEL_ERROR, "pms_verify_setup(); outbox unreachable");
+		return false;
 	}
-	return false;
+	persist_write_bool(MESSAGE_KEY_PMS_IS_CONFIGURED, true);
+	return true;
 }
 
 

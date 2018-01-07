@@ -35,8 +35,11 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 				APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_index() failed.");
 			}
 			read_stored_values();
-			pms_verify_setup();
-			return;
+			if (!pms_verify_setup())
+			{
+				APP_LOG(APP_LOG_LEVEL_ERROR, "pms_verify_setup() failed in inbox_received_callback()");
+			 	return;
+			}
 		}
 		APP_LOG(APP_LOG_LEVEL_DEBUG, "inbox_callback_received");
 	}
