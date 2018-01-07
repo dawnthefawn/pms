@@ -37,7 +37,20 @@ enum modes
 static enum modes s_mode;
 
 //****************************************************************************************
-
+bool bool_reset_response_array()
+{
+	int x;
+	for (x = 0; x <= 8; x++)
+	{
+		strcpy(s_pms_response[x], "");
+		if (s_pms_response[x])
+		{
+			APP_LOG(APP_LOG_LEVEL_ERROR, "bool_reset_response_array() failed to clear s_pms_response_index at %d, has %s", x, s_pms_response[x]);
+			return false;
+		}
+	}
+	return true;
+}	
 
 void read_stored_values() 
 {
@@ -45,11 +58,11 @@ void read_stored_values()
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored url: %s", s_pms_base_url);
 	persist_read_string(MESSAGE_KEY_SONARR_PORT, s_pms_sonarr_port, 7);
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored sonarr port: %s", s_pms_sonarr_port);
-	persist_read_string(MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key, 32);
+	persist_read_string(MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key, 33);
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored sonarr api: %s", s_pms_sonarr_api_key);
 	persist_read_string(MESSAGE_KEY_RADARR_PORT, s_pms_radarr_port, 7);
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored radarr port: %s", s_pms_radarr_port);
-	persist_read_string(MESSAGE_KEY_RADARR_API, s_pms_radarr_api_key, 32);
+	persist_read_string(MESSAGE_KEY_RADARR_API, s_pms_radarr_api_key, 33);
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored radarr api: %s", s_pms_radarr_api_key);
 
 //	pms_verify_setup();
@@ -98,57 +111,104 @@ bool bool_get_js_ready()
 	 return s_js_ready;
 }
 
-char str_response_at_index(int index)
+char * str_response_at_index(MenuIndex *cell_index)
 {
-	return *s_pms_response[index - 1];
+	char *response; 
+	if (cell_index)
+	{
+		response = s_pms_response[(int)cell_index->row];
+	}
+	else
+	{
+
+		APP_LOG(APP_LOG_LEVEL_ERROR, "str_response_at_index(): cell_index not provided, unable to process");
+		response = "ERROR";
+	}
+	return response;
 }
 
-bool bool_set_response_at_index(int index, char *response)
+bool bool_set_index(int index, bool reset)
 {
-	if (response && index)
+	if (reset)
 	{
-		strcpy(s_pms_response[index - 1],  response);
-		s_pms_response_index = index;
-		APP_LOG(APP_LOG_LEVEL_DEBUG, s_pms_response[s_pms_response_index - 1]);
+		s_pms_response_index = 0;
 		return true;
 	}
-	APP_LOG(APP_LOG_LEVEL_ERROR, "no response included in bool_set_response_at_index");
-	s_pms_response_index = index;
+	else
+	{
+		if (index)
+		{
+			s_pms_response_index = index - 1;
+			return true;
+		}
+
+	}
 	return false;
 }
 
-
-bool bool_set_index(int index)
-{
-	if (index)
-	{
-		s_pms_response_index = index;
-		return true;
-	}
-
-	else
-	{
-		return false;
-	}
-}
 
 int int_get_response_index() 
 {
 	 return s_pms_response_index;
 }
 
-bool bool_set_response_items(int items)
+bool bool_set_response_at_index(int index, char *response)
 {
-	if (items)
+	if (response)
 	{
-		s_pms_response_items = items + 1;
+		if (index > 8)
+		{
+			APP_LOG(APP_LOG_LEVEL_ERROR, "Index over expexted bounds: %d", index);
+			return false;
+		}
+		
+		if (!(s_pms_response_index == index))
+		{
+			APP_LOG(APP_LOG_LEVEL_ERROR, "Error, provided index was not expected index");
+			char *error = "INDEX ERROR";
+			strcpy(s_pms_response[s_pms_response_index], error);
+			if (s_pms_response_index < index)
+			{
+				if (!bool_set_index(s_pms_response_index + 1, false))
+				{
+					APP_LOG(APP_LOG_LEVEL_ERROR, "failed to increment response index");
+					return false;
+				}
+				return bool_set_response_at_index(int_get_response_index(), response);
+			}
+			else
+			{
+				APP_LOG(APP_LOG_LEVEL_ERROR, "stored index larger than index received in call, fatal error");
+				return false;
+			}
+		}
+		else
+		{	
+		 	APP_LOG(APP_LOG_LEVEL_DEBUG, "Writing response: %s", response);
+			strcpy(s_pms_response[s_pms_response_index],  response);
+			APP_LOG(APP_LOG_LEVEL_DEBUG, s_pms_response[s_pms_response_index]);
+			return true;
+		}
+	}
+		APP_LOG(APP_LOG_LEVEL_ERROR, "no response included in bool_set_response_at_index");
+		return false;
+}
+
+
+bool bool_set_response_items(int items, bool reset)
+{
+	if (reset)
+	{
+		s_pms_response_items = 0;
 		return true;
 	}
-
-	else 
+	if (items)
 	{
-		return false;
+		s_pms_response_items = items - 1;
+		return true;
 	}
+	APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_response_items() received neither items nor reset");
+	return false;
 }
 
 int int_get_pms_response_items() 

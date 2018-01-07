@@ -133,23 +133,35 @@ function BuildURL() {
 function ProcessServerResponse(dict, x) {
 
     var key = messageKeys.PMS_RESPONSE + x;
-    if (x < json.length) {
+    if (x < json.length) 
+	{
       var object = json[x];
       dict[key] = object.title;
+	  console.log(object.title);
+	  Pebble.sendAppMessage({"PMS_RESPONSE_INDEX":x + 1});
       Pebble.sendAppMessage(dict, function() {
         
-        if (x <= 8) {
+        if (x < 7) {
           x = x + 1;
           ProcessServerResponse(dict, x);
+
         }
-        if (x >= json.length) {
-          pms_items = x;
-          console.log('sent last item');
-          Pebble.sendAppMessage({'PMS_RESPONSE_SENT':1});
-          return
-        }
-      });
+		else
+		{
+			pms_items = x;
+	   		console.log('sent last item');
+			Pebble.sendAppMessage({'PMS_RESPONSE_SENT':1, 'PMS_RESPONSE_ITEMS':pms_items + 1});
+			return;
+		}
+	});
     }
+	else 
+	{
+		pms_items = x;
+   		console.log('sent last item');
+		Pebble.sendAppMessage({'PMS_RESPONSE_SENT':1, 'PMS_RESPONSE_ITEMS':pms_items + 1});
+		return;
+	}
 }
 
 function PmsBuildRequest(choice) {
@@ -189,11 +201,11 @@ function SendServerRequest() {
     request.open(method, pms_request_url, true);
     request.onload = function() {
       try {
-       	console.log(this.responseText); 
         json = JSON.parse(this.responseText);
         pms_request_type = 'ADD';
         ProcessServerResponse({}, 0);
       } catch(err) {
+		console.log(this.responseText);
         console.log('Unable to parse JSON response: ' + err);
       };
     
@@ -202,8 +214,8 @@ function SendServerRequest() {
     request.onerror = function() {
       try {
         json = JSON.parse(this.responseText);
-        console.log(this.responseText);
       } catch(err) {
+        console.log(this.responseText);
         console.log('Unable to parse JSON Error Message: ', err);
         }
     }

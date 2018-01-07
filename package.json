@@ -35,6 +35,8 @@
       "PMS_SERVICE_RADARR",
       "PMS_IS_CONFIGURED",
       "PMS_RESPONSE[8]",
+      "PMS_RESPONSE_INDEX",
+      "PMS_RESPONSE_ITEMS",
       "PMS_RESPONSE_SENT",
       "PMS_CHOICE",
       "PMS_SUCCESS",

@@ -65,7 +65,7 @@ uint16_t get_num_rows_callback(MenuLayer *menu_layer, uint16_t section_index, vo
 void draw_row_callback(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_index, void *context) 
 {
 	static char s_buff[16];
-	snprintf(s_buff, sizeof(s_buff), "%d", str_response_at_index((int)cell_index->row));
+	snprintf(s_buff, sizeof(s_buff), "%s", str_response_at_index(cell_index));
 	menu_cell_basic_draw(ctx, cell_layer, s_buff, NULL, NULL);
 }
 
@@ -114,19 +114,20 @@ bool pms_request_handler(int *choice)
 		AppMessageResult result = app_message_outbox_begin(&out_iter);
 		if (result == APP_MSG_OK) 
 		{
-			int value = 1;
+			int yes = 1;
+			int no = 0;
 			switch (int_get_mode()) 
 			{
 				case NONE:
 					return false;
 					break;
 				case SONARR:
-					dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_SONARR, &value, sizeof(int), true);
-					dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_RADARR, &value, sizeof(int), false);
+					dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_SONARR, &yes, sizeof(int), true);
+					dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_RADARR, &no, sizeof(int), true);
 					break;
 				case RADARR:
-					dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_RADARR, &value, sizeof(int), true);
-					dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_SONARR, &value, sizeof(int), false);
+					dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_RADARR, &yes, sizeof(int), true);
+					dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_SONARR, &no, sizeof(int), true);
 					break;
 				case DICTATION:
 					dict_write_cstring(out_iter, MESSAGE_KEY_PMS_REQUEST, str_get_last_text());
@@ -151,7 +152,7 @@ bool pms_request_handler(int *choice)
 				switch (int_get_mode()) 
 				{
 					case NONE:
-						return false;
+						return true;
 						break;
 					case SONARR: 
 						return true;
