@@ -1,6 +1,9 @@
+#ifndef CORE_LIBRARIES_INCLUDED
+#define CORE_LIBRARIES_INCLUDED
 #include <pebble.h>
 #include <stdio.h>
 #include <string.h>
+#endif
 
 static int s_pms_response_index;
 static char s_pms_response[8][20];
@@ -98,7 +101,7 @@ char str_response_at_index(int index)
 
 bool bool_set_response_at_index(int index, char *response)
 {
-	if (response)
+	if (response && index)
 	{
 		strcpy(s_pms_response[index],  response);
 		s_pms_response_index = index;
@@ -154,10 +157,9 @@ int int_get_mode()
 	 return s_mode;
 }
 
-bool bool_set_mode(enum modes mode)
+void set_mode(enum modes mode)
 {
 	s_mode = mode;
-	return true;
 }
 
 char * str_sonarr_api_key()
@@ -187,6 +189,18 @@ char * str_base_url()
 
 bool bool_set_sonarr_api_key(char *sonarr_api)
 {
+	if (!sonarr_api)
+	{
+		APP_LOG(APP_LOG_LEVEL_ERROR, "No sonarr api key provided");
+		return false;
+	}
+	int len = (int)strlen(sonarr_api);
+	if (!(len == 34))	
+	{
+		APP_LOG(APP_LOG_LEVEL_ERROR, "invalid sonarr api key provided");
+		return false;
+	}
+
 	strcpy(s_pms_sonarr_api_key, sonarr_api);
 	persist_write_string(MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key);
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "sonarr api key set to %s", s_pms_sonarr_api_key);
@@ -195,6 +209,18 @@ bool bool_set_sonarr_api_key(char *sonarr_api)
 
 bool bool_set_radarr_api_key(char *radarr_api)
 {
+	if (!radarr_api)
+	{
+		APP_LOG(APP_LOG_LEVEL_ERROR, "No radarr api provided to bool_set_radarr_api_key()");
+		return false;
+	}
+	int len = (int)strlen(radarr_api);
+	if (!(len == 34))
+	{
+		APP_LOG(APP_LOG_LEVEL_ERROR, "invalid radarr API key length.");
+		return false;
+	}
+
 	strcpy(s_pms_radarr_api_key, radarr_api);
 	persist_write_string(MESSAGE_KEY_RADARR_API, s_pms_radarr_api_key);
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "radarr api key set to %s", s_pms_radarr_api_key);
@@ -203,6 +229,11 @@ bool bool_set_radarr_api_key(char *radarr_api)
 
 bool bool_set_sonarr_port(char *sonarr_port)
 {
+	if (!sonarr_port)
+	{
+		APP_LOG(APP_LOG_LEVEL_ERROR, "No sonarr port provided");
+		return false;
+	}
 	strcpy(s_pms_sonarr_port, sonarr_port);
 	persist_write_string(MESSAGE_KEY_SONARR_PORT, s_pms_sonarr_port);
 	return true;
@@ -210,6 +241,12 @@ bool bool_set_sonarr_port(char *sonarr_port)
 
 bool bool_set_radarr_port(char *radarr_port)
 {
+	if (!radarr_port)
+	{
+		APP_LOG(APP_LOG_LEVEL_ERROR, "no radarr port provided");
+		return false;
+	}
+
 	strcpy(s_pms_radarr_port, radarr_port);
 	persist_write_string(MESSAGE_KEY_RADARR_PORT, s_pms_radarr_port);
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "radarr port set to %s", s_pms_radarr_port);

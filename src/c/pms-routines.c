@@ -1,4 +1,14 @@
-#include "pms-data.c"
+#ifndef PMS_DATA
+#define PMS_DATA
+#include <pms-data.h>
+#endif
+#ifndef CORE_LIBRARIES_INCLUDED
+#define CORE_LIBRARIES_INCLUDED
+#include <pebble.h>
+#include <stdio.h>
+#include <string.h>
+#endif
+
 static AppTimer *s_timeout_timer;
 
 

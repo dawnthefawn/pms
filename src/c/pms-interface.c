@@ -1,5 +1,17 @@
-#include "pms-routines.c"
-
+#ifndef PMS_ROUTINES
+#define PMS_ROUTINES
+#include <pms-routines.h>
+#endif
+#ifndef PMS_DATA
+#define PMS_DATA
+#include <pms-data.h>
+#endif
+#ifndef CORE_LIBRARIES_INCLUDED
+#define CORE_LIBRARIES_INCLUDED
+#include <pebble.h>
+#include <stdio.h>
+#include <string.h>
+#endif
 
 static Window *s_window;
 static TextLayer *s_text_layer;
@@ -19,7 +31,7 @@ static bool pms_deinit_cards()
 	return true;
 }
 
-static bool pms_error_response_handler(char *error_message) 
+bool pms_error_response_handler(char *error_message) 
 {
 	vibes_long_pulse();
 	switch (int_get_mode()) 
@@ -40,26 +52,14 @@ static bool pms_error_response_handler(char *error_message)
 			return false;
 			break;
 		case MENU:
-			if (bool_set_mode(NONE))
-			{
-				deinitialize_menu();
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			set_mode(NONE);
+			deinitialize_menu();
+			return true;
 			break;
 		case PROCESS:
-			if (bool_set_mode(NONE))
-			{
-				deinitialize_menu();
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+			set_mode(NONE);
+			deinitialize_menu();
+			return true;
 			break;
 	}
 	APP_LOG(APP_LOG_LEVEL_ERROR, "Mode not found pms_error_response_handler()");
@@ -82,7 +82,7 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 	}
 }
 
-static void pms_deinit(void) 
+void pms_deinit(void) 
 {
 	window_destroy(s_window);
 	window_stack_pop_all(true);
@@ -121,15 +121,8 @@ static bool initialize_menu()
 			});
 	menu_layer_set_click_config_onto_window(s_menu_layer, s_window);
 	layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
-	if (bool_set_mode(MENU))
-	{
-		return true;
-	}
-	else
-	{
-		APP_LOG(APP_LOG_LEVEL_ERROR, "failed to set mode at initialize_menui()");
-		return false;
-	}
+	set_mode(MENU);
+	return true;
 }
 
 static void pms_select_click_handler(ClickRecognizerRef recognizer, void *context) 
@@ -166,10 +159,7 @@ static void pms_up_click_handler(ClickRecognizerRef recognizer, void *context)
 	{
 		case NONE:
 			text_layer_set_text(s_text_layer, "\n\n\n\n\nShow:\nPress Select to Dictate");
-			if (!bool_set_mode(SONARR))
-			{
-				APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_mode() failed in pms_up_click_handler()");
-			}
+			set_mode(SONARR);
 			pms_request_handler(NULL);
 			return;
 			break;
@@ -179,10 +169,7 @@ static void pms_up_click_handler(ClickRecognizerRef recognizer, void *context)
 			break;
 		case RADARR:
 			text_layer_set_text(s_text_layer, "\n\n\n\n\nShow:\nPress Select to Dictate");
-			if (!bool_set_mode(SONARR))
-			{
-				APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_mode() failed in pms_up_click_handler()");
-			}
+			set_mode(SONARR);
 			pms_request_handler(NULL);
 			return;
 			break;
@@ -205,20 +192,13 @@ static void pms_down_click_handler(ClickRecognizerRef recognizer, void *context)
 	{
 		case NONE:
 
-			if (!bool_set_mode(RADARR))
-			{
-				APP_LOG(APP_LOG_LEVEL_ERROR, "failed to set mode in pms_down_click_handler();.");
-			}
+			set_mode(RADARR);
 			pms_request_handler(NULL);
 			return;
 			break;
 		case SONARR:
 			text_layer_set_text(s_text_layer, "\n\n\n\n\nMovie:\nPress Select to Dictate");
-			if (!bool_set_mode(RADARR))
-			{
-				APP_LOG(APP_LOG_LEVEL_ERROR, "failed to set mode in pms_down_click_handler();.");
-			}
-
+			set_mode(RADARR);
 			pms_request_handler(NULL);
 			return;
 			break;
@@ -268,7 +248,7 @@ static void pms_back_click_handler(ClickRecognizerRef recognizer, void *context)
 			break;
 		case MENU:
 			deinitialize_menu();
-			if (!bool_set_mode(NONE))
+			set_mode(NONE);
 			{
 				APP_LOG(APP_LOG_LEVEL_ERROR, "failed to set mode in pms_down_click_handler();.");
 			}
@@ -304,9 +284,8 @@ static void pms_window_unload(Window *window)
 		text_layer_destroy(s_text_layer);
 		dictation_session_destroy(s_dictation_session);
 		menu_layer_destroy(s_menu_layer);
-		return false;
-	}
 }
+
 static bool pms_init_cards() 
 {
 	Layer *window_layer = window_get_root_layer(s_window);
@@ -320,19 +299,13 @@ static bool pms_init_cards()
 	layer_add_child(window_layer, text_layer_get_layer(s_text_layer));
 	window_set_click_config_provider(s_window, pms_click_config_provider);
 	//move back to pms.c
-	//  s_dictation_session = dictation_session_create(sizeof(s_last_text), dictation_session_callback, NULL);
-	if (!bool_set_mode(NONE)) 
-	{
-		APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_mode() failed in pms_init_cards()");
-		return false;
-	}
+	 s_dictation_session = dictation_session_create(sizeof(s_last_text), dictation_session_callback, NULL);
+	set_mode(NONE); 
 	return true;
 }
 
-static bool pms_init() 
+bool pms_init() 
 {
-	persist_write_bool(MESSAGE_KEY_PMS_IS_CONFIGURED, false);
-	set_js_ready(true);
 	s_window = window_create();
 	window_set_click_config_provider(s_window, pms_click_config_provider);
 	window_set_window_handlers(s_window, (WindowHandlers) 
@@ -342,11 +315,9 @@ static bool pms_init()
 			});
 	const bool animated = true;
 	window_stack_push(s_window, animated);
+	return true;
+
 }
-static void pms_click_config_provider();
-
-
-
 
 
 static bool deinitialize_menu() 
