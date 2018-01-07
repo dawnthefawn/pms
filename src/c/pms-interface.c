@@ -31,8 +31,16 @@ static void pms_menu_click_config_provider();
 
 static bool pms_deinit_cards()
 {
-	text_layer_destroy(s_text_layer);
-	dictation_session_destroy(s_dictation_session);
+	if (s_text_layer)
+	{
+		text_layer_destroy(s_text_layer);
+		s_text_layer = NULL;
+	}
+	if (s_dictation_session)
+	{
+		dictation_session_destroy(s_dictation_session);
+		s_dictation_session = NULL;
+	}
 	return true;
 }
 
@@ -74,12 +82,12 @@ bool pms_error_response_handler(char *error_message)
 		case MENU:
 			set_mode(NONE);
 			deinitialize_menu();
-			return true;
+			return pms_init_cards();
 			break;
 		case PROCESS:
 			set_mode(NONE);
 			deinitialize_menu();
-			return true;
+			return pms_init_cards();
 			break;
 	}
 	APP_LOG(APP_LOG_LEVEL_ERROR, "Mode not found pms_error_response_handler()");
@@ -104,12 +112,22 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 		{
 			APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to Deintialize menu");
 		}	
+		if (!pms_init_cards())
+		{
+			APP_LOG(APP_LOG_LEVEL_ERROR, "pms_initialize_cards() failed in select_callback()");
+		}
+
 	}
 }
 
 void pms_deinit(void) 
 {
-	window_destroy(s_window);
+	exit_reason_set(APP_EXIT_ACTION_PERFORMED_SUCCESSFULLY);
+	if (s_window)
+	{
+		window_destroy(s_window);
+		s_window = NULL;
+	}
 	window_stack_pop_all(true);
 }
 
@@ -144,7 +162,11 @@ static bool initialize_menu()
 		return false;
 	}
 	layer_remove_from_parent(text_layer_get_layer(s_text_layer));
-	text_layer_destroy(s_text_layer);
+	if (s_text_layer)
+	{
+		text_layer_destroy(s_text_layer);
+		s_text_layer = NULL;
+	}
 	s_menu_layer = menu_layer_create(s_bounds);
 	menu_layer_set_click_config_onto_window(s_menu_layer, s_window);
 	menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) 
@@ -270,7 +292,7 @@ static void pms_back_click_handler(ClickRecognizerRef recognizer, void *context)
 			{
 				APP_LOG(APP_LOG_LEVEL_ERROR, "pms_deinit_cards failed.");
 			}
-			pms_deinit();
+			window_stack_pop_all(true);
 			break;
 		case SONARR:
 			pms_cards_reset_text();
@@ -327,9 +349,21 @@ static void pms_window_load(Window *window)
 
 static void pms_window_unload(Window *window) 
 {
+	if (s_text_layer)
+	{
 		text_layer_destroy(s_text_layer);
+		s_text_layer = NULL;
+	}
+	if (s_dictation_session)
+	{
 		dictation_session_destroy(s_dictation_session);
+		s_dictation_session = NULL;
+	}
+	if (s_menu_layer)
+	{
 		menu_layer_destroy(s_menu_layer);
+		s_menu_layer = NULL;
+	}
 }
 
 
@@ -388,8 +422,11 @@ bool pms_init()
 static bool deinitialize_menu() 
 {
 	layer_remove_from_parent(menu_layer_get_layer(s_menu_layer));
-	menu_layer_destroy(s_menu_layer);
-	return pms_init_cards();
+	if (s_menu_layer)
+	{
+		menu_layer_destroy(s_menu_layer);
+		s_menu_layer = NULL;
+	}
 	if (!bool_set_response_items(0, true))
 	{
 		APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_response_items() failed to resetin deinitialize_menu()");
