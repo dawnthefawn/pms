@@ -125,12 +125,16 @@ bool pms_request_handler(int *choice)
 					break;
 				case SONARR:
 					dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_SONARR, &value, sizeof(int), true);
+					dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_RADARR, &value, sizeof(int), false);
 					break;
 				case RADARR:
 					dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_RADARR, &value, sizeof(int), true);
+					dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_SONARR, &value, sizeof(int), false);
 					break;
 				case DICTATION:
 					dict_write_cstring(out_iter, MESSAGE_KEY_PMS_REQUEST, str_get_last_text());
+					APP_LOG(APP_LOG_LEVEL_DEBUG, "wrote request to dictionary: %s", str_get_last_text());	
+
 					break;
 				case MENU:
 					dict_write_int(out_iter, MESSAGE_KEY_PMS_CHOICE, choice, sizeof(int), true);
@@ -159,6 +163,7 @@ bool pms_request_handler(int *choice)
 						return true;
 						break;
 					case DICTATION:
+						set_mode(NONE);
 						return true;
 						break;
 					case MENU:

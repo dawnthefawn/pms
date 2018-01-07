@@ -93,8 +93,10 @@ void pms_deinit(void)
 
 static void dictation_session_callback(DictationSession *session, DictationSessionStatus status, char *transcription, void *context) 
 {
+	set_mode(DICTATION);
 	if(status == DictationSessionStatusSuccess) 
 	{
+		bool_set_last_text(transcription);
 		pms_request_handler(NULL);
 	} 
 	else 
@@ -194,7 +196,7 @@ static void pms_down_click_handler(ClickRecognizerRef recognizer, void *context)
 	switch (int_get_mode()) 
 	{
 		case NONE:
-
+			text_layer_set_text(s_text_layer, "\n\n\n\n\nMovie:\nPress Select to Dictate");
 			set_mode(RADARR);
 			pms_request_handler(NULL);
 			return;
@@ -298,6 +300,7 @@ static bool pms_init_cards()
 		APP_LOG(APP_LOG_LEVEL_ERROR, "Error in pms_init_cards(): failed to return window_layer");
 		return false;
 	}
+	s_bounds = layer_get_bounds(window_layer);
 	s_text_layer = text_layer_create(s_bounds);
 	if (!s_text_layer)
 	{
@@ -338,6 +341,7 @@ bool pms_init()
 		APP_LOG(APP_LOG_LEVEL_ERROR, "pms_init_cards() failed during pms_init()");
 		return false;
 	}
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "Pushing Window");
 	window_stack_push(s_window, animated);
 	return true;
 }

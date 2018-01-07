@@ -45,11 +45,11 @@ void read_stored_values()
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored url: %s", s_pms_base_url);
 	persist_read_string(MESSAGE_KEY_SONARR_PORT, s_pms_sonarr_port, 7);
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored sonarr port: %s", s_pms_sonarr_port);
-	persist_read_string(MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key, 34);
+	persist_read_string(MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key, 32);
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored sonarr api: %s", s_pms_sonarr_api_key);
 	persist_read_string(MESSAGE_KEY_RADARR_PORT, s_pms_radarr_port, 7);
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored radarr port: %s", s_pms_radarr_port);
-	persist_read_string(MESSAGE_KEY_RADARR_API, s_pms_radarr_api_key, 34);
+	persist_read_string(MESSAGE_KEY_RADARR_API, s_pms_radarr_api_key, 32);
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored radarr api: %s", s_pms_radarr_api_key);
 
 //	pms_verify_setup();
@@ -199,9 +199,9 @@ bool bool_set_sonarr_api_key(char *sonarr_api)
 		return false;
 	}
 	int len = (int)strlen(sonarr_api);
-	if (!(len == 34))	
+	if (!(len == 32))	
 	{
-		APP_LOG(APP_LOG_LEVEL_ERROR, "invalid sonarr api key provided");
+		APP_LOG(APP_LOG_LEVEL_ERROR, "invalid sonarr api key provided, len: %d", len);
 		return false;
 	}
 
@@ -219,7 +219,7 @@ bool bool_set_radarr_api_key(char *radarr_api)
 		return false;
 	}
 	int len = (int)strlen(radarr_api);
-	if (!(len == 34))
+	if (!(len == 32))
 	{
 		APP_LOG(APP_LOG_LEVEL_ERROR, "invalid radarr API key length.");
 		return false;

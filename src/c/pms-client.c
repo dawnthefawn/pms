@@ -30,11 +30,12 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 		if(ready_tuple) 
 		{
 			set_js_ready(true);
-			if (!bool_set_index(0))
+			if (!bool_set_index(1))
 			{
 				APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_index() failed.");
 			}
 			read_stored_values();
+			pms_verify_setup();
 			return;
 		}
 		APP_LOG(APP_LOG_LEVEL_DEBUG, "inbox_callback_received");
@@ -58,6 +59,7 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 	Tuple *server_response = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE + int_get_response_index());
 	if (server_response) 
 	{
+		APP_LOG(APP_LOG_LEVEL_DEBUG, "Received Server Response!");
 		if (!bool_set_response_at_index(int_get_response_index(), server_response->value->cstring))
 		{
 			APP_LOG(APP_LOG_LEVEL_ERROR, "Failed bool_set_response_at_index(%d)", int_get_response_index() + 1);
@@ -75,7 +77,7 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 		{
 			APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to set response items: response_sent event handler.");
 		}
-		if (!bool_set_index(0))
+		if (!bool_set_index(1))
 		{
 			APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to set index in response_sent event handler.");
 		}
