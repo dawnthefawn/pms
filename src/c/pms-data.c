@@ -53,18 +53,9 @@ bool bool_get_response_sent()
 	return s_response_sent;
 }
 
-bool bool_set_response_sent(bool *response_sent)
+void set_response_sent(bool *response_sent)
 {
-	if(response_sent || !response_sent)
-	{
-		s_response_sent = response_sent;
-		return true;
-	}
-	else
-	{
-		APP_LOG(APP_LOG_LEVEL_ERROR, "error setting s_pms_response_sent");
-	}
-	return false;
+	s_response_sent = response_sent;
 }
 	
 
@@ -163,7 +154,7 @@ int int_get_mode()
 	 return s_mode;
 }
 
-bool bool_set_mode(int mode)
+bool bool_set_mode(enum modes mode)
 {
 	s_mode = mode;
 	return true;

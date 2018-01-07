@@ -7,11 +7,7 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
 	if (!bool_get_js_ready()) {
 		Tuple *ready_tuple = dict_find(iter, MESSAGE_KEY_JSReady);
 		if(ready_tuple) {
-			if (!blnSetJSReady(true))
-			{
-				APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to set JSReady");
-			}
-
+			set_js_ready(true);
 			if (!bool_set_index(0))
 			{
 				APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_index() failed.");
@@ -62,8 +58,9 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
 		}
 		APP_LOG(APP_LOG_LEVEL_DEBUG, "Received All Items");
 
-		// what the fuck do I do about this?		
+		//what the fuck do I do about this?		
 		//		initialize_menu();
+		menu_initializer();
 
 	}
 	//}
@@ -109,4 +106,14 @@ if(!persist_read_bool(MESSAGE_KEY_PMS_IS_CONFIGURED)) {
 }  
 return;  
 }
-
+void register_app_message_callbacks()
+{
+	app_message_register_inbox_received(inbox_received_callback);
+	app_message_register_inbox_dropped(inbox_dropped_callback);
+	app_message_register_outbox_failed(outbox_failed_callback);
+	app_message_register_outbox_sent(outbox_sent_callback);  
+	const int inbox_size = 512;
+	const int outbox_size = 512;
+	app_message_open(inbox_size, outbox_size);
+	set_response_sent(false);
+}
