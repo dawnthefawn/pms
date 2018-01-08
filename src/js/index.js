@@ -1,10 +1,10 @@
 var Clay = require('pebble-clay');
+var ImageJS = require('imagejs');
 var clayConfig = require('./config.json');
-//var customClay = require('./custom-clay.js');
-//var clay = new Clay(clayConfig, customClay);
+var Jimp = require('jimp');
+
 var clay = new Clay(clayConfig);
 var messageKeys = require('message_keys');
-
 var server_base_url;// = Clay.getItemByMessageKey('SERVER_URL');
 var sonarr_api_key;// = Clay.getItemByMessageKey('SONARR_API');
 var radarr_api_key;
@@ -32,21 +32,20 @@ var pms_tvdbids = {};
 var pms_choice;
 var json;
 
-function downloadPoster(url)
+function fetchPoster(url)
 {
-	var request = new XMLHttpRequest();
-	request.onload = function() 
+	Jimp.read(url, function (err, image)
 	{
-		processPoster(this.response);
-	};
-	request.responseType = "arraybuffer";
-	request.open("GET", url);
-	request.send();
+		image.resize(256, 256)
+		console.log(image.bitmap.data);
+		processPoster(image.bitmap.data);
+	});
+
 }
 
-function processPoster(responseData)
+function processPoster(imagedata)
 {
-	var byteArray = new Uint8Array(responseData);
+	var byteArray = new Uint8Array(imagedata);
 	var array = [];
 	for (var x = 0; x < byteArray.byteLength; x++)
 	{
@@ -94,7 +93,7 @@ function sendChunk(array, index, arrayLength)
 		}
 		else
 		{
-			Pebble.sendAppMessage({'IMAGE_SENT': 1}_;
+			Pebble.sendAppMessage({'IMAGE_SENT': 1});
 		}
 	}, function(e)
 	{
@@ -213,6 +212,7 @@ function ProcessServerResponse(dict, x) {
         
         if (x < 7) {
           x = x + 1;
+		  fetchPoster(object.images[0].url);
           ProcessServerResponse(dict, x);
 
         }
