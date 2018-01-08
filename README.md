@@ -1,4 +1,4 @@
-# Project Title
+# Pebble Media Secretary
 
 The Pebble Media Secretary (PMS) is designed to allow users to add media to a Sonarr/Radarr setup using a Pebble Smartwatch. PMS Takes a voice dictation, and sends the request to the specified server. 
 
