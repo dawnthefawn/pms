@@ -40,7 +40,8 @@
       "PMS_RESPONSE_SENT",
       "PMS_CHOICE",
       "PMS_SUCCESS",
-      "PMS_ERROR"
+      "PMS_ERROR",
+	  "DATA_LENGTH"
     ],
     "resources": {
       "media": []

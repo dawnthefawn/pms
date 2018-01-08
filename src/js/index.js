@@ -32,6 +32,76 @@ var pms_tvdbids = {};
 var pms_choice;
 var json;
 
+function downloadPoster(url)
+{
+	var request = new XMLHttpRequest();
+	request.onload = function() 
+	{
+		processPoster(this.response);
+	};
+	request.responseType = "arraybuffer";
+	request.open("GET", url);
+	request.send();
+}
+
+function processPoster(responseData)
+{
+	var byteArray = new Uint8Array(responseData);
+	var array = [];
+	for (var x = 0; x < byteArray.byteLength; x++)
+	{
+		array.push(byteArray[x]);
+	}
+
+	transmitPoster(array);
+}
+
+function transmitPoster(array)
+{
+	var index = 0;
+	var arrayLength = array.length;
+
+	Pebble.sendAppMessage({'DATA_LENGTH': arrayLength}, function(e)
+	{
+		sendChunk(array, index, arrayLength);
+	}, function (e)
+	{
+		console.log('failed to initiate image transfer');
+	})
+}
+
+function sendChunk(array, index, arrayLength) 
+{
+	var chunkSize = BUFFER_SIZE;
+	if (arrayLength - index < BUFFER_SIZE)
+	{
+		chunkSize = arrayLength - index;
+	}
+
+	var dict = 
+	{
+		'DATA_CHUNK': array.slice(index, index + chunkSize),
+		'CHUNK_SIZE': chunkSize,
+		'IMAGE_CHUNK_INDEX': index
+	};
+
+	Pebble.sendAppMessage(dict, function()
+	{
+		index += chunkSize;
+		if (index < arrayLength)
+		{
+			sendChunk(array, index, arrayLength);
+		}
+		else
+		{
+			Pebble.sendAppMessage({'IMAGE_SENT': 1}_;
+		}
+	}, function(e)
+	{
+		console.log('Failed to send chunk with index ' + index);
+	});
+}
+
 function AddMedia(request, choice) {
   console.log('AddMedia(): request = ' + request);
   var serverrequest = new XMLHttpRequest();
