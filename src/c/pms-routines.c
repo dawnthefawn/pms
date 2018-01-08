@@ -23,6 +23,7 @@ static bool bool_cancel_timer()
 	{
 		app_timer_cancel(s_timeout_timer); 
 		s_timeout_timer = NULL;
+		set_mode(NONE);
 		return true;
 	}
 	return false;
