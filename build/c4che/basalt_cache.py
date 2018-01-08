@@ -62,7 +62,11 @@ STLIB_MARKER = None
 STLIB_ST = '-l%s'
 SUPPORTED_PLATFORMS = ['aplite', 'chalk', 'emery', 'diorite', 'basalt']
 TARGET_PLATFORMS = ['diorite', 'chalk', 'basalt', 'aplite']
+<<<<<<< HEAD
 TIMESTAMP = 1515369684
+=======
+TIMESTAMP = 1515371787
+>>>>>>> dn
 USE_GROUPS = True
 VERBOSE = 0
 WEBPACK = '/home/dawn/.pebble-sdk/SDKs/current/node_modules/.bin/webpack'
