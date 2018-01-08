@@ -23,11 +23,10 @@ static char s_last_text[512];
 static char *s_transcription_header;
 static GRect s_bounds;
 static MenuLayer *s_menu_layer;
-
+static ClickConfigProvider last_ccp;
 //*********************************************************************************************
 static bool deinitialize_menu();
 static bool pms_init_cards();
-static void pms_menu_click_config_provider();
 
 static bool pms_deinit_cards()
 {
@@ -151,6 +150,60 @@ static void dictation_session_callback(DictationSession *session, DictationSessi
 	}
 }
 
+static void pms_back_click_handler(ClickRecognizerRef recognizer, void *context) 
+{
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "Selected back! Mode: %d", int_get_mode());
+	switch (int_get_mode()) 
+	{
+		case NONE:
+			if (!pms_deinit_cards())
+			{
+				APP_LOG(APP_LOG_LEVEL_ERROR, "pms_deinit_cards failed.");
+			}
+			window_stack_pop_all(true);
+			break;
+		case SONARR:
+			pms_cards_reset_text();
+			break;
+		case RADARR:
+			pms_cards_reset_text();
+			break;
+		case DICTATION:
+			pms_cards_reset_text();
+			break;
+		case MENU:
+			if (!deinitialize_menu())
+			{
+				APP_LOG(APP_LOG_LEVEL_ERROR, "deinitialize_menu() failed on back click provider, mode MENU");
+			}
+			if (!pms_init_cards())
+			{
+				APP_LOG(APP_LOG_LEVEL_ERROR, "pms_init_cards() failed in back click provider, mode MENU");
+			}
+			return;
+			break;
+		case PROCESS:
+			APP_LOG(APP_LOG_LEVEL_ERROR, "Click Handler Error, Mode: %d", int_get_mode());
+			set_mode(NONE);
+			break;
+
+	}
+} 
+
+static void pms_menu_click_config_provider(void *context)
+{
+
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "Subscribing to back_click_handler");
+	last_ccp(context);
+	window_single_click_subscribe(BUTTON_ID_BACK, pms_back_click_handler);
+}
+
+
+static void pms_force_back_button(Window *window, MenuLayer *menu_layer)
+{
+	last_ccp = window_get_click_config_provider(window);
+	window_set_click_config_provider_with_context(window, pms_menu_click_config_provider, menu_layer);
+}
 
 
 static bool initialize_menu() 
@@ -168,6 +221,8 @@ static bool initialize_menu()
 		s_text_layer = NULL;
 	}
 	s_menu_layer = menu_layer_create(s_bounds);
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "Setting default click config profile");
+	menu_layer_set_click_config_onto_window(s_menu_layer, s_window);
 	menu_layer_set_callbacks(s_menu_layer, NULL, (MenuLayerCallbacks) 
 			{
 			.get_num_rows = get_num_rows_callback,
@@ -175,9 +230,9 @@ static bool initialize_menu()
 			.get_cell_height = get_cell_height_callback,
 			.select_click = select_callback,
 			});
-	window_set_click_config_provider_with_context(s_window, pms_menu_click_config_provider, s_menu_layer);
 	layer_add_child(window_layer, menu_layer_get_layer(s_menu_layer));
 	set_mode(MENU);
+	pms_force_back_button(s_window, s_menu_layer);
 	return true;
 }
 
@@ -281,50 +336,8 @@ static void pms_down_click_handler(ClickRecognizerRef recognizer, void *context)
 	}
 }
 
-static void pms_back_click_handler(ClickRecognizerRef recognizer, void *context) 
-{
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "Selected back! Mode: %d", int_get_mode());
-	switch (int_get_mode()) 
-	{
-		case NONE:
-			if (!pms_deinit_cards())
-			{
-				APP_LOG(APP_LOG_LEVEL_ERROR, "pms_deinit_cards failed.");
-			}
-			window_stack_pop_all(true);
-			break;
-		case SONARR:
-			pms_cards_reset_text();
-			break;
-		case RADARR:
-			pms_cards_reset_text();
-			break;
-		case DICTATION:
-			pms_cards_reset_text();
-			break;
-		case MENU:
-			if (!deinitialize_menu())
-			{
-				APP_LOG(APP_LOG_LEVEL_ERROR, "deinitialize_menu() failed on back click provider, mode MENU");
-			}
-			if (!pms_init_cards())
-			{
-				APP_LOG(APP_LOG_LEVEL_ERROR, "pms_init_cards() failed in back click provider, mode MENU");
-			}
-			return;
-			break;
-		case PROCESS:
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Click Handler Error, Mode: %d", int_get_mode());
-			set_mode(NONE);
-			break;
 
-	}
-} 
 
-static void pms_menu_click_config_provider(void *context)
-{
-	window_single_click_subscribe(BUTTON_ID_BACK, pms_back_click_handler);
-}
 
 static void pms_cards_click_config_provider(void *context) 
 {
@@ -438,12 +451,6 @@ static bool deinitialize_menu()
 		APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_response_index() failed to resetin deinitialize_menu()");
 		return false;
 	}
-	if (!bool_reset_response_array())
-	{
-		APP_LOG(APP_LOG_LEVEL_ERROR, "bool_reset_response_array() failed reset in deinitialize_menu()");
-		return false;
-	}
-
 	return true;
 }
 

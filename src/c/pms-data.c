@@ -37,20 +37,20 @@ enum modes
 static enum modes s_mode;
 
 //****************************************************************************************
-bool bool_reset_response_array()
-{
-	int x;
-	for (x = 0; x <= 8; x++)
-	{
-		strcpy(s_pms_response[x], "");
-		if (s_pms_response[x])
-		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "bool_reset_response_array() failed to clear s_pms_response_index at %d, has %s", x, s_pms_response[x]);
-			return false;
-		}
-	}
-	return true;
-}	
+//bool bool_reset_response_array()
+//{
+//	int x;
+//	for (x = 0; x <= 8; x++)
+//	{
+//		strcpy(s_pms_response[x], "");
+//		if (s_pms_response[x])
+//		{
+//			APP_LOG(APP_LOG_LEVEL_ERROR, "bool_reset_response_array() failed to clear s_pms_response_index at %d, has %s", x, s_pms_response[x]);
+//			return false;
+//		}
+//	}
+//	return true;
+//}	
 
 void read_stored_values() 
 {

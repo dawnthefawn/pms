@@ -61,8 +61,6 @@ Discarded input sections
  .bss           0x0000000000000000        0x0 src/c/pms-interface.c.33.o
  .text          0x0000000000000000        0x0 src/c/pms-routines.c.33.o
  .bss           0x0000000000000000        0x0 src/c/pms-routines.c.33.o
- .text.timeout_timer_handler
-                0x0000000000000000       0x34 src/c/pms-routines.c.33.o
  .text          0x0000000000000000        0x0 src/c/pms.c.33.o
  .bss           0x0000000000000000        0x0 src/c/pms.c.33.o
  .text          0x0000000000000000        0x0 aplite/appinfo.auto.c.33.o
@@ -143,6 +141,8 @@ Discarded input sections
  .text.app_sync_init
                 0x0000000000000000        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
  .text.app_sync_set
+                0x0000000000000000        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+ .text.app_timer_cancel
                 0x0000000000000000        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
  .text.app_timer_register
                 0x0000000000000000        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
@@ -371,8 +371,6 @@ Discarded input sections
                 0x0000000000000000        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
  .text.menu_layer_legacy2_set_callbacks__deprecated
                 0x0000000000000000        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
- .text.menu_layer_set_click_config_onto_window
-                0x0000000000000000        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
  .text.menu_layer_set_selected_index
                 0x0000000000000000        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
  .text.menu_layer_set_selected_next
@@ -534,8 +532,6 @@ Discarded input sections
  .text.vibes_enqueue_custom_pattern
                 0x0000000000000000        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
  .text.vibes_short_pulse
-                0x0000000000000000        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
- .text.window_get_click_config_provider
                 0x0000000000000000        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
  .text.window_get_fullscreen
                 0x0000000000000000        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
@@ -1231,7 +1227,7 @@ LOAD /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtn.o
  .note.gnu.build-id
                 0x0000000000000084       0x24 linker stubs
 
-.text           0x00000000000000a8     0x254b
+.text           0x00000000000000a8     0x24b3
  *(.text)
  .text          0x00000000000000a8       0x14 /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
  *(.text.*)
@@ -1240,518 +1236,514 @@ LOAD /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtn.o
  .text.initialize_client
                 0x0000000000000438       0x94 src/c/pms-client.c.33.o
                 0x0000000000000438                initialize_client
- .text.bool_reset_response_array
-                0x00000000000004cc       0x3c src/c/pms-data.c.33.o
-                0x00000000000004cc                bool_reset_response_array
  .text.read_stored_values
-                0x0000000000000508      0x100 src/c/pms-data.c.33.o
-                0x0000000000000508                read_stored_values
+                0x00000000000004cc      0x100 src/c/pms-data.c.33.o
+                0x00000000000004cc                read_stored_values
  .text.set_response_sent
-                0x0000000000000608        0xc src/c/pms-data.c.33.o
-                0x0000000000000608                set_response_sent
+                0x00000000000005cc        0xc src/c/pms-data.c.33.o
+                0x00000000000005cc                set_response_sent
  .text.bool_set_last_text
-                0x0000000000000614       0x58 src/c/pms-data.c.33.o
-                0x0000000000000614                bool_set_last_text
+                0x00000000000005d8       0x58 src/c/pms-data.c.33.o
+                0x00000000000005d8                bool_set_last_text
  .text.str_get_last_text
-                0x000000000000066c        0xc src/c/pms-data.c.33.o
-                0x000000000000066c                str_get_last_text
+                0x0000000000000630        0xc src/c/pms-data.c.33.o
+                0x0000000000000630                str_get_last_text
  .text.set_js_ready
-                0x0000000000000678        0xc src/c/pms-data.c.33.o
-                0x0000000000000678                set_js_ready
+                0x000000000000063c        0xc src/c/pms-data.c.33.o
+                0x000000000000063c                set_js_ready
  .text.bool_get_js_ready
-                0x0000000000000684        0xc src/c/pms-data.c.33.o
-                0x0000000000000684                bool_get_js_ready
+                0x0000000000000648        0xc src/c/pms-data.c.33.o
+                0x0000000000000648                bool_get_js_ready
  .text.str_response_at_index
-                0x0000000000000690       0x38 src/c/pms-data.c.33.o
-                0x0000000000000690                str_response_at_index
+                0x0000000000000654       0x38 src/c/pms-data.c.33.o
+                0x0000000000000654                str_response_at_index
  .text.bool_set_index
-                0x00000000000006c8       0x28 src/c/pms-data.c.33.o
-                0x00000000000006c8                bool_set_index
+                0x000000000000068c       0x28 src/c/pms-data.c.33.o
+                0x000000000000068c                bool_set_index
  .text.int_get_response_index
-                0x00000000000006f0        0xc src/c/pms-data.c.33.o
-                0x00000000000006f0                int_get_response_index
+                0x00000000000006b4        0xc src/c/pms-data.c.33.o
+                0x00000000000006b4                int_get_response_index
  .text.bool_set_response_at_index
-                0x00000000000006fc      0x108 src/c/pms-data.c.33.o
-                0x00000000000006fc                bool_set_response_at_index
+                0x00000000000006c0      0x108 src/c/pms-data.c.33.o
+                0x00000000000006c0                bool_set_response_at_index
  .text.bool_set_response_items
-                0x0000000000000804       0x44 src/c/pms-data.c.33.o
-                0x0000000000000804                bool_set_response_items
+                0x00000000000007c8       0x44 src/c/pms-data.c.33.o
+                0x00000000000007c8                bool_set_response_items
  .text.int_get_pms_response_items
-                0x0000000000000848        0xc src/c/pms-data.c.33.o
-                0x0000000000000848                int_get_pms_response_items
+                0x000000000000080c        0xc src/c/pms-data.c.33.o
+                0x000000000000080c                int_get_pms_response_items
  .text.int_get_mode
-                0x0000000000000854        0xc src/c/pms-data.c.33.o
-                0x0000000000000854                int_get_mode
+                0x0000000000000818        0xc src/c/pms-data.c.33.o
+                0x0000000000000818                int_get_mode
  .text.set_mode
-                0x0000000000000860        0xc src/c/pms-data.c.33.o
-                0x0000000000000860                set_mode
+                0x0000000000000824        0xc src/c/pms-data.c.33.o
+                0x0000000000000824                set_mode
  .text.str_sonarr_api_key
-                0x000000000000086c       0x1c src/c/pms-data.c.33.o
-                0x000000000000086c                str_sonarr_api_key
+                0x0000000000000830       0x1c src/c/pms-data.c.33.o
+                0x0000000000000830                str_sonarr_api_key
  .text.str_radarr_api_key
-                0x0000000000000888       0x1c src/c/pms-data.c.33.o
-                0x0000000000000888                str_radarr_api_key
+                0x000000000000084c       0x1c src/c/pms-data.c.33.o
+                0x000000000000084c                str_radarr_api_key
  .text.str_sonarr_port
-                0x00000000000008a4       0x1c src/c/pms-data.c.33.o
-                0x00000000000008a4                str_sonarr_port
+                0x0000000000000868       0x1c src/c/pms-data.c.33.o
+                0x0000000000000868                str_sonarr_port
  .text.str_radarr_port
-                0x00000000000008c0       0x1c src/c/pms-data.c.33.o
-                0x00000000000008c0                str_radarr_port
+                0x0000000000000884       0x1c src/c/pms-data.c.33.o
+                0x0000000000000884                str_radarr_port
  .text.str_base_url
-                0x00000000000008dc       0x1c src/c/pms-data.c.33.o
-                0x00000000000008dc                str_base_url
+                0x00000000000008a0       0x1c src/c/pms-data.c.33.o
+                0x00000000000008a0                str_base_url
  .text.bool_set_sonarr_api_key
-                0x00000000000008f8       0x94 src/c/pms-data.c.33.o
-                0x00000000000008f8                bool_set_sonarr_api_key
+                0x00000000000008bc       0x94 src/c/pms-data.c.33.o
+                0x00000000000008bc                bool_set_sonarr_api_key
  .text.bool_set_radarr_api_key
-                0x000000000000098c       0x8c src/c/pms-data.c.33.o
-                0x000000000000098c                bool_set_radarr_api_key
+                0x0000000000000950       0x8c src/c/pms-data.c.33.o
+                0x0000000000000950                bool_set_radarr_api_key
  .text.bool_set_sonarr_port
-                0x0000000000000a18       0x54 src/c/pms-data.c.33.o
-                0x0000000000000a18                bool_set_sonarr_port
+                0x00000000000009dc       0x54 src/c/pms-data.c.33.o
+                0x00000000000009dc                bool_set_sonarr_port
  .text.bool_set_radarr_port
-                0x0000000000000a6c       0x70 src/c/pms-data.c.33.o
-                0x0000000000000a6c                bool_set_radarr_port
+                0x0000000000000a30       0x70 src/c/pms-data.c.33.o
+                0x0000000000000a30                bool_set_radarr_port
  .text.bool_set_base_url
-                0x0000000000000adc       0x70 src/c/pms-data.c.33.o
-                0x0000000000000adc                bool_set_base_url
+                0x0000000000000aa0       0x70 src/c/pms-data.c.33.o
+                0x0000000000000aa0                bool_set_base_url
  .text.pms_down_click_handler
-                0x0000000000000b4c       0x9c src/c/pms-interface.c.33.o
+                0x0000000000000b10       0x9c src/c/pms-interface.c.33.o
  .text.pms_cards_click_config_provider
-                0x0000000000000be8       0x40 src/c/pms-interface.c.33.o
+                0x0000000000000bac       0x40 src/c/pms-interface.c.33.o
  .text.pms_menu_click_config_provider
-                0x0000000000000c28       0x10 src/c/pms-interface.c.33.o
+                0x0000000000000bec       0x3c src/c/pms-interface.c.33.o
  .text.pms_window_unload
-                0x0000000000000c38       0x40 src/c/pms-interface.c.33.o
+                0x0000000000000c28       0x40 src/c/pms-interface.c.33.o
  .text.pms_select_click_handler
-                0x0000000000000c78       0x9c src/c/pms-interface.c.33.o
+                0x0000000000000c68       0xa0 src/c/pms-interface.c.33.o
  .text.pms_cards_reset_text
-                0x0000000000000d14       0x80 src/c/pms-interface.c.33.o
+                0x0000000000000d08       0x80 src/c/pms-interface.c.33.o
  .text.pms_init_cards
-                0x0000000000000d94      0x104 src/c/pms-interface.c.33.o
+                0x0000000000000d88      0x104 src/c/pms-interface.c.33.o
  .text.deinitialize_menu
-                0x0000000000000e98       0x94 src/c/pms-interface.c.33.o
+                0x0000000000000e8c       0x74 src/c/pms-interface.c.33.o
  .text.select_callback
-                0x0000000000000f2c       0x9c src/c/pms-interface.c.33.o
+                0x0000000000000f00       0x9c src/c/pms-interface.c.33.o
  .text.pms_back_click_handler
-                0x0000000000000fc8       0xe8 src/c/pms-interface.c.33.o
+                0x0000000000000f9c       0xe0 src/c/pms-interface.c.33.o
  .text.pms_up_click_handler
-                0x00000000000010b0       0x58 src/c/pms-interface.c.33.o
+                0x000000000000107c       0x5c src/c/pms-interface.c.33.o
  .text.pms_window_load
-                0x0000000000001108       0x28 src/c/pms-interface.c.33.o
+                0x00000000000010d8       0x28 src/c/pms-interface.c.33.o
  .text.dictation_session_callback
-                0x0000000000001130       0x5c src/c/pms-interface.c.33.o
+                0x0000000000001100       0x5c src/c/pms-interface.c.33.o
  .text.pms_error_response_handler
-                0x000000000000118c       0x5c src/c/pms-interface.c.33.o
-                0x000000000000118c                pms_error_response_handler
+                0x000000000000115c       0x5c src/c/pms-interface.c.33.o
+                0x000000000000115c                pms_error_response_handler
  .text.pms_deinit
-                0x00000000000011e8       0x20 src/c/pms-interface.c.33.o
-                0x00000000000011e8                pms_deinit
+                0x00000000000011b8       0x20 src/c/pms-interface.c.33.o
+                0x00000000000011b8                pms_deinit
  .text.pms_init
-                0x0000000000001208       0x84 src/c/pms-interface.c.33.o
-                0x0000000000001208                pms_init
+                0x00000000000011d8       0x84 src/c/pms-interface.c.33.o
+                0x00000000000011d8                pms_init
  .text.menu_initializer
-                0x000000000000128c      0x120 src/c/pms-interface.c.33.o
-                0x000000000000128c                menu_initializer
+                0x000000000000125c      0x154 src/c/pms-interface.c.33.o
+                0x000000000000125c                menu_initializer
  .text.inbox_dropped_callback
-                0x00000000000013ac       0x18 src/c/pms-routines.c.33.o
-                0x00000000000013ac                inbox_dropped_callback
+                0x00000000000013b0       0x18 src/c/pms-routines.c.33.o
+                0x00000000000013b0                inbox_dropped_callback
  .text.outbox_failed_callback
-                0x00000000000013c4       0x48 src/c/pms-routines.c.33.o
-                0x00000000000013c4                outbox_failed_callback
+                0x00000000000013c8       0x18 src/c/pms-routines.c.33.o
+                0x00000000000013c8                outbox_failed_callback
  .text.outbox_sent_callback
-                0x000000000000140c       0x18 src/c/pms-routines.c.33.o
-                0x000000000000140c                outbox_sent_callback
+                0x00000000000013e0       0x18 src/c/pms-routines.c.33.o
+                0x00000000000013e0                outbox_sent_callback
  .text.get_num_rows_callback
-                0x0000000000001424        0xa src/c/pms-routines.c.33.o
-                0x0000000000001424                get_num_rows_callback
- *fill*         0x000000000000142e        0x2 
+                0x00000000000013f8        0xa src/c/pms-routines.c.33.o
+                0x00000000000013f8                get_num_rows_callback
+ *fill*         0x0000000000001402        0x2 
  .text.draw_row_callback
-                0x0000000000001430       0x38 src/c/pms-routines.c.33.o
-                0x0000000000001430                draw_row_callback
+                0x0000000000001404       0x38 src/c/pms-routines.c.33.o
+                0x0000000000001404                draw_row_callback
  .text.get_cell_height_callback
-                0x0000000000001468        0x4 src/c/pms-routines.c.33.o
-                0x0000000000001468                get_cell_height_callback
+                0x000000000000143c        0x4 src/c/pms-routines.c.33.o
+                0x000000000000143c                get_cell_height_callback
  .text.pms_verify_setup
-                0x000000000000146c       0xe4 src/c/pms-routines.c.33.o
-                0x000000000000146c                pms_verify_setup
+                0x0000000000001440       0xe4 src/c/pms-routines.c.33.o
+                0x0000000000001440                pms_verify_setup
  .text.pms_request_handler
-                0x0000000000001550      0x168 src/c/pms-routines.c.33.o
-                0x0000000000001550                pms_request_handler
+                0x0000000000001524      0x168 src/c/pms-routines.c.33.o
+                0x0000000000001524                pms_request_handler
  .text.startup.main
-                0x00000000000016b8       0x1a src/c/pms.c.33.o
-                0x00000000000016b8                main
- *fill*         0x00000000000016d2        0x2 
+                0x000000000000168c       0x1a src/c/pms.c.33.o
+                0x000000000000168c                main
+ *fill*         0x00000000000016a6        0x2 
  .text.app_event_loop
-                0x00000000000016d4        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000016d4                app_event_loop
- .text.app_log  0x00000000000016e0        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000016e0                app_log
+                0x00000000000016a8        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000016a8                app_event_loop
+ .text.app_log  0x00000000000016b4        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000016b4                app_log
  .text.app_message_open
-                0x00000000000016ec        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000016ec                app_message_open
- .text.app_timer_cancel
-                0x00000000000016f8        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000016f8                app_timer_cancel
+                0x00000000000016c0        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000016c0                app_message_open
  .text.dict_find
-                0x0000000000001704        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001704                dict_find
+                0x00000000000016cc        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000016cc                dict_find
  .text.dict_write_cstring
-                0x0000000000001710        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001710                dict_write_cstring
+                0x00000000000016d8        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000016d8                dict_write_cstring
  .text.dict_write_int
-                0x000000000000171c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000000000000171c                dict_write_int
+                0x00000000000016e4        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000016e4                dict_write_int
  .text.layer_add_child
-                0x0000000000001728        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001728                layer_add_child
+                0x00000000000016f0        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000016f0                layer_add_child
  .text.layer_get_bounds
-                0x0000000000001734        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001734                layer_get_bounds
+                0x00000000000016fc        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000016fc                layer_get_bounds
  .text.layer_remove_from_parent
-                0x0000000000001740        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001740                layer_remove_from_parent
- .text.memset   0x000000000000174c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000000000000174c                memset
+                0x0000000000001708        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001708                layer_remove_from_parent
+ .text.memset   0x0000000000001714        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001714                memset
  .text.menu_cell_basic_draw
-                0x0000000000001758        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001758                menu_cell_basic_draw
+                0x0000000000001720        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001720                menu_cell_basic_draw
  .text.menu_layer_destroy
-                0x0000000000001764        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001764                menu_layer_destroy
+                0x000000000000172c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000000000000172c                menu_layer_destroy
  .text.menu_layer_get_layer
-                0x0000000000001770        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001770                menu_layer_get_layer
+                0x0000000000001738        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001738                menu_layer_get_layer
+ .text.menu_layer_set_click_config_onto_window
+                0x0000000000001744        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001744                menu_layer_set_click_config_onto_window
  .text.persist_read_bool
-                0x000000000000177c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000000000000177c                persist_read_bool
+                0x0000000000001750        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001750                persist_read_bool
  .text.persist_write_bool
-                0x0000000000001788        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001788                persist_write_bool
+                0x000000000000175c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000000000000175c                persist_write_bool
  .text.persist_write_string
-                0x0000000000001794        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001794                persist_write_string
+                0x0000000000001768        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001768                persist_write_string
  .text.snprintf
-                0x00000000000017a0        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000017a0                snprintf
- .text.strcpy   0x00000000000017ac        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000017ac                strcpy
- .text.strlen   0x00000000000017b8        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000017b8                strlen
+                0x0000000000001774        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001774                snprintf
+ .text.strcpy   0x0000000000001780        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001780                strcpy
+ .text.strlen   0x000000000000178c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000000000000178c                strlen
  .text.vibes_double_pulse
-                0x00000000000017c4        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000017c4                vibes_double_pulse
+                0x0000000000001798        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001798                vibes_double_pulse
  .text.vibes_long_pulse
-                0x00000000000017d0        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000017d0                vibes_long_pulse
+                0x00000000000017a4        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000017a4                vibes_long_pulse
  .text.window_create
-                0x00000000000017dc        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000017dc                window_create
+                0x00000000000017b0        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000017b0                window_create
  .text.window_destroy
-                0x00000000000017e8        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000017e8                window_destroy
+                0x00000000000017bc        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000017bc                window_destroy
+ .text.window_get_click_config_provider
+                0x00000000000017c8        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000017c8                window_get_click_config_provider
  .text.window_get_root_layer
-                0x00000000000017f4        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000017f4                window_get_root_layer
+                0x00000000000017d4        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000017d4                window_get_root_layer
  .text.window_set_click_config_provider
-                0x0000000000001800        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001800                window_set_click_config_provider
+                0x00000000000017e0        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000017e0                window_set_click_config_provider
  .text.window_set_click_config_provider_with_context
-                0x000000000000180c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000000000000180c                window_set_click_config_provider_with_context
+                0x00000000000017ec        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000017ec                window_set_click_config_provider_with_context
  .text.window_set_window_handlers
-                0x0000000000001818        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001818                window_set_window_handlers
+                0x00000000000017f8        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000017f8                window_set_window_handlers
  .text.window_stack_pop_all
-                0x0000000000001824        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001824                window_stack_pop_all
+                0x0000000000001804        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001804                window_stack_pop_all
  .text.window_stack_push
-                0x0000000000001830        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001830                window_stack_push
+                0x0000000000001810        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001810                window_stack_push
  .text.app_message_outbox_begin
-                0x000000000000183c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000000000000183c                app_message_outbox_begin
+                0x000000000000181c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000000000000181c                app_message_outbox_begin
  .text.app_message_outbox_send
-                0x0000000000001848        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001848                app_message_outbox_send
+                0x0000000000001828        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001828                app_message_outbox_send
  .text.app_message_register_inbox_dropped
-                0x0000000000001854        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001854                app_message_register_inbox_dropped
+                0x0000000000001834        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001834                app_message_register_inbox_dropped
  .text.app_message_register_inbox_received
-                0x0000000000001860        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001860                app_message_register_inbox_received
+                0x0000000000001840        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001840                app_message_register_inbox_received
  .text.app_message_register_outbox_failed
-                0x000000000000186c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000000000000186c                app_message_register_outbox_failed
+                0x000000000000184c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000000000000184c                app_message_register_outbox_failed
  .text.app_message_register_outbox_sent
-                0x0000000000001878        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001878                app_message_register_outbox_sent
+                0x0000000000001858        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001858                app_message_register_outbox_sent
  .text.window_single_click_subscribe
-                0x0000000000001884        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001884                window_single_click_subscribe
+                0x0000000000001864        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001864                window_single_click_subscribe
  .text.persist_read_string
-                0x0000000000001890        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001890                persist_read_string
+                0x0000000000001870        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001870                persist_read_string
  .text.menu_layer_create
-                0x000000000000189c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000000000000189c                menu_layer_create
+                0x000000000000187c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000000000000187c                menu_layer_create
  .text.text_layer_create
-                0x00000000000018a8        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000018a8                text_layer_create
+                0x0000000000001888        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001888                text_layer_create
  .text.text_layer_destroy
-                0x00000000000018b4        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000018b4                text_layer_destroy
+                0x0000000000001894        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001894                text_layer_destroy
  .text.text_layer_get_layer
-                0x00000000000018c0        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000018c0                text_layer_get_layer
+                0x00000000000018a0        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000018a0                text_layer_get_layer
  .text.text_layer_set_background_color
-                0x00000000000018cc        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000018cc                text_layer_set_background_color
+                0x00000000000018ac        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000018ac                text_layer_set_background_color
  .text.text_layer_set_overflow_mode
-                0x00000000000018d8        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000018d8                text_layer_set_overflow_mode
+                0x00000000000018b8        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000018b8                text_layer_set_overflow_mode
  .text.text_layer_set_text
-                0x00000000000018e4        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000018e4                text_layer_set_text
+                0x00000000000018c4        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000018c4                text_layer_set_text
  .text.text_layer_set_text_alignment
-                0x00000000000018f0        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000018f0                text_layer_set_text_alignment
+                0x00000000000018d0        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000018d0                text_layer_set_text_alignment
  .text.text_layer_set_text_color
-                0x00000000000018fc        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x00000000000018fc                text_layer_set_text_color
+                0x00000000000018dc        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000018dc                text_layer_set_text_color
  .text.menu_layer_set_callbacks
-                0x0000000000001908        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001908                menu_layer_set_callbacks
+                0x00000000000018e8        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000018e8                menu_layer_set_callbacks
  .text.dictation_session_create
-                0x0000000000001914        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001914                dictation_session_create
+                0x00000000000018f4        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x00000000000018f4                dictation_session_create
  .text.dictation_session_destroy
-                0x0000000000001920        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x0000000000001920                dictation_session_destroy
+                0x0000000000001900        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x0000000000001900                dictation_session_destroy
  .text.dictation_session_start
-                0x000000000000192c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
-                0x000000000000192c                dictation_session_start
+                0x000000000000190c        0xc /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+                0x000000000000190c                dictation_session_start
  *(.rodata)
  *(.rodata*)
  .rodata.inbox_received_callback.str1.1
-                0x0000000000001938      0x2aa src/c/pms-client.c.33.o
+                0x0000000000001918      0x2aa src/c/pms-client.c.33.o
  .rodata.initialize_client.str1.1
-                0x0000000000001be2       0x27 src/c/pms-client.c.33.o
- .rodata.bool_reset_response_array.str1.1
-                0x0000000000001c09       0x5a src/c/pms-data.c.33.o
-                                         0x5b (size before relaxing)
+                0x0000000000001bc2       0x27 src/c/pms-client.c.33.o
  .rodata.bool_set_base_url.str1.1
-                0x0000000000001c63       0x42 src/c/pms-data.c.33.o
+                0x0000000000001be9       0x42 src/c/pms-data.c.33.o
  .rodata.bool_set_last_text.str1.1
-                0x0000000000001ca5       0x4b src/c/pms-data.c.33.o
+                0x0000000000001c2b       0x4b src/c/pms-data.c.33.o
  .rodata.bool_set_radarr_api_key.str1.1
-                0x0000000000001cf0       0x6c src/c/pms-data.c.33.o
+                0x0000000000001c76       0x6c src/c/pms-data.c.33.o
  .rodata.bool_set_radarr_port.str1.1
-                0x0000000000001d5c       0x2e src/c/pms-data.c.33.o
+                0x0000000000001ce2       0x2e src/c/pms-data.c.33.o
  .rodata.bool_set_response_at_index.str1.1
-                0x0000000000001d8a      0x100 src/c/pms-data.c.33.o
+                0x0000000000001d10      0x100 src/c/pms-data.c.33.o
  .rodata.bool_set_response_items.str1.1
-                0x0000000000001e8a       0x3b src/c/pms-data.c.33.o
+                0x0000000000001e10       0x3b src/c/pms-data.c.33.o
  .rodata.bool_set_sonarr_api_key.str1.1
-                0x0000000000001ec5       0x5d src/c/pms-data.c.33.o
+                0x0000000000001e4b       0x5d src/c/pms-data.c.33.o
  .rodata.bool_set_sonarr_port.str1.1
-                0x0000000000001f22       0x18 src/c/pms-data.c.33.o
+                0x0000000000001ea8       0x18 src/c/pms-data.c.33.o
  .rodata.read_stored_values.str1.1
-                0x0000000000001f3a       0x69 src/c/pms-data.c.33.o
+                0x0000000000001ec0       0x74 src/c/pms-data.c.33.o
  .rodata.str_response_at_index.str1.1
-                0x0000000000001fa3       0x44 src/c/pms-data.c.33.o
+                0x0000000000001f34       0x44 src/c/pms-data.c.33.o
                                          0x4a (size before relaxing)
  .rodata.deinitialize_menu.str1.1
-                0x0000000000001fe7       0xc0 src/c/pms-interface.c.33.o
+                0x0000000000001f78       0x80 src/c/pms-interface.c.33.o
  .rodata.dictation_session_callback.str1.1
-                0x00000000000020a7       0x3d src/c/pms-interface.c.33.o
+                0x0000000000001ff8       0x3d src/c/pms-interface.c.33.o
  .rodata.menu_initializer.str1.1
-                0x00000000000020e4       0x4c src/c/pms-interface.c.33.o
+                0x0000000000002035       0x71 src/c/pms-interface.c.33.o
  .rodata.pms_back_click_handler.str1.1
-                0x0000000000002130       0x8f src/c/pms-interface.c.33.o
+                0x00000000000020a6       0x8f src/c/pms-interface.c.33.o
  .rodata.pms_cards_reset_text.str1.1
-                0x00000000000021bf       0x64 src/c/pms-interface.c.33.o
+                0x0000000000002135       0x64 src/c/pms-interface.c.33.o
  .rodata.pms_down_click_handler.str1.1
-                0x0000000000002223       0x52 src/c/pms-interface.c.33.o
+                0x0000000000002199       0x52 src/c/pms-interface.c.33.o
  .rodata.pms_error_response_handler.str1.1
-                0x0000000000002275       0x2c src/c/pms-interface.c.33.o
+                0x00000000000021eb       0x2c src/c/pms-interface.c.33.o
  .rodata.pms_init.str1.1
-                0x00000000000022a1       0x39 src/c/pms-interface.c.33.o
+                0x0000000000002217       0x39 src/c/pms-interface.c.33.o
  .rodata.pms_init_cards.str1.1
-                0x00000000000022da       0xe2 src/c/pms-interface.c.33.o
+                0x0000000000002250       0xe2 src/c/pms-interface.c.33.o
+ .rodata.pms_menu_click_config_provider.str1.1
+                0x0000000000002332       0x22 src/c/pms-interface.c.33.o
  .rodata.pms_up_click_handler.str1.1
-                0x00000000000023bc       0x37 src/c/pms-interface.c.33.o
+                0x0000000000002354       0x37 src/c/pms-interface.c.33.o
  .rodata.pms_window_load.str1.1
-                0x00000000000023f3       0x2e src/c/pms-interface.c.33.o
+                0x000000000000238b       0x2e src/c/pms-interface.c.33.o
  .rodata.select_callback.str1.1
-                0x0000000000002421       0xa4 src/c/pms-interface.c.33.o
+                0x00000000000023b9       0xa4 src/c/pms-interface.c.33.o
  .rodata.draw_row_callback.str1.1
-                0x00000000000024c5       0xa4 src/c/pms-routines.c.33.o
+                0x000000000000245d       0xa4 src/c/pms-routines.c.33.o
                                           0x3 (size before relaxing)
  .rodata.inbox_dropped_callback.str1.1
-                0x00000000000024c5       0x12 src/c/pms-routines.c.33.o
+                0x000000000000245d       0x21 src/c/pms-routines.c.33.o
  .rodata.outbox_failed_callback.str1.1
-                0x00000000000024d7       0x2b src/c/pms-routines.c.33.o
+                0x000000000000247e       0x14 src/c/pms-routines.c.33.o
  .rodata.outbox_sent_callback.str1.1
-                0x0000000000002502       0x15 src/c/pms-routines.c.33.o
+                0x0000000000002492       0x15 src/c/pms-routines.c.33.o
  .rodata.pms_request_handler.str1.1
-                0x0000000000002517       0x5c src/c/pms-routines.c.33.o
+                0x00000000000024a7       0x5c src/c/pms-routines.c.33.o
                                          0x8c (size before relaxing)
  .rodata.pms_verify_setup.str1.1
-                0x0000000000002573       0x58 src/c/pms-routines.c.33.o
- .rodata.timeout_timer_handler.str1.1
-                0x00000000000025cb       0x28 src/c/pms-routines.c.33.o
+                0x0000000000002503       0x58 src/c/pms-routines.c.33.o
 
-.glue_7         0x00000000000025f4        0x0
- .glue_7        0x00000000000025f4        0x0 linker stubs
+.glue_7         0x000000000000255c        0x0
+ .glue_7        0x000000000000255c        0x0 linker stubs
 
-.glue_7t        0x00000000000025f4        0x0
- .glue_7t       0x00000000000025f4        0x0 linker stubs
+.glue_7t        0x000000000000255c        0x0
+ .glue_7t       0x000000000000255c        0x0 linker stubs
 
-.vfp11_veneer   0x00000000000025f4        0x0
- .vfp11_veneer  0x00000000000025f4        0x0 linker stubs
+.vfp11_veneer   0x000000000000255c        0x0
+ .vfp11_veneer  0x000000000000255c        0x0 linker stubs
 
-.v4_bx          0x00000000000025f4        0x0
- .v4_bx         0x00000000000025f4        0x0 linker stubs
+.v4_bx          0x000000000000255c        0x0
+ .v4_bx         0x000000000000255c        0x0 linker stubs
 
-.init           0x00000000000025f4        0x4
- .init          0x00000000000025f4        0x4 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crti.o
-                0x00000000000025f4                _init
+.init           0x000000000000255c        0x4
+ .init          0x000000000000255c        0x4 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crti.o
+                0x000000000000255c                _init
 
-.fini           0x00000000000025f8        0x4
- .fini          0x00000000000025f8        0x4 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crti.o
-                0x00000000000025f8                _fini
+.fini           0x0000000000002560        0x4
+ .fini          0x0000000000002560        0x4 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crti.o
+                0x0000000000002560                _fini
 
-.iplt           0x00000000000025fc        0x0
- .iplt          0x00000000000025fc        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtbegin.o
+.iplt           0x0000000000002564        0x0
+ .iplt          0x0000000000002564        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtbegin.o
 
-.rel.dyn        0x00000000000025fc        0x0
- .rel.iplt      0x00000000000025fc        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtbegin.o
- .rel.got       0x00000000000025fc        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtbegin.o
+.rel.dyn        0x0000000000002564        0x0
+ .rel.iplt      0x0000000000002564        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtbegin.o
+ .rel.got       0x0000000000002564        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtbegin.o
 
-.data           0x00000000000025fc       0x44
+.data           0x0000000000002564       0x44
  *(.data)
- .data          0x00000000000025fc        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crti.o
- .data          0x00000000000025fc        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtbegin.o
- .data          0x00000000000025fc        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/crt0.o
- .data          0x00000000000025fc        0x0 src/c/pms-client.c.33.o
- .data          0x00000000000025fc        0x0 src/c/pms-data.c.33.o
- .data          0x00000000000025fc        0x0 src/c/pms-interface.c.33.o
- .data          0x00000000000025fc        0x0 src/c/pms-routines.c.33.o
- .data          0x00000000000025fc        0x0 src/c/pms.c.33.o
- .data          0x00000000000025fc        0x0 aplite/appinfo.auto.c.33.o
- .data          0x00000000000025fc        0x0 aplite/src/resource_ids.auto.c.33.o
- .data          0x00000000000025fc        0x0 src/message_keys.auto.c.33.o
- .data          0x00000000000025fc        0x0 /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
- .data          0x00000000000025fc        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-atexit.o)
- .data          0x00000000000025fc        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-exit.o)
- .data          0x00000000000025fc        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-fini.o)
- .data          0x00000000000025fc        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-impure.o)
- .data          0x00000000000025fc        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-init.o)
- .data          0x00000000000025fc        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-__atexit.o)
- .data          0x00000000000025fc        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-__call_atexit.o)
- .data          0x00000000000025fc        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtend.o
- .data          0x00000000000025fc        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtn.o
+ .data          0x0000000000002564        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crti.o
+ .data          0x0000000000002564        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtbegin.o
+ .data          0x0000000000002564        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/crt0.o
+ .data          0x0000000000002564        0x0 src/c/pms-client.c.33.o
+ .data          0x0000000000002564        0x0 src/c/pms-data.c.33.o
+ .data          0x0000000000002564        0x0 src/c/pms-interface.c.33.o
+ .data          0x0000000000002564        0x0 src/c/pms-routines.c.33.o
+ .data          0x0000000000002564        0x0 src/c/pms.c.33.o
+ .data          0x0000000000002564        0x0 aplite/appinfo.auto.c.33.o
+ .data          0x0000000000002564        0x0 aplite/src/resource_ids.auto.c.33.o
+ .data          0x0000000000002564        0x0 src/message_keys.auto.c.33.o
+ .data          0x0000000000002564        0x0 /home/dawn/.pebble-sdk/SDKs/current/sdk-core/pebble/aplite/lib/libpebble.a(tmp7jpKUopebble.o)
+ .data          0x0000000000002564        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-atexit.o)
+ .data          0x0000000000002564        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-exit.o)
+ .data          0x0000000000002564        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-fini.o)
+ .data          0x0000000000002564        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-impure.o)
+ .data          0x0000000000002564        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-init.o)
+ .data          0x0000000000002564        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-__atexit.o)
+ .data          0x0000000000002564        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-__call_atexit.o)
+ .data          0x0000000000002564        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtend.o
+ .data          0x0000000000002564        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtn.o
  *(.data.*)
  .data.MESSAGE_KEY_JSReady
-                0x00000000000025fc        0x4 src/message_keys.auto.c.33.o
-                0x00000000000025fc                MESSAGE_KEY_JSReady
+                0x0000000000002564        0x4 src/message_keys.auto.c.33.o
+                0x0000000000002564                MESSAGE_KEY_JSReady
  .data.MESSAGE_KEY_PMS_CHOICE
-                0x0000000000002600        0x4 src/message_keys.auto.c.33.o
-                0x0000000000002600                MESSAGE_KEY_PMS_CHOICE
+                0x0000000000002568        0x4 src/message_keys.auto.c.33.o
+                0x0000000000002568                MESSAGE_KEY_PMS_CHOICE
  .data.MESSAGE_KEY_PMS_ERROR
-                0x0000000000002604        0x4 src/message_keys.auto.c.33.o
-                0x0000000000002604                MESSAGE_KEY_PMS_ERROR
+                0x000000000000256c        0x4 src/message_keys.auto.c.33.o
+                0x000000000000256c                MESSAGE_KEY_PMS_ERROR
  .data.MESSAGE_KEY_PMS_IS_CONFIGURED
-                0x0000000000002608        0x4 src/message_keys.auto.c.33.o
-                0x0000000000002608                MESSAGE_KEY_PMS_IS_CONFIGURED
+                0x0000000000002570        0x4 src/message_keys.auto.c.33.o
+                0x0000000000002570                MESSAGE_KEY_PMS_IS_CONFIGURED
  .data.MESSAGE_KEY_PMS_REQUEST
-                0x000000000000260c        0x4 src/message_keys.auto.c.33.o
-                0x000000000000260c                MESSAGE_KEY_PMS_REQUEST
+                0x0000000000002574        0x4 src/message_keys.auto.c.33.o
+                0x0000000000002574                MESSAGE_KEY_PMS_REQUEST
  .data.MESSAGE_KEY_PMS_RESPONSE
-                0x0000000000002610        0x4 src/message_keys.auto.c.33.o
-                0x0000000000002610                MESSAGE_KEY_PMS_RESPONSE
+                0x0000000000002578        0x4 src/message_keys.auto.c.33.o
+                0x0000000000002578                MESSAGE_KEY_PMS_RESPONSE
  .data.MESSAGE_KEY_PMS_RESPONSE_INDEX
-                0x0000000000002614        0x4 src/message_keys.auto.c.33.o
-                0x0000000000002614                MESSAGE_KEY_PMS_RESPONSE_INDEX
+                0x000000000000257c        0x4 src/message_keys.auto.c.33.o
+                0x000000000000257c                MESSAGE_KEY_PMS_RESPONSE_INDEX
  .data.MESSAGE_KEY_PMS_RESPONSE_ITEMS
-                0x0000000000002618        0x4 src/message_keys.auto.c.33.o
-                0x0000000000002618                MESSAGE_KEY_PMS_RESPONSE_ITEMS
+                0x0000000000002580        0x4 src/message_keys.auto.c.33.o
+                0x0000000000002580                MESSAGE_KEY_PMS_RESPONSE_ITEMS
  .data.MESSAGE_KEY_PMS_RESPONSE_SENT
-                0x000000000000261c        0x4 src/message_keys.auto.c.33.o
-                0x000000000000261c                MESSAGE_KEY_PMS_RESPONSE_SENT
+                0x0000000000002584        0x4 src/message_keys.auto.c.33.o
+                0x0000000000002584                MESSAGE_KEY_PMS_RESPONSE_SENT
  .data.MESSAGE_KEY_PMS_SERVICE_RADARR
-                0x0000000000002620        0x4 src/message_keys.auto.c.33.o
-                0x0000000000002620                MESSAGE_KEY_PMS_SERVICE_RADARR
+                0x0000000000002588        0x4 src/message_keys.auto.c.33.o
+                0x0000000000002588                MESSAGE_KEY_PMS_SERVICE_RADARR
  .data.MESSAGE_KEY_PMS_SERVICE_SONARR
-                0x0000000000002624        0x4 src/message_keys.auto.c.33.o
-                0x0000000000002624                MESSAGE_KEY_PMS_SERVICE_SONARR
+                0x000000000000258c        0x4 src/message_keys.auto.c.33.o
+                0x000000000000258c                MESSAGE_KEY_PMS_SERVICE_SONARR
  .data.MESSAGE_KEY_PMS_SUCCESS
-                0x0000000000002628        0x4 src/message_keys.auto.c.33.o
-                0x0000000000002628                MESSAGE_KEY_PMS_SUCCESS
+                0x0000000000002590        0x4 src/message_keys.auto.c.33.o
+                0x0000000000002590                MESSAGE_KEY_PMS_SUCCESS
  .data.MESSAGE_KEY_RADARR_API
-                0x000000000000262c        0x4 src/message_keys.auto.c.33.o
-                0x000000000000262c                MESSAGE_KEY_RADARR_API
+                0x0000000000002594        0x4 src/message_keys.auto.c.33.o
+                0x0000000000002594                MESSAGE_KEY_RADARR_API
  .data.MESSAGE_KEY_RADARR_PORT
-                0x0000000000002630        0x4 src/message_keys.auto.c.33.o
-                0x0000000000002630                MESSAGE_KEY_RADARR_PORT
+                0x0000000000002598        0x4 src/message_keys.auto.c.33.o
+                0x0000000000002598                MESSAGE_KEY_RADARR_PORT
  .data.MESSAGE_KEY_SERVER_URL
-                0x0000000000002634        0x4 src/message_keys.auto.c.33.o
-                0x0000000000002634                MESSAGE_KEY_SERVER_URL
+                0x000000000000259c        0x4 src/message_keys.auto.c.33.o
+                0x000000000000259c                MESSAGE_KEY_SERVER_URL
  .data.MESSAGE_KEY_SONARR_API
-                0x0000000000002638        0x4 src/message_keys.auto.c.33.o
-                0x0000000000002638                MESSAGE_KEY_SONARR_API
+                0x00000000000025a0        0x4 src/message_keys.auto.c.33.o
+                0x00000000000025a0                MESSAGE_KEY_SONARR_API
  .data.MESSAGE_KEY_SONARR_PORT
-                0x000000000000263c        0x4 src/message_keys.auto.c.33.o
-                0x000000000000263c                MESSAGE_KEY_SONARR_PORT
+                0x00000000000025a4        0x4 src/message_keys.auto.c.33.o
+                0x00000000000025a4                MESSAGE_KEY_SONARR_PORT
 
-.igot.plt       0x0000000000002640        0x0
- .igot.plt      0x0000000000002640        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtbegin.o
+.igot.plt       0x00000000000025a8        0x0
+ .igot.plt      0x00000000000025a8        0x0 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtbegin.o
 
-.got            0x0000000000002640       0x70
- .got           0x0000000000002640       0x70 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtbegin.o
+.got            0x00000000000025a8       0x70
+ .got           0x00000000000025a8       0x70 /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtbegin.o
 
-.got.plt        0x00000000000026b0        0xc
- .got.plt       0x00000000000026b0        0xc /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtbegin.o
-                0x00000000000026b0                _GLOBAL_OFFSET_TABLE_
+.got.plt        0x0000000000002618        0xc
+ .got.plt       0x0000000000002618        0xc /usr/lib/gcc/arm-none-eabi/7.2.0/armv7-m/crtbegin.o
+                0x0000000000002618                _GLOBAL_OFFSET_TABLE_
 
-.bss            0x00000000000026bc      0x85c
+.bss            0x0000000000002624      0x85c
  *(.bss)
  *(.bss.*)
  .bss.s_js_ready
-                0x00000000000026bc        0x1 src/c/pms-data.c.33.o
+                0x0000000000002624        0x1 src/c/pms-data.c.33.o
  .bss.s_last_text
-                0x00000000000026bd      0x200 src/c/pms-data.c.33.o
- .bss.s_mode    0x00000000000028bd        0x1 src/c/pms-data.c.33.o
+                0x0000000000002625      0x200 src/c/pms-data.c.33.o
+ .bss.s_mode    0x0000000000002825        0x1 src/c/pms-data.c.33.o
  .bss.s_pms_response
-                0x00000000000028be       0xa0 src/c/pms-data.c.33.o
- *fill*         0x000000000000295e        0x2 
+                0x0000000000002826       0xa0 src/c/pms-data.c.33.o
+ *fill*         0x00000000000028c6        0x2 
  .bss.s_pms_response_index
-                0x0000000000002960        0x4 src/c/pms-data.c.33.o
+                0x00000000000028c8        0x4 src/c/pms-data.c.33.o
  .bss.s_pms_response_items
-                0x0000000000002964        0x4 src/c/pms-data.c.33.o
+                0x00000000000028cc        0x4 src/c/pms-data.c.33.o
  .bss.s_response_sent
-                0x0000000000002968        0x4 src/c/pms-data.c.33.o
- .bss.s_bounds  0x000000000000296c        0x8 src/c/pms-interface.c.33.o
+                0x00000000000028d0        0x4 src/c/pms-data.c.33.o
+ .bss.last_ccp  0x00000000000028d4        0x4 src/c/pms-interface.c.33.o
+ .bss.s_bounds  0x00000000000028d8        0x8 src/c/pms-interface.c.33.o
  .bss.s_dictation_session
-                0x0000000000002974        0x4 src/c/pms-interface.c.33.o
+                0x00000000000028e0        0x4 src/c/pms-interface.c.33.o
  .bss.s_failed_buff.7717
-                0x0000000000002978       0x80 src/c/pms-interface.c.33.o
+                0x00000000000028e4       0x80 src/c/pms-interface.c.33.o
  .bss.s_menu_layer
-                0x00000000000029f8        0x4 src/c/pms-interface.c.33.o
+                0x0000000000002964        0x4 src/c/pms-interface.c.33.o
  .bss.s_text_layer
-                0x00000000000029fc        0x4 src/c/pms-interface.c.33.o
- .bss.s_window  0x0000000000002a00        0x4 src/c/pms-interface.c.33.o
- .bss.s_buff.7678
-                0x0000000000002a04       0x10 src/c/pms-routines.c.33.o
- .bss.s_timeout_timer
-                0x0000000000002a14        0x4 src/c/pms-routines.c.33.o
- COMMON         0x0000000000002a18      0x500 src/c/pms-data.c.33.o
-                0x0000000000002a18                s_pms_sonarr_api_key
-                0x0000000000002b18                s_pms_radarr_port
-                0x0000000000002c18                s_pms_radarr_api_key
-                0x0000000000002d18                s_pms_sonarr_port
-                0x0000000000002e18                s_pms_base_url
+                0x0000000000002968        0x4 src/c/pms-interface.c.33.o
+ .bss.s_window  0x000000000000296c        0x4 src/c/pms-interface.c.33.o
+ .bss.s_buff.7672
+                0x0000000000002970       0x10 src/c/pms-routines.c.33.o
+ COMMON         0x0000000000002980      0x500 src/c/pms-data.c.33.o
+                0x0000000000002980                s_pms_sonarr_api_key
+                0x0000000000002a80                s_pms_radarr_port
+                0x0000000000002b80                s_pms_radarr_api_key
+                0x0000000000002c80                s_pms_sonarr_port
+                0x0000000000002d80                s_pms_base_url
 
 DISCARD
  libc.a(*)
@@ -1816,94 +1808,94 @@ OUTPUT(/home/dawn/pebble-dev/pms/build/aplite/pebble-app.elf elf32-littlearm)
  .comment       0x000000000000001d       0x1e aplite/src/resource_ids.auto.c.33.o
  .comment       0x000000000000001d       0x1e src/message_keys.auto.c.33.o
 
-.debug_info     0x0000000000000000     0x6673
+.debug_info     0x0000000000000000     0x6633
  .debug_info    0x0000000000000000     0x128e src/c/pms-client.c.33.o
- .debug_info    0x000000000000128e     0x1437 src/c/pms-data.c.33.o
- .debug_info    0x00000000000026c5     0x1d64 src/c/pms-interface.c.33.o
- .debug_info    0x0000000000004429     0x13a9 src/c/pms-routines.c.33.o
- .debug_info    0x00000000000057d2      0x9b2 src/c/pms.c.33.o
- .debug_info    0x0000000000006184      0x2f0 aplite/appinfo.auto.c.33.o
- .debug_info    0x0000000000006474       0x64 aplite/src/resource_ids.auto.c.33.o
- .debug_info    0x00000000000064d8      0x19b src/message_keys.auto.c.33.o
+ .debug_info    0x000000000000128e     0x13ee src/c/pms-data.c.33.o
+ .debug_info    0x000000000000267c     0x1e42 src/c/pms-interface.c.33.o
+ .debug_info    0x00000000000044be     0x12d4 src/c/pms-routines.c.33.o
+ .debug_info    0x0000000000005792      0x9b2 src/c/pms.c.33.o
+ .debug_info    0x0000000000006144      0x2f0 aplite/appinfo.auto.c.33.o
+ .debug_info    0x0000000000006434       0x64 aplite/src/resource_ids.auto.c.33.o
+ .debug_info    0x0000000000006498      0x19b src/message_keys.auto.c.33.o
 
-.debug_abbrev   0x0000000000000000     0x112c
+.debug_abbrev   0x0000000000000000     0x10f7
  .debug_abbrev  0x0000000000000000      0x2be src/c/pms-client.c.33.o
- .debug_abbrev  0x00000000000002be      0x3d0 src/c/pms-data.c.33.o
- .debug_abbrev  0x000000000000068e      0x484 src/c/pms-interface.c.33.o
- .debug_abbrev  0x0000000000000b12      0x336 src/c/pms-routines.c.33.o
- .debug_abbrev  0x0000000000000e48      0x1d8 src/c/pms.c.33.o
- .debug_abbrev  0x0000000000001020       0xa2 aplite/appinfo.auto.c.33.o
- .debug_abbrev  0x00000000000010c2       0x26 aplite/src/resource_ids.auto.c.33.o
- .debug_abbrev  0x00000000000010e8       0x44 src/message_keys.auto.c.33.o
+ .debug_abbrev  0x00000000000002be      0x3a7 src/c/pms-data.c.33.o
+ .debug_abbrev  0x0000000000000665      0x498 src/c/pms-interface.c.33.o
+ .debug_abbrev  0x0000000000000afd      0x316 src/c/pms-routines.c.33.o
+ .debug_abbrev  0x0000000000000e13      0x1d8 src/c/pms.c.33.o
+ .debug_abbrev  0x0000000000000feb       0xa2 aplite/appinfo.auto.c.33.o
+ .debug_abbrev  0x000000000000108d       0x26 aplite/src/resource_ids.auto.c.33.o
+ .debug_abbrev  0x00000000000010b3       0x44 src/message_keys.auto.c.33.o
 
-.debug_loc      0x0000000000000000      0xcbf
+.debug_loc      0x0000000000000000      0xca9
  .debug_loc     0x0000000000000000      0x274 src/c/pms-client.c.33.o
  .debug_loc     0x0000000000000274      0x368 src/c/pms-data.c.33.o
- .debug_loc     0x00000000000005dc      0x442 src/c/pms-interface.c.33.o
- .debug_loc     0x0000000000000a1e      0x2a1 src/c/pms-routines.c.33.o
+ .debug_loc     0x00000000000005dc      0x44d src/c/pms-interface.c.33.o
+ .debug_loc     0x0000000000000a29      0x280 src/c/pms-routines.c.33.o
 
-.debug_aranges  0x0000000000000000      0x278
+.debug_aranges  0x0000000000000000      0x268
  .debug_aranges
                 0x0000000000000000       0x28 src/c/pms-client.c.33.o
  .debug_aranges
-                0x0000000000000028       0xe8 src/c/pms-data.c.33.o
+                0x0000000000000028       0xe0 src/c/pms-data.c.33.o
  .debug_aranges
-                0x0000000000000110       0xa0 src/c/pms-interface.c.33.o
+                0x0000000000000108       0xa0 src/c/pms-interface.c.33.o
  .debug_aranges
-                0x00000000000001b0       0x60 src/c/pms-routines.c.33.o
+                0x00000000000001a8       0x58 src/c/pms-routines.c.33.o
  .debug_aranges
-                0x0000000000000210       0x20 src/c/pms.c.33.o
+                0x0000000000000200       0x20 src/c/pms.c.33.o
  .debug_aranges
-                0x0000000000000230       0x18 aplite/appinfo.auto.c.33.o
+                0x0000000000000220       0x18 aplite/appinfo.auto.c.33.o
  .debug_aranges
-                0x0000000000000248       0x18 aplite/src/resource_ids.auto.c.33.o
+                0x0000000000000238       0x18 aplite/src/resource_ids.auto.c.33.o
  .debug_aranges
-                0x0000000000000260       0x18 src/message_keys.auto.c.33.o
+                0x0000000000000250       0x18 src/message_keys.auto.c.33.o
 
-.debug_ranges   0x0000000000000000      0x2f0
+.debug_ranges   0x0000000000000000      0x2a0
  .debug_ranges  0x0000000000000000       0x48 src/c/pms-client.c.33.o
- .debug_ranges  0x0000000000000048      0x100 src/c/pms-data.c.33.o
- .debug_ranges  0x0000000000000148       0xd8 src/c/pms-interface.c.33.o
- .debug_ranges  0x0000000000000220       0xc0 src/c/pms-routines.c.33.o
- .debug_ranges  0x00000000000002e0       0x10 src/c/pms.c.33.o
+ .debug_ranges  0x0000000000000048       0xf8 src/c/pms-data.c.33.o
+ .debug_ranges  0x0000000000000140       0xd8 src/c/pms-interface.c.33.o
+ .debug_ranges  0x0000000000000218       0x78 src/c/pms-routines.c.33.o
+ .debug_ranges  0x0000000000000290       0x10 src/c/pms.c.33.o
 
-.debug_line     0x0000000000000000     0x1123
+.debug_line     0x0000000000000000     0x10e0
  .debug_line    0x0000000000000000      0x26a src/c/pms-client.c.33.o
- .debug_line    0x000000000000026a      0x41b src/c/pms-data.c.33.o
- .debug_line    0x0000000000000685      0x443 src/c/pms-interface.c.33.o
- .debug_line    0x0000000000000ac8      0x2dd src/c/pms-routines.c.33.o
- .debug_line    0x0000000000000da5      0x1d1 src/c/pms.c.33.o
- .debug_line    0x0000000000000f76       0xf5 aplite/appinfo.auto.c.33.o
- .debug_line    0x000000000000106b       0x1d aplite/src/resource_ids.auto.c.33.o
- .debug_line    0x0000000000001088       0x9b src/message_keys.auto.c.33.o
+ .debug_line    0x000000000000026a      0x407 src/c/pms-data.c.33.o
+ .debug_line    0x0000000000000671      0x44f src/c/pms-interface.c.33.o
+ .debug_line    0x0000000000000ac0      0x2a2 src/c/pms-routines.c.33.o
+ .debug_line    0x0000000000000d62      0x1d1 src/c/pms.c.33.o
+ .debug_line    0x0000000000000f33       0xf5 aplite/appinfo.auto.c.33.o
+ .debug_line    0x0000000000001028       0x1d aplite/src/resource_ids.auto.c.33.o
+ .debug_line    0x0000000000001045       0x9b src/message_keys.auto.c.33.o
 
-.debug_str      0x0000000000000000     0x1c5e
+.debug_str      0x0000000000000000     0x1c6e
  .debug_str     0x0000000000000000      0xa95 src/c/pms-client.c.33.o
                                         0xbc7 (size before relaxing)
- .debug_str     0x0000000000000a95      0x230 src/c/pms-data.c.33.o
-                                        0xb1f (size before relaxing)
- .debug_str     0x0000000000000cc5      0xa28 src/c/pms-interface.c.33.o
-                                       0x12f4 (size before relaxing)
- .debug_str     0x00000000000016ed      0x2f5 src/c/pms-routines.c.33.o
-                                        0xcc7 (size before relaxing)
- .debug_str     0x00000000000019e2       0x23 src/c/pms.c.33.o
+ .debug_str     0x0000000000000a95      0x216 src/c/pms-data.c.33.o
+                                        0xb05 (size before relaxing)
+ .debug_str     0x0000000000000cab      0xaa4 src/c/pms-interface.c.33.o
+                                       0x1356 (size before relaxing)
+ .debug_str     0x000000000000174f      0x2a3 src/c/pms-routines.c.33.o
+                                        0xc75 (size before relaxing)
+ .debug_str     0x00000000000019f2       0x23 src/c/pms.c.33.o
                                         0x6f9 (size before relaxing)
- .debug_str     0x0000000000001a05      0x222 aplite/appinfo.auto.c.33.o
+ .debug_str     0x0000000000001a15      0x222 aplite/appinfo.auto.c.33.o
                                         0x379 (size before relaxing)
- .debug_str     0x0000000000001c27       0x1f aplite/src/resource_ids.auto.c.33.o
+ .debug_str     0x0000000000001c37       0x1f aplite/src/resource_ids.auto.c.33.o
                                         0x123 (size before relaxing)
- .debug_str     0x0000000000001c46       0x18 src/message_keys.auto.c.33.o
+ .debug_str     0x0000000000001c56       0x18 src/message_keys.auto.c.33.o
                                         0x2e7 (size before relaxing)
 
-.debug_frame    0x0000000000000000      0x7c8
+.debug_frame    0x0000000000000000      0x784
  .debug_frame   0x0000000000000000       0x70 src/c/pms-client.c.33.o
- .debug_frame   0x0000000000000070      0x28c src/c/pms-data.c.33.o
- .debug_frame   0x00000000000002fc      0x26c src/c/pms-interface.c.33.o
- .debug_frame   0x0000000000000568      0x10c src/c/pms-routines.c.33.o
- .debug_frame   0x0000000000000674       0x28 src/c/pms.c.33.o
- .debug_frame   0x000000000000069c       0x20 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-atexit.o)
- .debug_frame   0x00000000000006bc       0x28 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-exit.o)
- .debug_frame   0x00000000000006e4       0x34 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-fini.o)
- .debug_frame   0x0000000000000718       0x2c /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-init.o)
- .debug_frame   0x0000000000000744       0x34 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-__atexit.o)
- .debug_frame   0x0000000000000778       0x50 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-__call_atexit.o)
+ .debug_frame   0x0000000000000070      0x270 src/c/pms-data.c.33.o
+ .debug_frame   0x00000000000002e0      0x27c src/c/pms-interface.c.33.o
+ .debug_frame   0x000000000000055c       0xd4 src/c/pms-routines.c.33.o
+ .debug_frame   0x0000000000000630       0x28 src/c/pms.c.33.o
+ .debug_frame   0x0000000000000658       0x20 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-atexit.o)
+ .debug_frame   0x0000000000000678       0x28 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-exit.o)
+ .debug_frame   0x00000000000006a0       0x34 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-fini.o)
+ .debug_frame   0x00000000000006d4       0x2c /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-init.o)
+ .debug_frame   0x0000000000000700       0x34 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-__atexit.o)
+ .debug_frame   0x0000000000000734       0x50 /usr/lib/gcc/arm-none-eabi/7.2.0/../../../../arm-none-eabi/lib/armv7-m/libc.a(lib_a-__call_atexit.o)
