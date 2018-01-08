@@ -12,10 +12,29 @@
 #include <pebble.h>
 #endif
 
+static AppTimer *s_timeout_timer;
 
 
 //**************************************************************************************
 
+static bool bool_cancel_timer() 
+{
+	if (s_timeout_timer) 
+	{
+		app_timer_cancel(s_timeout_timer); 
+		s_timeout_timer = NULL;
+		return true;
+	}
+	return false;
+}
+
+void timeout_timer_handler(void *context) 
+{
+	if (!bool_cancel_timer())
+	{
+		APP_LOG(APP_LOG_LEVEL_ERROR, "bool_cancel_timer failed");
+	}
+}
 
 void inbox_dropped_callback(AppMessageResult reason, void *context) 
 {
@@ -25,6 +44,10 @@ void inbox_dropped_callback(AppMessageResult reason, void *context)
 void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context) 
 {
 	APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox send failed!"); 
+	if (!bool_cancel_timer())
+	{
+		APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to cancel timer");
+	}
 }  
 
 
@@ -120,6 +143,8 @@ bool pms_request_handler(int *choice)
 					break;
 			} 
 			result = app_message_outbox_send();
+			const int interval_ms = 10000;
+			s_timeout_timer = app_timer_register(interval_ms, timeout_timer_handler, NULL);
 			if(result != APP_MSG_OK) 
 			{
 				APP_LOG(APP_LOG_LEVEL_ERROR, "Error sending outbox message");
