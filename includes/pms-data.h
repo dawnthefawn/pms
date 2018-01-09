@@ -12,6 +12,8 @@ enum modes
 	MENU,
 	PROCESS,
 };
+bool bool_set_sms_port(char *sms_port);
+char * str_get_sms_port();
 bool bool_reset_response_array();
 int int_get_pms_response_items();
 bool bool_set_response_items(int items, bool reset);

@@ -5,7 +5,7 @@
 #endif
 
 bool bool_get_js_ready();
-bool pms_request_handler(int *choice);
+bool pms_request_handler(int *choice, bool is_sms_request);
 bool pms_verify_setup();
 int16_t get_cell_height_callback(struct MenuLayer *menu_layer,MenuIndex *cell_index,void *context);
 void draw_row_callback(GContext *ctx,const Layer *cell_layer,MenuIndex *cell_index,void *context);
