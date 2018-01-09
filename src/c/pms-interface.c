@@ -282,7 +282,7 @@ static void pms_up_click_handler(ClickRecognizerRef recognizer, void *context)
 			return;
 			break;
 		case RADARR:
-			text_layer_set_text(s_text_layer, "\n\n\n\n\nShow:\nPress Select to Dictate");
+			text_layer_set_text(s_text_layer, "\n\nUp: Restart Sonarr\n\n\nShow:\nPress Select to Dictate");
 			set_mode(SONARR);
 			pms_request_handler(NULL, false);
 			return;
@@ -305,13 +305,13 @@ static void pms_down_click_handler(ClickRecognizerRef recognizer, void *context)
 	switch (int_get_mode()) 
 	{
 		case NONE:
-			text_layer_set_text(s_text_layer, "\n\nDown: Restart Radarr\n\n\nMovie:\nPress Select to Dictate");
+			text_layer_set_text(s_text_layer, "\n\n\n\n\nMovie:\nPress Select to Dictate\n\nDown: Restart Radarr");
 			set_mode(RADARR);
 			pms_request_handler(NULL,false);
 			return;
 			break;
 		case SONARR:
-			text_layer_set_text(s_text_layer, "\n\n\n\n\nMovie:\nPress Select to Dictate");
+			text_layer_set_text(s_text_layer, "\n\n\n\n\nMovie:\nPress Select to Dictate\n\nDown: Restart Radarr");
 			set_mode(RADARR);
 			pms_request_handler(NULL,false);
 			return;
