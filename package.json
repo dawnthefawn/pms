@@ -1,7 +1,7 @@
 {
   "name": "PebbleMediaSecretary",
   "author": "Dawn Nowell",
-  "version": "0.0.0",
+  "version": "1.1.0",
   "keywords": [
     "pebble-app"
   ],
@@ -29,10 +29,12 @@
       "SONARR_PORT",
       "RADARR_API",
       "RADARR_PORT",
+      "SMS_PORT",
       "JSReady",
       "PMS_REQUEST",
       "PMS_SERVICE_SONARR",
       "PMS_SERVICE_RADARR",
+      "PMS_SERVICE_REQUEST_IS_SMS",
       "PMS_IS_CONFIGURED",
       "PMS_RESPONSE[8]",
       "PMS_RESPONSE_INDEX",
@@ -40,6 +42,7 @@
       "PMS_RESPONSE_SENT",
       "PMS_CHOICE",
       "PMS_SUCCESS",
+      "PMS_SMS_SUCCESS",
       "PMS_ERROR"
     ],
     "resources": {

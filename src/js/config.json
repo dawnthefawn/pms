@@ -34,6 +34,11 @@
 			"type": "input",
 			"messageKey": "RADARR_API",
 			"label": "Radarr Api Key"
+		},
+		{
+			"type": "input",
+			"messageKey": "SMS_PORT",
+			"label": "Services Manager Server Port"
 		}]
 	},
 	{	"type": "submit",

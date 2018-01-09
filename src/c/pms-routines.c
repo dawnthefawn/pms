@@ -23,6 +23,7 @@ static bool bool_cancel_timer()
 	{
 		app_timer_cancel(s_timeout_timer); 
 		s_timeout_timer = NULL;
+		set_mode(NONE);
 		return true;
 	}
 	return false;
@@ -76,8 +77,6 @@ int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_i
 }
 
 
-
-
 bool pms_verify_setup() 
 {
 	DictionaryIterator *out_iter;
@@ -89,6 +88,7 @@ bool pms_verify_setup()
 		dict_write_cstring(out_iter, MESSAGE_KEY_SONARR_API, str_sonarr_api_key());
 		dict_write_cstring(out_iter, MESSAGE_KEY_RADARR_PORT, str_radarr_port());
 		dict_write_cstring(out_iter, MESSAGE_KEY_RADARR_API, str_radarr_api_key());
+		dict_write_cstring(out_iter, MESSAGE_KEY_SMS_PORT, str_get_sms_port());
 		result = app_message_outbox_send();
 		if(result != APP_MSG_OK) 
 		{
@@ -106,7 +106,7 @@ bool pms_verify_setup()
 }
 
 
-bool pms_request_handler(int *choice) 
+bool pms_request_handler(int *choice, bool is_sms_request) 
 {   
 	if (bool_get_js_ready())
 	{
@@ -124,10 +124,26 @@ bool pms_request_handler(int *choice)
 				case SONARR:
 					dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_SONARR, &yes, sizeof(int), true);
 					dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_RADARR, &no, sizeof(int), true);
+					if (is_sms_request)
+					{
+						dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_REQUEST_IS_SMS, &yes, sizeof(int), true);
+					}
+					else
+					{
+						dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_REQUEST_IS_SMS, &no, sizeof(int), true);
+					}
 					break;
 				case RADARR:
 					dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_RADARR, &yes, sizeof(int), true);
 					dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_SONARR, &no, sizeof(int), true);
+					if (is_sms_request)
+					{
+						dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_REQUEST_IS_SMS, &yes, sizeof(int), true);
+					}
+					else
+					{
+						dict_write_int(out_iter, MESSAGE_KEY_PMS_SERVICE_REQUEST_IS_SMS, &no, sizeof(int), true);
+					}
 					break;
 				case DICTATION:
 					dict_write_cstring(out_iter, MESSAGE_KEY_PMS_REQUEST, str_get_last_text());

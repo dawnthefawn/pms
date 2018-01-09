@@ -84,6 +84,13 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 		}
 		return;
 	}
+	Tuple *sms_success = dict_find(iter, MESSAGE_KEY_PMS_SMS_SUCCESS);
+	if (sms_success)
+	{
+		vibes_double_pulse();
+		sms_success_handler(sms_success->value->cstring);
+		return;
+	}
 
 	Tuple *pms_error = dict_find(iter, MESSAGE_KEY_PMS_ERROR);
 	if (pms_error) 
@@ -164,6 +171,16 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 			APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_radarr_port() failed.");
 		}
 	}
+
+	Tuple *sms_port = dict_find(iter, MESSAGE_KEY_SMS_PORT);
+	if (sms_port)
+	{
+		if (!bool_set_sms_port(sms_port->value->cstring))
+		{
+			APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_sms_port() failed");
+		}
+	}
+
 	if(!persist_read_bool(MESSAGE_KEY_PMS_IS_CONFIGURED)) 
 	{
 		pms_verify_setup();
