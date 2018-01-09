@@ -1,8 +1,8 @@
-*/*.swp
-*/*.swo
-*/*.swm
-*/*.o
+/*/*.swp
+/*/*.swo
+/*/*.swm
+/*/*.o
 *.tar.gz
 
-buildlog/*
-node_modules/*
+/buildlog/*
+/node_modules/*
