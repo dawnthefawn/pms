@@ -84,6 +84,13 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 		}
 		return;
 	}
+	Tuple *sms_success = dict_find(iter, MESSAGE_KEY_PMS_SMS_SUCCESS);
+	if (sms_success)
+	{
+		vibes_double_pulse();
+		sms_success_handler(sms_success->value->cstring);
+		return;
+	}
 
 	Tuple *pms_error = dict_find(iter, MESSAGE_KEY_PMS_ERROR);
 	if (pms_error) 

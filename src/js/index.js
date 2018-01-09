@@ -242,14 +242,15 @@ function SendServerRequest(is_sms_request) {
     request.open(method, pms_request_url, true);
     request.onload = function() {
       try {
-        json = JSON.parse(this.responseText);
+        var reply = JSON.parse(this.responseText);
         pms_request_type = 'ADD';
 		if (is_sms_request)
 		{
-			//Send Event Message
+			Pebble.sendAppMessage({'PMS_SMS_SUCCESS': reply.status});
 		}
 		else
 		{
+			json = reply;
         	ProcessServerResponse({}, 0);
 		}
       } catch(err) {

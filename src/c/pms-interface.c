@@ -430,7 +430,10 @@ bool pms_init()
 	return true;
 }
 
-
+void sms_success_handler(char *msg)
+{
+	text_layer_set_text(s_text_layer, msg);
+}
 static bool deinitialize_menu() 
 {
 	layer_remove_from_parent(menu_layer_get_layer(s_menu_layer));

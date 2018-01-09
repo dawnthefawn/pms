@@ -11,3 +11,4 @@ uint16_t get_num_rows_callback(MenuLayer *menu_layer,uint16_t section_index,void
 void pms_deinit(void);
 int int_get_mode();
 bool pms_error_response_handler(char *error_message);
+void sms_success_handler(char *msg);
