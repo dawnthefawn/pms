@@ -1,10 +1,10 @@
 var Clay = require('pebble-clay');
+var ImageJS = require('imagejs');
 var clayConfig = require('./config.json');
-//var customClay = require('./custom-clay.js');
-//var clay = new Clay(clayConfig, customClay);
+var Jimp = require('jimp');
+
 var clay = new Clay(clayConfig);
 var messageKeys = require('message_keys');
-
 var server_base_url;// = Clay.getItemByMessageKey('SERVER_URL');
 var sonarr_api_key;// = Clay.getItemByMessageKey('SONARR_API');
 var radarr_api_key;
@@ -34,6 +34,75 @@ var pms_items;
 var pms_tvdbids = {};
 var pms_choice;
 var json;
+
+function fetchPoster(url)
+{
+	Jimp.read(url, function (err, image)
+	{
+		image.resize(256, 256)
+		console.log(image.bitmap.data);
+		processPoster(image.bitmap.data);
+	});
+
+}
+
+function processPoster(imagedata)
+{
+	var byteArray = new Uint8Array(imagedata);
+	var array = [];
+	for (var x = 0; x < byteArray.byteLength; x++)
+	{
+		array.push(byteArray[x]);
+	}
+
+	transmitPoster(array);
+}
+
+function transmitPoster(array)
+{
+	var index = 0;
+	var arrayLength = array.length;
+
+	Pebble.sendAppMessage({'DATA_LENGTH': arrayLength}, function(e)
+	{
+		sendChunk(array, index, arrayLength);
+	}, function (e)
+	{
+		console.log('failed to initiate image transfer');
+	})
+}
+
+function sendChunk(array, index, arrayLength) 
+{
+	var chunkSize = BUFFER_SIZE;
+	if (arrayLength - index < BUFFER_SIZE)
+	{
+		chunkSize = arrayLength - index;
+	}
+
+	var dict = 
+	{
+		'DATA_CHUNK': array.slice(index, index + chunkSize),
+		'CHUNK_SIZE': chunkSize,
+		'IMAGE_CHUNK_INDEX': index
+	};
+
+	Pebble.sendAppMessage(dict, function()
+	{
+		index += chunkSize;
+		if (index < arrayLength)
+		{
+			sendChunk(array, index, arrayLength);
+		}
+		else
+		{
+			Pebble.sendAppMessage({'IMAGE_SENT': 1});
+		}
+	}, function(e)
+	{
+		console.log('Failed to send chunk with index ' + index);
+	});
+}
 
 function AddMedia(request, choice) {
   console.log('AddMedia(): request = ' + request);
@@ -183,6 +252,7 @@ function ProcessServerResponse(dict, x) {
         
         if (x < 7) {
           x = x + 1;
+		  fetchPoster(object.images[0].url);
           ProcessServerResponse(dict, x);
 
         }
