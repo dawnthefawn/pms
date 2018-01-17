@@ -11,9 +11,12 @@ var radarr_api_key;
 var api_key;
 var radarr_port;
 var sonarr_port;// = Clay.getItemByMessageKey('SONARR_PORT');
+var sms_port;
 var port;
 var sonarr_search_string = '/api/series/lookup?term=';
 var radarr_search_string = '/api/movies/lookup?term=';
+var sms_reset_sonarr_string = '/sonarr/restart';
+var sms_reset_radarr_string = '/radarr/restart';
 var radarr_add_string = '/api/movie';
 var sonarr_add_string = '/api/series';
 var search_postfix = '&apikey=';
@@ -114,11 +117,10 @@ function AddMedia(request, choice) {
         try {
           
           var reply = JSON.parse(this.responseText);
-  	  console.log(reply);
 	  if (reply.title == json[choice].title) {
 	    Pebble.sendAppMessage({'PMS_SUCCESS': 1});
           } else {
-            Pebble.sendAppMessage({'PMS_ERROR': 'Item Added is not Item Selected'});
+            Pebble.sendAppMessage({'PMS_ERROR': reply[0].errorMessage});
           } 
         } catch(err) {
           console.log('Unable to parse JSON response: ' + err);
@@ -151,10 +153,18 @@ function AddMedia(request, choice) {
   }
 
 
-function BuildURL() {
+function BuildURL(is_sms_request) {
   console.log ('BuildURL(): pms_service = ' + pms_service + '; pms_request_type = ' + pms_request_type + ';');
   if (pms_service == 'SONARR') {
-    port = ':' + sonarr_port;
+	if (is_sms_request)
+	{
+		port = ':' + sms_port;
+	}
+	else
+	{
+   		port = ':' + sonarr_port;
+	}
+	
     api_key = sonarr_api_key;
     if (pms_request_type == 'ADD') {
       request_type_string = sonarr_add_string;
@@ -163,8 +173,15 @@ function BuildURL() {
       pms_request = '';
     }
     else if (pms_request_type == 'SEARCH') {
-      request_type_string = sonarr_search_string + pms_request;
-      postfix = search_postfix;
+	  if (is_sms_request)
+	  {
+		  request_type_string = sms_reset_sonarr_string;
+	  }
+	  else
+	  {
+	      request_type_string = sonarr_search_string + pms_request;
+   	      postfix = search_postfix;
+	  }
       method = 'GET';
     }
     else {
@@ -173,7 +190,16 @@ function BuildURL() {
     }
   }
   else if (pms_service == 'RADARR') {
-    port = ':' + radarr_port;
+	if (is_sms_request)
+	{
+
+	    port = ':' + sms_port;
+	}
+	else
+	{
+		port = ':' + radarr_port;
+	}
+
     api_key = radarr_api_key;
 
     if (pms_request_type == 'ADD') {
@@ -183,8 +209,16 @@ function BuildURL() {
       pms_request = '';
     }
     else if (pms_request_type == 'SEARCH') {
-      request_type_string = radarr_search_string + pms_request;
-      postfix = search_postfix;
+	  if (is_sms_request)
+	  {
+		  request_type_string = sms_reset_radarr_string;
+	  }
+	  else
+	  {
+
+	      request_type_string = radarr_search_string + pms_request;
+   	      postfix = search_postfix;
+	  }
       method = 'GET';
     }
     else {
@@ -194,8 +228,14 @@ function BuildURL() {
   else {
     return false;
   }
-  
-  pms_request_url = server_base_url + port + request_type_string + postfix + api_key;
+  if (is_sms_request)
+  {
+	  pms_request_url = server_base_url + port + request_type_string;
+  }
+  else
+  {
+ 	 pms_request_url = server_base_url + port + request_type_string + postfix + api_key;
+  }
   return true;
 }
 
@@ -264,16 +304,24 @@ function PmsBuildRequest(choice) {
   }
 }
 
-function SendServerRequest() {
-  if (BuildURL() == true) {
+function SendServerRequest(is_sms_request) {
+  if (BuildURL(is_sms_request) == true) {
     var request = new XMLHttpRequest();
     console.log('Opening request, method: ' + method + 'URL: ' + pms_request_url);
     request.open(method, pms_request_url, true);
     request.onload = function() {
       try {
-        json = JSON.parse(this.responseText);
+        var reply = JSON.parse(this.responseText);
         pms_request_type = 'ADD';
-        ProcessServerResponse({}, 0);
+		if (is_sms_request)
+		{
+			Pebble.sendAppMessage({'PMS_SMS_SUCCESS': reply.status});
+		}
+		else
+		{
+			json = reply;
+        	ProcessServerResponse({}, 0);
+		}
       } catch(err) {
 		console.log(this.responseText);
         console.log('Unable to parse JSON response: ' + err);
@@ -321,7 +369,7 @@ Pebble.addEventListener('appmessage', function(message) {
     console.log('dict.PMS_REQUEST=' + encodeURI(dict.PMS_REQUEST));
     pms_request = encodeURI(dict.PMS_REQUEST);
     console.log('got request string: ' + pms_request);
-    SendServerRequest();
+    SendServerRequest(false);
     dict.PMS_REQUEST = '';
   }
 });
@@ -338,14 +386,19 @@ Pebble.addEventListener('appmessage', function(message) {
     pms_request_type = 'SEARCH';
     console.log('got service request: ' + dict);
     dict.PMS_SERVICE_SONARR = 0;
-    return;
   }
   else if (dict.PMS_SERVICE_RADARR) {
     pms_service = 'RADARR';
     pms_request_type = 'SEARCH';
     dict.PMS_SERVICE_RADARR = 0;
-    return;
   }
+  if (dict.PMS_SERVICE_REQUEST_IS_SMS)
+  {
+    dict.PMS_SERVICE_REQUEST_IS_SMS = 0;
+	SendServerRequest(true);
+	return;
+  }
+    
   if (dict.SERVER_URL) {
     server_base_url = dict.SERVER_URL;
     console.log('set server url as: ' + server_base_url);
@@ -365,6 +418,11 @@ Pebble.addEventListener('appmessage', function(message) {
   if (dict.RADARR_PORT) {
     radarr_port = dict.RADARR_PORT;
     console.log('set radarr port as: ' + radarr_port);
+  }
+  if (dict.SMS_PORT)
+  {
+	  sms_port = dict.SMS_PORT;
+	  console.log('set services-manager-server port as: ' + sms_port);
   }
 });
 

@@ -99,7 +99,7 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "SELECTED!");
 	int choice = (int)cell_index->row + 1; 
-	if (!pms_request_handler(&choice))
+	if (!pms_request_handler(&choice, false))
 	{
     	APP_LOG(APP_LOG_LEVEL_ERROR, "pms_request_handler() returned false. %d", choice);
 	}	
@@ -137,7 +137,7 @@ static void dictation_session_callback(DictationSession *session, DictationSessi
 
 		set_mode(DICTATION);
 		bool_set_last_text(transcription);
-		pms_request_handler(NULL);
+		pms_request_handler(NULL, false);
 	} 
 	else 
 	{
@@ -272,19 +272,19 @@ static void pms_up_click_handler(ClickRecognizerRef recognizer, void *context)
 	switch (int_get_mode()) 
 	{
 		case NONE:
-			text_layer_set_text(s_text_layer, "\n\n\n\n\nShow:\nPress Select to Dictate");
+			text_layer_set_text(s_text_layer, "\n\nUp: Restart Sonarr\n\n\nShow:\nPress Select to Dictate");
 			set_mode(SONARR);
-			pms_request_handler(NULL);
+			pms_request_handler(NULL, false);
 			return;
 			break;
 		case SONARR:
-			pms_request_handler(NULL);
+			pms_request_handler(NULL, true);
 			return;
 			break;
 		case RADARR:
-			text_layer_set_text(s_text_layer, "\n\n\n\n\nShow:\nPress Select to Dictate");
+			text_layer_set_text(s_text_layer, "\n\nUp: Restart Sonarr\n\n\nShow:\nPress Select to Dictate");
 			set_mode(SONARR);
-			pms_request_handler(NULL);
+			pms_request_handler(NULL, false);
 			return;
 			break;
 		case DICTATION:
@@ -305,20 +305,20 @@ static void pms_down_click_handler(ClickRecognizerRef recognizer, void *context)
 	switch (int_get_mode()) 
 	{
 		case NONE:
-			text_layer_set_text(s_text_layer, "\n\n\n\n\nMovie:\nPress Select to Dictate");
+			text_layer_set_text(s_text_layer, "\n\n\n\n\nMovie:\nPress Select to Dictate\n\nDown: Restart Radarr");
 			set_mode(RADARR);
-			pms_request_handler(NULL);
+			pms_request_handler(NULL,false);
 			return;
 			break;
 		case SONARR:
-			text_layer_set_text(s_text_layer, "\n\n\n\n\nMovie:\nPress Select to Dictate");
+			text_layer_set_text(s_text_layer, "\n\n\n\n\nMovie:\nPress Select to Dictate\n\nDown: Restart Radarr");
 			set_mode(RADARR);
-			pms_request_handler(NULL);
+			pms_request_handler(NULL,false);
 			return;
 			break;
 		case RADARR:
 			set_mode(RADARR);
-			pms_request_handler(NULL);
+			pms_request_handler(NULL, true);
 			return;
 			break;
 		case DICTATION:
@@ -430,7 +430,10 @@ bool pms_init()
 	return true;
 }
 
-
+void sms_success_handler(char *msg)
+{
+	text_layer_set_text(s_text_layer, msg);
+}
 static bool deinitialize_menu() 
 {
 	layer_remove_from_parent(menu_layer_get_layer(s_menu_layer));

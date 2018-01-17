@@ -16,13 +16,14 @@ static bool *s_response_sent;
 static bool s_js_ready;
 static char s_last_text[512];
 
-char s_pms_sonarr_api_key[PERSIST_DATA_MAX_LENGTH];
-char s_pms_base_url[PERSIST_DATA_MAX_LENGTH]; 
-char s_pms_sonarr_port[PERSIST_DATA_MAX_LENGTH];
-char s_pms_radarr_api_key[PERSIST_DATA_MAX_LENGTH];
-char s_pms_radarr_port[PERSIST_DATA_MAX_LENGTH];
+static char s_pms_sonarr_api_key[PERSIST_DATA_MAX_LENGTH];
+static char s_pms_base_url[PERSIST_DATA_MAX_LENGTH]; 
+static char s_pms_sonarr_port[PERSIST_DATA_MAX_LENGTH];
+static char s_pms_radarr_api_key[PERSIST_DATA_MAX_LENGTH];
+static char s_pms_radarr_port[PERSIST_DATA_MAX_LENGTH];
+static char s_pms_sms_port[PERSIST_DATA_MAX_LENGTH];
 
-
+//static bool s_make_request_to_sms;
 
 enum modes 
 {
@@ -35,40 +36,68 @@ enum modes
 };
 
 static enum modes s_mode;
+//**************************************************************************************************************
 
-//****************************************************************************************
-//bool bool_reset_response_array()
-//{
-//	int x;
-//	for (x = 0; x <= 8; x++)
-//	{
-//		strcpy(s_pms_response[x], "");
-//		if (s_pms_response[x])
-//		{
-//			APP_LOG(APP_LOG_LEVEL_ERROR, "bool_reset_response_array() failed to clear s_pms_response_index at %d, has %s", x, s_pms_response[x]);
-//			return false;
-//		}
-//	}
-//	return true;
-//}	
+
 
 void read_stored_values() 
 {
 	persist_read_string(MESSAGE_KEY_SERVER_URL, s_pms_base_url, 256);
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored url: %s", s_pms_base_url);
-	persist_read_string(MESSAGE_KEY_SONARR_PORT, s_pms_sonarr_port, 7);
+	persist_read_string(MESSAGE_KEY_SONARR_PORT, s_pms_sonarr_port, 8);
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored sonarr port: %s", s_pms_sonarr_port);
 	persist_read_string(MESSAGE_KEY_SONARR_API, s_pms_sonarr_api_key, 33);
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored sonarr api: %s", s_pms_sonarr_api_key);
-	persist_read_string(MESSAGE_KEY_RADARR_PORT, s_pms_radarr_port, 7);
+	persist_read_string(MESSAGE_KEY_RADARR_PORT, s_pms_radarr_port, 8);
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored radarr port: %s", s_pms_radarr_port);
 	persist_read_string(MESSAGE_KEY_RADARR_API, s_pms_radarr_api_key, 33);
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored radarr api: %s", s_pms_radarr_api_key);
-
-//	pms_verify_setup();
+	persist_read_string(MESSAGE_KEY_SMS_PORT, s_pms_sms_port, 8);
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "stored sms port: %s", s_pms_sms_port);
 }
 
-bool bool_get_response_sent() 
+//bool bool_get_make_request_to_sms()
+//{
+//	return s_make_request_to_sms;
+//}
+//
+//bool bool_set_make_request_to_sms(bool state, bool reset)
+//{
+//	if (reset)
+//	{
+//		s_make_request_to_sms = false;
+//		return true;
+//	}
+//	if (state)
+//	{
+//		s_make_request_to_sms = state;
+//		return true;
+//	}
+//	APP_LOG(APP_LOG_LEVEL_ERROR, "error in bool_set_make_request_to_sms(): neither state nor reset were provided.");
+//	return false;
+//}
+
+
+
+bool bool_set_sms_port(char *sms_port)
+{
+	if (!sms_port)
+	{
+		APP_LOG(APP_LOG_LEVEL_ERROR, "error in bool_set_sms_port(): No sms_port provided to function");
+		return false;
+	}	
+	APP_LOG(APP_LOG_LEVEL_DEBUG, "Setting sms port to: %s", sms_port);
+	strcpy(s_pms_sms_port, sms_port);
+	persist_write_string(MESSAGE_KEY_SMS_PORT, sms_port);
+	return true;
+}
+
+char * str_get_sms_port()
+{
+	return s_pms_sms_port;
+}
+
+bool * bool_get_response_sent() 
 {
 	return s_response_sent;
 }
