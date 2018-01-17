@@ -48,11 +48,10 @@ function AddMedia(request, choice) {
         try {
           
           var reply = JSON.parse(this.responseText);
-  	  console.log(reply);
 	  if (reply.title == json[choice].title) {
 	    Pebble.sendAppMessage({'PMS_SUCCESS': 1});
           } else {
-            Pebble.sendAppMessage({'PMS_ERROR': 'Item Added is not Item Selected'});
+            Pebble.sendAppMessage({'PMS_ERROR': reply[0].errorMessage});
           } 
         } catch(err) {
           console.log('Unable to parse JSON response: ' + err);
