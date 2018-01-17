@@ -129,7 +129,7 @@ function BuildURL(is_sms_request) {
 	}
 	else
 	{
-		port = radarr_port;
+		port = ':' + radarr_port;
 	}
 
     api_key = radarr_api_key;
