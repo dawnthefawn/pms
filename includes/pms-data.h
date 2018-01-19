@@ -12,7 +12,7 @@ enum modes
 	MENU,
 	PROCESS,
 };
-bool bool_log_error(char *text, char *function, int *value, bool zerovalue);
+bool bool_log_error(char *text, char *function, int value, bool zerovalue);
 void sos_pulse();
 bool bool_set_sms_port(char *sms_port);
 char * str_get_sms_port();

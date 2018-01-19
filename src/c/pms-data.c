@@ -50,7 +50,7 @@ void sos_pulse()
 	vibes_enqueue_custom_pattern(pms_sos);
 }
 
-bool bool_log_error(char *text, char *function, int *value, bool zerovalue)
+bool bool_log_error(char *text, char *function, int value, bool zerovalue)
 {
 	if (!text)
 	{
@@ -108,7 +108,7 @@ bool bool_set_img_size(int *img_size, bool reset)
 	}
 	if (!img_size)
 	{
-		if (!bool_log_error("Error in bool_set_img_size(): no img_size provided", function, NULL, false))
+		if (!bool_log_error("Error in bool_set_img_size(): no img_size provided", function, 0, false))
 		{
 			sos_pulse();
 		}
@@ -130,7 +130,7 @@ bool bool_set_chunk_data(uint8_t *chunk_data, int chunk_size, int index)
 
 	if (!chunk_data)
 	{
-		if (!bool_log_error("Error in fnctmplt(): no chunk_data provided", function, NULL, false))
+		if (!bool_log_error("Error in fnctmplt(): no chunk_data provided", function, 0, false))
 		{
 			sos_pulse();
 		}
@@ -139,7 +139,7 @@ bool bool_set_chunk_data(uint8_t *chunk_data, int chunk_size, int index)
 	if (!chunk_size)
 	{
 
-		if (!bool_log_error("Error in fnctmplt(): no chunk_size provided", function, NULL, false))
+		if (!bool_log_error("Error in fnctmplt(): no chunk_size provided", function, 0, false))
 		{
 			sos_pulse();
 		}
@@ -147,7 +147,7 @@ bool bool_set_chunk_data(uint8_t *chunk_data, int chunk_size, int index)
 	}
 	if (!index)
 	{
-		if (!bool_log_error("Error in fnctmplt(): no template provided", function, NULL, false))
+		if (!bool_log_error("Error in fnctmplt(): no template provided", function, 0, false))
 		{
 			sos_pulse();
 		}
@@ -163,7 +163,7 @@ bool bool_set_sms_port(char *sms_port)
 
 	if (!sms_port)
 	{
-		if (!bool_log_error("error in bool_set_sms_port(): No sms_port provided to function", function, NULL, false))
+		if (!bool_log_error("error in bool_set_sms_port(): No sms_port provided to function", function, 0, false))
 		{
 			sos_pulse();
 		}
@@ -189,7 +189,7 @@ void set_response_sent(bool *response_sent)
 {
 	s_response_sent = response_sent;
 }
-	
+
 
 bool bool_set_last_text(char *transcription)
 {
@@ -203,7 +203,7 @@ bool bool_set_last_text(char *transcription)
 	}
 	else
 	{
-		if (!bool_log_error("no transcription provided to bool_set_last_text()", function, NULL, false))
+		if (!bool_log_error("no transcription provided to bool_set_last_text()", function, 0, false))
 		{
 			sos_pulse();
 		}
@@ -225,7 +225,7 @@ void set_js_ready(bool ready)
 
 bool bool_get_js_ready()
 {
-	 return s_js_ready;
+	return s_js_ready;
 }
 
 char * str_response_at_index(MenuIndex *cell_index)
@@ -240,7 +240,7 @@ char * str_response_at_index(MenuIndex *cell_index)
 	else
 	{
 
-		if (!bool_log_error("str_response_at_index(): cell_index not provided, unable to process", function, NULL, false))
+		if (!bool_log_error("str_response_at_index(): cell_index not provided, unable to process", function, 0, false))
 		{
 			sos_pulse();
 		}
@@ -271,7 +271,7 @@ bool bool_set_index(int index, bool reset)
 
 int int_get_response_index() 
 {
-	 return s_pms_response_index;
+	return s_pms_response_index;
 }
 
 bool bool_set_response_at_index(int index, char *response)
@@ -282,16 +282,16 @@ bool bool_set_response_at_index(int index, char *response)
 	{
 		if (index > 8)
 		{
-			if (!bool_log_error("Index over expexted bounds: ", function, &index, false))
+			if (!bool_log_error("Index over expexted bounds: ", function, index, false))
 			{
 				sos_pulse();
 			}
 			return false;
 		}
-		
+
 		if (!(s_pms_response_index == index))
 		{
-			if (!bool_log_error("Error, provided index was not expected index", function, NULL, false))
+			if (!bool_log_error("Error, provided index was not expected index", function, 0, false))
 			{
 				sos_pulse();
 			}
@@ -301,7 +301,7 @@ bool bool_set_response_at_index(int index, char *response)
 			{
 				if (!bool_set_index(s_pms_response_index + 1, false))
 				{
-					if (!bool_log_error("failed to increment response index", function, NULL, false))
+					if (!bool_log_error("failed to increment response index", function, 0, false))
 					{
 						sos_pulse();
 					}
@@ -311,7 +311,7 @@ bool bool_set_response_at_index(int index, char *response)
 			}
 			else
 			{
-				if (!bool_log_error("stored index larger than index received in call, fatal error", function, NULL, false))
+				if (!bool_log_error("stored index larger than index received in call, fatal error", function, 0, false))
 				{
 					sos_pulse();
 				}
@@ -320,17 +320,17 @@ bool bool_set_response_at_index(int index, char *response)
 		}
 		else
 		{	
-		 	APP_LOG(APP_LOG_LEVEL_DEBUG, "Writing response: %s", response);
+			APP_LOG(APP_LOG_LEVEL_DEBUG, "Writing response: %s", response);
 			strcpy(s_pms_response[s_pms_response_index],  response);
 			APP_LOG(APP_LOG_LEVEL_DEBUG, s_pms_response[s_pms_response_index]);
 			return true;
 		}
 	}
-		if (!bool_log_error("no response included in bool_set_response_at_index", function, NULL, false))
-		{
-			sos_pulse();
-		}
-		return false;
+	if (!bool_log_error("no response included in bool_set_response_at_index", function, 0, false))
+	{
+		sos_pulse();
+	}
+	return false;
 }
 
 
@@ -348,7 +348,7 @@ bool bool_set_response_items(int items, bool reset)
 		s_pms_response_items = items - 1;
 		return true;
 	}
-	if (!bool_log_error("bool_set_response_items() received neither items nor reset", function, NULL, false))
+	if (!bool_log_error("bool_set_response_items() received neither items nor reset", function, 0, false))
 	{
 		sos_pulse();
 	}
@@ -357,12 +357,12 @@ bool bool_set_response_items(int items, bool reset)
 
 int int_get_pms_response_items() 
 {
-	 return s_pms_response_items;
+	return s_pms_response_items;
 }
 
 int int_get_mode() 
 {
-	 return s_mode;
+	return s_mode;
 }
 
 void set_mode(enum modes mode)
@@ -401,7 +401,7 @@ bool bool_set_sonarr_api_key(char *sonarr_api)
 
 	if (!sonarr_api)
 	{
-		if (!bool_log_error("No sonarr api key provided", function, NULL, false))
+		if (!bool_log_error("No sonarr api key provided", function, 0, false))
 		{
 			sos_pulse();
 		}
@@ -410,7 +410,7 @@ bool bool_set_sonarr_api_key(char *sonarr_api)
 	int len = (int)strlen(sonarr_api);
 	if (!(len == 32))	
 	{
-		if (!bool_log_error("invalid sonarr api key provided, len: ", function, &len, false))
+		if (!bool_log_error("invalid sonarr api key provided, len: ", function, len, false))
 		{
 			sos_pulse();
 		}
@@ -429,7 +429,7 @@ bool bool_set_radarr_api_key(char *radarr_api)
 
 	if (!radarr_api)
 	{
-		if (!bool_log_error("No radarr api provided to bool_set_radarr_api_key()", function, NULL, false))
+		if (!bool_log_error("No radarr api provided to bool_set_radarr_api_key()", function, 0, false))
 		{
 			sos_pulse();
 		}
@@ -438,7 +438,7 @@ bool bool_set_radarr_api_key(char *radarr_api)
 	int len = (int)strlen(radarr_api);
 	if (!(len == 32))
 	{
-		if (!bool_log_error("invalid radarr API key length.", function, NULL, false))
+		if (!bool_log_error("invalid radarr API key length.", function, 0, false))
 		{
 			sos_pulse();
 		}
@@ -457,7 +457,7 @@ bool bool_set_sonarr_port(char *sonarr_port)
 
 	if (!sonarr_port)
 	{
-		if (!bool_log_error("No sonarr port provided", function, NULL, false))
+		if (!bool_log_error("No sonarr port provided", function, 0, false))
 		{
 			sos_pulse();
 		}
@@ -470,9 +470,11 @@ bool bool_set_sonarr_port(char *sonarr_port)
 
 bool bool_set_radarr_port(char *radarr_port)
 {
+	char *function = "bool_set_radarr_port(char *radarr_port)";
+
 	if (!radarr_port)
 	{
-		if (!bool_log_error("no radarr port provided", function, NULL, false))
+		if (!bool_log_error("no radarr port provided", function, 0, false))
 		{
 			sos_pulse();
 		}
@@ -487,17 +489,20 @@ bool bool_set_radarr_port(char *radarr_port)
 
 bool bool_set_base_url(char *base_url)
 {
+	char *function = "bool_set_base_url(char *base_url)";
+
 	if (!base_url)
-		if (!bool_log_error("bool_set_base_url(): no base_url provided", function, NULL, false))
-				{
-			sos_pulse()return;
-				}
-		return false;
-	}
-	strcpy(s_pms_base_url, base_url);
-	persist_write_string(MESSAGE_KEY_SERVER_URL, s_pms_base_url);
-	APP_LOG(APP_LOG_LEVEL_DEBUG, "server url is set to %s", s_pms_base_url);
-	return true;
+	{
+		if (!bool_log_error("bool_set_base_url(): no base_url provided", function, 0, false))
+		{
+			sos_pulse();
+		}
+	return false;
+}
+strcpy(s_pms_base_url, base_url);
+persist_write_string(MESSAGE_KEY_SERVER_URL, s_pms_base_url);
+APP_LOG(APP_LOG_LEVEL_DEBUG, "server url is set to %s", s_pms_base_url);
+return true;
 }
 
 
