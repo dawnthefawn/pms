@@ -64,7 +64,7 @@ static bool pms_deinit_cards()
 	return true;
 }
 
-static void pms_cards_reset_text()
+void pms_cards_reset_text()
 {
 	char *function = "pms_cards_reset_text()";
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "resetting text, mode: %d", int_get_mode());
@@ -79,12 +79,25 @@ static void pms_cards_reset_text()
 	text_layer_set_overflow_mode(s_text_layer, GTextOverflowModeWordWrap);
 	text_layer_set_background_color(s_text_layer, GColorBlack);
 	text_layer_set_text_color(s_text_layer, GColorGreen);
-	if (!bool_set_text("\n\nPress Up to \nAdd a Show\n\n\n\nPress Down to\nAdd a Movie", false))
+	if (!bool_get_js_ready())
 	{
-		
-		if (!bool_log_error("Was unable to set text in pms_cards_reset_text()", function, 0, false))
+		if (!bool_set_text("Server not ready, standby", false))
 		{
-			sos_pulse();
+			if (!bool_log_error("Failed to set js not ready text", function, 0, false))
+			{
+				sos_pulse();
+			}
+		}
+	}
+	else
+	{
+		if (!bool_set_text("\n\nPress Up to \nAdd a Show\n\n\n\nPress Down to\nAdd a Movie", false))
+		{
+
+			if (!bool_log_error("Was unable to set text in pms_cards_reset_text()", function, 0, false))
+			{
+				sos_pulse();
+			}
 		}
 	}
 	text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);
@@ -160,9 +173,9 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 		if (!bool_set_text("Unable to handle request.", false))
 		{
 
-    		if (!bool_log_error("pms_request_handler() returned false. ", function, choice, false))
+			if (!bool_log_error("pms_request_handler() returned false. ", function, choice, false))
 			{
-			sos_pulse();
+				sos_pulse();
 			}
 		}
 	}	
@@ -237,7 +250,7 @@ static void dictation_session_callback(DictationSession *session, DictationSessi
 			sos_pulse();
 		}
 
-		
+
 	}
 }
 
@@ -551,17 +564,6 @@ static void pms_window_unload(Window *window)
 static bool pms_init_cards() 
 {
 	char *function = "pms_init_cards()";
-	if (!bool_get_js_ready())
-	{
-		if (!bool_set_text("JSKit not Ready :C", false))
-		{
-			if (!bool_log_error("unable to set JS not ready text ", function, 0, false))
-			{
-				sos_pulse();
-			}
-			return false;
-		}
-	}
 	Layer *window_layer = window_get_root_layer(s_window);
 	if (!window_layer)
 	{
@@ -582,20 +584,19 @@ static bool pms_init_cards()
 		}
 		return false;
 	}
-
 	pms_cards_reset_text();
 	layer_add_child(window_layer, text_layer_get_layer(s_text_layer));
 	window_set_click_config_provider(s_window, pms_cards_click_config_provider);
-	 s_dictation_session = dictation_session_create(sizeof(s_last_text), dictation_session_callback, NULL);
-	 if (!s_dictation_session)
-	 {
+	s_dictation_session = dictation_session_create(sizeof(s_last_text), dictation_session_callback, NULL);
+	if (!s_dictation_session)
+	{
 
 		if (!bool_log_error("Error in pms_init_cards(): failed to return s_dictation_session", function, 0, false))
 		{
 			sos_pulse();
 		}
 		return false;
-	 }
+	}
 	set_mode(NONE); 
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "Finished initializing cards interface, mode: %d", int_get_mode());
 	return true;

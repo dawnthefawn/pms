@@ -54,6 +54,7 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 				}
 			 	return;
 			}
+			pms_cards_reset_text();
 		}
 		APP_LOG(APP_LOG_LEVEL_DEBUG, "inbox_callback_received");
 	}

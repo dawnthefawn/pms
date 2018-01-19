@@ -13,3 +13,4 @@ void pms_deinit(void);
 int int_get_mode();
 bool pms_error_response_handler(char *error_message);
 void sms_success_handler(char *msg);
+void pms_cards_reset_text();
