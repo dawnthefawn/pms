@@ -31,23 +31,38 @@ static bool bool_cancel_timer()
 
 void timeout_timer_handler(void *context) 
 {
+	char *function = "timeout_timter_handler()";
 	if (!bool_cancel_timer())
 	{
-		APP_LOG(APP_LOG_LEVEL_ERROR, "bool_cancel_timer failed");
+		if (!bool_log_error("bool_cancel_timer() failed", function, NULL, false))
+		{
+			sos_pulse();
+		}
 	}
 }
 
 void inbox_dropped_callback(AppMessageResult reason, void *context) 
 {
-	APP_LOG(APP_LOG_LEVEL_ERROR, "Message dropped! "); 
+	char *function = "inbox_dropped_callback()";
+	if (!bool_log_error("Message Dropped", function, NULL, false))
+	{
+		sos_pulse();
+	}
 }  
 
 void outbox_failed_callback(DictionaryIterator *iterator, AppMessageResult reason, void *context) 
 {
-	APP_LOG(APP_LOG_LEVEL_ERROR, "Outbox send failed!"); 
+	char *function = "outbox_failed_callback()";
+	if (!bool_log_error("Outbox failed", function, NULL, false))
+	{
+		sos_pulse();
+	}
 	if (!bool_cancel_timer())
 	{
-		APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to cancel timer");
+		if (!bool_log_error("bool_cancel_timer() failed", context, NULL, false))
+		{
+			sos_pulse();
+		}
 	}
 }  
 
@@ -79,6 +94,9 @@ int16_t get_cell_height_callback(struct MenuLayer *menu_layer, MenuIndex *cell_i
 
 bool pms_verify_setup() 
 {
+	char *function = "pms_verify_setup()";
+
+	
 	DictionaryIterator *out_iter;
 	AppMessageResult result = app_message_outbox_begin(&out_iter);
 	if (result == APP_MSG_OK) 
@@ -92,13 +110,19 @@ bool pms_verify_setup()
 		result = app_message_outbox_send();
 		if(result != APP_MSG_OK) 
 		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "pms_verify_setup(): Error sending outbox message");
+			if (!bool_log_error("pms_verify_setup(): Error sending outbox message", function, NULL, false))
+			{
+				sos_pulse();
+			}
 			return false;
 		}
 	} 
 	else 
 	{
-		APP_LOG(APP_LOG_LEVEL_ERROR, "pms_verify_setup(); outbox unreachable");
+		if (!bool_log_error("pms_verify_setup(); outbox unreachable", function, NULL, false))
+		{
+			sos_pulse();
+		}
 		return false;
 	}
 	persist_write_bool(MESSAGE_KEY_PMS_IS_CONFIGURED, true);
@@ -108,6 +132,8 @@ bool pms_verify_setup()
 
 bool pms_request_handler(int *choice, bool is_sms_request) 
 {   
+	char *function = "pms_request_handler(int *choice, bool is_sms_request)";
+
 	if (bool_get_js_ready())
 	{
 		DictionaryIterator *out_iter;
@@ -163,7 +189,10 @@ bool pms_request_handler(int *choice, bool is_sms_request)
 			s_timeout_timer = app_timer_register(interval_ms, timeout_timer_handler, NULL);
 			if(result != APP_MSG_OK) 
 			{
-				APP_LOG(APP_LOG_LEVEL_ERROR, "Error sending outbox message");
+				if (!bool_log_error("Error sending outbox message", function, NULL, false))
+				{
+					sos_pulse();
+				}
 				return false;
 			} else 
 			{
@@ -192,14 +221,20 @@ bool pms_request_handler(int *choice, bool is_sms_request)
 			}
 		} else 
 		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "outbox unreachable");
+			if (!bool_log_error("outbox unreachable", function, NULL, false))
+			{
+				sos_pulse();
+			}
 			return false;
 		}
 		return false;
 	}
 	else
 	{
-		APP_LOG(APP_LOG_LEVEL_ERROR, "bool_get_js_ready() returned false in pms_request_handler()");
+		if (!bool_log_error("bool_get_js_ready() returned false in pms_request_handler()", function, NULL, false))
+		{
+			sos_pulse();
+		}
 		return false;
 	}
 

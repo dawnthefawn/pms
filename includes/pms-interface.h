@@ -3,6 +3,7 @@
 #define PEBBLE_INCLUDED
 #include <pebble.h>
 #endif
+bool bool_set_text(char *text, bool reset);
 bool menu_initializer();
 bool pms_init();
 int16_t get_cell_height_callback(struct MenuLayer *menu_layer,MenuIndex *cell_index,void *context);

@@ -28,6 +28,27 @@ static ClickConfigProvider last_ccp;
 static bool deinitialize_menu();
 static bool pms_init_cards();
 
+bool bool_set_text(char *text, bool reset)
+{
+	char *function = "bool_set_text()";
+	if (reset)
+	{
+		text_layer_set_text(s_text_layer, "");
+		return true;
+	}
+
+	if (!text)
+	{
+		if (!bool_log_error("No text provided to set", function, NULL, false))
+		{
+			sos_pulse();
+		}
+		return false;
+	}
+	text_layer_set_text(s_text_layer, text);
+	return true;
+
+}
 static bool pms_deinit_cards()
 {
 	if (s_text_layer)
@@ -45,34 +66,65 @@ static bool pms_deinit_cards()
 
 static void pms_cards_reset_text()
 {
+	char *function = "pms_cards_reset_text()";
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "resetting text, mode: %d", int_get_mode());
 	if (!(int_get_mode() == NONE))
 	{
 		set_mode(NONE);
-		APP_LOG(APP_LOG_LEVEL_ERROR, "mode was not reset.");
+		if (!bool_log_error("mode was not reset.", function, NULL, false))
+		{
+			sos_pulse();
+		}
 	}
 	text_layer_set_overflow_mode(s_text_layer, GTextOverflowModeWordWrap);
 	text_layer_set_background_color(s_text_layer, GColorBlack);
 	text_layer_set_text_color(s_text_layer, GColorGreen);
-	text_layer_set_text(s_text_layer, "\n\nPress Up to \nAdd a Show\n\n\n\nPress Down to\nAdd a Movie");
+	if (!bool_set_text("\n\nPress Up to \nAdd a Show\n\n\n\nPress Down to\nAdd a Movie", false))
+	{
+		
+		if (!bool_log_error("Was unable to set text in pms_cards_reset_text()", function, NULL, false))
+		{
+			sos_pulse();
+		}
+	}
 	text_layer_set_text_alignment(s_text_layer, GTextAlignmentCenter);
 }
 
+
 bool pms_error_response_handler(char *error_message) 
 {
+	char *function = "pms_error_response_handler()";
 	vibes_long_pulse();
 	switch (int_get_mode()) 
 	{
 		case NONE:
-			text_layer_set_text(s_text_layer, error_message);
+			if (!bool_set_text(error_message, false))
+			{
+				if (!bool_log_error("Unable to set error message as text, no error message provided", function, NULL, false))
+				{
+					sos_pulse();
+				}
+			}
 			return true;
 			break;
 		case SONARR: 
-			text_layer_set_text(s_text_layer, error_message);
+			if (!bool_set_text(error_message, false))
+			{
+				if (!bool_log_error("Unable to set error message as text, no error message provided", function, NULL, false))
+				{
+					sos_pulse();
+				}
+			}
 			return true;
 			break;
 		case RADARR:
-			text_layer_set_text(s_text_layer, error_message);
+			if (!bool_set_text(error_message, false))
+			{
+				if (!bool_log_error("Unable to set error message as text, no error message provided", function, NULL, false))
+				{
+					sos_pulse();
+				}
+			}
 			return true;
 			break;
 		case DICTATION:
@@ -89,19 +141,26 @@ bool pms_error_response_handler(char *error_message)
 			return pms_init_cards();
 			break;
 	}
-	APP_LOG(APP_LOG_LEVEL_ERROR, "Mode not found pms_error_response_handler()");
+	if (!bool_log_error("Mode not found pms_error_response_handler()", function, NULL, false))
+	{
+		sos_pulse();
+	}
 	return false;
 }
 
 
 static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index, void *context) 
 {
+	char *function = "select_callback()";
 
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "SELECTED!");
 	int choice = (int)cell_index->row + 1; 
 	if (!pms_request_handler(&choice, false))
 	{
-    	APP_LOG(APP_LOG_LEVEL_ERROR, "pms_request_handler() returned false. %d", choice);
+    	if (!bool_log_error("pms_request_handler() returned false. ", function, &choice, false))
+		{
+			sos_pulse();
+		}
 	}	
 	else 
 	{
@@ -109,11 +168,17 @@ static void select_callback(struct MenuLayer *menu_layer, MenuIndex *cell_index,
 		set_mode(NONE);
 		if (!deinitialize_menu())
 		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to Deintialize menu");
+			if (!bool_log_error("Failed to Deintialize menu", function, NULL, false))
+			{
+				sos_pulse();
+			}
 		}	
 		if (!pms_init_cards())
 		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "pms_initialize_cards() failed in select_callback()");
+			if (!bool_log_error("pms_initialize_cards() failed in select_callback()", function, NULL, false))
+			{
+				sos_pulse();
+			}
 		}
 
 	}
@@ -132,6 +197,7 @@ void pms_deinit(void)
 
 static void dictation_session_callback(DictationSession *session, DictationSessionStatus status, char *transcription, void *context) 
 {
+	char *function = "dictation_session_callback()";
 	if(status == DictationSessionStatusSuccess) 
 	{
 
@@ -144,7 +210,10 @@ static void dictation_session_callback(DictationSession *session, DictationSessi
 		pms_cards_reset_text();
 		static char s_failed_buff[128];
 		snprintf(s_failed_buff, sizeof(s_failed_buff), "Transcription failed.\n\nError ID:\n%d", (int)status);
-		APP_LOG(APP_LOG_LEVEL_ERROR, "Transcription failed: %s", s_failed_buff);
+		if (!bool_log_error(s_failed_buff, function, NULL, false))
+		{
+			sos_pulse();
+		}
 
 		
 	}
@@ -152,13 +221,18 @@ static void dictation_session_callback(DictationSession *session, DictationSessi
 
 static void pms_back_click_handler(ClickRecognizerRef recognizer, void *context) 
 {
+	char *function = "pms_back_click_handler()";
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "Selected back! Mode: %d", int_get_mode());
+	int m = int_get_mode();
 	switch (int_get_mode()) 
 	{
 		case NONE:
 			if (!pms_deinit_cards())
 			{
-				APP_LOG(APP_LOG_LEVEL_ERROR, "pms_deinit_cards failed.");
+				if (!bool_log_error("pms_deinit_cards failed.", function, NULL, false))
+				{
+					sos_pulse();
+				}
 			}
 			window_stack_pop_all(true);
 			break;
@@ -174,16 +248,25 @@ static void pms_back_click_handler(ClickRecognizerRef recognizer, void *context)
 		case MENU:
 			if (!deinitialize_menu())
 			{
-				APP_LOG(APP_LOG_LEVEL_ERROR, "deinitialize_menu() failed on back click provider, mode MENU");
+				if (!bool_log_error("deinitialize_menu() failed on back click provider, mode MENU", function, NULL, false))
+				{
+					sos_pulse();
+				}
 			}
 			if (!pms_init_cards())
 			{
-				APP_LOG(APP_LOG_LEVEL_ERROR, "pms_init_cards() failed in back click provider, mode MENU");
+				if (!bool_log_error("pms_init_cards() failed in back click provider, mode MENU", function, NULL, false))
+				{
+					sos_pulse();
+				}
 			}
 			return;
 			break;
 		case PROCESS:
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Click Handler Error, Mode: %d", int_get_mode());
+			if (!bool_log_error("Click Handler Error, Mode: ", function, &m, false))
+			{
+				sos_pulse();
+			}
 			set_mode(NONE);
 			break;
 
@@ -208,10 +291,14 @@ static void pms_force_back_button(Window *window, MenuLayer *menu_layer)
 
 static bool initialize_menu() 
 {
+	char *function = "initialize_menu()";
 	Layer *window_layer = window_get_root_layer(s_window); 
 	if (!window_layer)
 	{
-		APP_LOG(APP_LOG_LEVEL_ERROR, "failed to return window_layer in initialize_menu()");
+		if (!bool_log_error("failed to return window_layer in initialize_menu()", function, NULL, false))
+		{
+			sos_pulse();
+		}
 		return false;
 	}
 	layer_remove_from_parent(text_layer_get_layer(s_text_layer));
@@ -238,10 +325,15 @@ static bool initialize_menu()
 
 static void pms_select_click_handler(ClickRecognizerRef recognizer, void *context) 
 {
-	switch (int_get_mode()) 
+	char *function = "pms_select_click_handler()";
+	int m = int_get_mode();
+	switch (m)
 	{
 		case NONE:
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Click Handler Error, Mode: %d", int_get_mode());
+			if (!bool_log_error("Click Handler Error, Mode: ", function, &m, false))
+			{
+				sos_pulse();
+			}
 			return;
 			break;
 		case SONARR:
@@ -253,15 +345,24 @@ static void pms_select_click_handler(ClickRecognizerRef recognizer, void *contex
 			dictation_session_start(s_dictation_session);
 			break;      
 		case DICTATION:
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Click Handler Error, Mode: %d", int_get_mode());
+			if (!bool_log_error("Click Handler Error, Mode: ", function, &m, false))
+			{
+				sos_pulse();
+			}
 			return;
 			break;
 		case MENU:
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Click Handler Error, Mode: %d", int_get_mode());
+			if (!bool_log_error("Click Handler Error, Mode: ", function, &m, false))
+			{
+				sos_pulse();
+			}
 			return;
 			break;
 		case PROCESS:
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Click Handler Error, Mode: %d", int_get_mode());
+			if (!bool_log_error("Click Handler Error, Mode: ", function, &m, false))
+			{
+				sos_pulse();
+			}
 			return;
 			break;
 	}
@@ -269,10 +370,18 @@ static void pms_select_click_handler(ClickRecognizerRef recognizer, void *contex
 
 static void pms_up_click_handler(ClickRecognizerRef recognizer, void *context) 
 {
-	switch (int_get_mode()) 
+	char *function = "pms_up_click_handler()";
+	int m = int_get_mode();
+	switch (m) 
 	{
 		case NONE:
-			text_layer_set_text(s_text_layer, "\n\nUp: Restart Sonarr\n\n\nShow:\nPress Select to Dictate");
+			if (!bool_set_text("\n\nUp: Restart Sonarr\n\n\nShow:\nPress Select to Dictate", false))
+			{
+				if (!bool_log_error("Unable to set sonarr text in pms_up_click_handler()", function, NULL, false))
+				{
+					sos_pulse();
+				}
+			}
 			set_mode(SONARR);
 			pms_request_handler(NULL, false);
 			return;
@@ -282,7 +391,13 @@ static void pms_up_click_handler(ClickRecognizerRef recognizer, void *context)
 			return;
 			break;
 		case RADARR:
-			text_layer_set_text(s_text_layer, "\n\nUp: Restart Sonarr\n\n\nShow:\nPress Select to Dictate");
+			if (!bool_set_text("\n\nUp: Restart Sonarr\n\n\nShow:\nPress Select to Dictate", false))
+			{
+				if (!bool_log_error("Unable to set sonarr text in RADARR mode, pms_up_click_handler()", function, NULL, false))
+				{
+					sos_pulse();
+				}
+			}
 			set_mode(SONARR);
 			pms_request_handler(NULL, false);
 			return;
@@ -291,7 +406,10 @@ static void pms_up_click_handler(ClickRecognizerRef recognizer, void *context)
 			return;
 			break;
 		case MENU:
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Click Handler Error");
+			if (!bool_log_error("Click Handler Error", function, NULL, false))
+			{
+				sos_pulse();
+			}
 			return;
 			break;
 		case PROCESS:
@@ -302,16 +420,31 @@ static void pms_up_click_handler(ClickRecognizerRef recognizer, void *context)
 
 static void pms_down_click_handler(ClickRecognizerRef recognizer, void *context) 
 {
-	switch (int_get_mode()) 
+	char *function = "pms_down_click_handler()";
+	int m = int_get_mode();
+	switch (m) 
 	{
 		case NONE:
-			text_layer_set_text(s_text_layer, "\n\n\n\n\nMovie:\nPress Select to Dictate\n\nDown: Restart Radarr");
+			if (!bool_set_text("\n\n\n\n\nMovie:\nPress Select to Dictate\n\nDown: Restart Radarr", false))
+			{
+				if (!bool_log_error("Unable to set radarr text in mode none at pms_down_click_handler()", function, NULL, false))
+				{
+					sos_pulse();
+				}
+			}	
 			set_mode(RADARR);
 			pms_request_handler(NULL,false);
 			return;
 			break;
 		case SONARR:
-			text_layer_set_text(s_text_layer, "\n\n\n\n\nMovie:\nPress Select to Dictate\n\nDown: Restart Radarr");
+			if (!bool_set_text("\n\n\n\n\nMovie:\nPress Select to Dictate\n\nDown: Restart Radarr", false))
+			{
+				if (!bool_log_error("Unable to set radarr text in mode sonarr", function, NULL, false))
+				{
+					sos_pulse();
+				}
+			}
+
 			set_mode(RADARR);
 			pms_request_handler(NULL,false);
 			return;
@@ -322,15 +455,24 @@ static void pms_down_click_handler(ClickRecognizerRef recognizer, void *context)
 			return;
 			break;
 		case DICTATION:
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Click Handler Error, Mode: %d", int_get_mode());
+			if (!bool_log_error("Click Handler Error, Mode: ", function, &m, false))
+			{
+				sos_pulse();
+			}
 			return;
 			break;
 		case MENU:
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Click Handler Error, Mode: %d", int_get_mode());
+			if (!bool_log_error("Click Handler Error, Mode: ", function, &m, false))
+			{
+				sos_pulse();
+			}
 			return;
 			break;
 		case PROCESS:
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Click Handler Error, Mode: %d", int_get_mode());
+			if (!bool_log_error("Click Handler Error, Mode: ", function, &m, false))
+			{
+				sos_pulse();
+			}
 			return;
 			break;
 	}
@@ -351,13 +493,18 @@ static void pms_cards_click_config_provider(void *context)
 
 static void pms_window_load(Window *window) 
 {
+	char *function = "pms_window_load()";
 	if (!pms_init_cards())
 	{
-		APP_LOG(APP_LOG_LEVEL_ERROR, "pms_init_cards() failed in pms_window_load();");
+		if (!bool_log_error("pms_init_cards() failed in pms_window_load();", function, NULL, false))
+		{
+			sos_pulse();
+		}
 	}
 
 
 }
+
 
 static void pms_window_unload(Window *window) 
 {
@@ -381,10 +528,14 @@ static void pms_window_unload(Window *window)
 
 static bool pms_init_cards() 
 {
+	char *function = "pms_init_cards()";
 	Layer *window_layer = window_get_root_layer(s_window);
 	if (!window_layer)
 	{
-		APP_LOG(APP_LOG_LEVEL_ERROR, "Error in pms_init_cards(): failed to return window_layer");
+		if (!bool_log_error("Error in pms_init_cards(): failed to return window_layer", function, NULL, false))
+		{
+			sos_pulse();
+		}
 		return false;
 	}
 	s_bounds = layer_get_bounds(window_layer);
@@ -392,7 +543,10 @@ static bool pms_init_cards()
 	if (!s_text_layer)
 	{
 
-		APP_LOG(APP_LOG_LEVEL_ERROR, "Error in pms_init_cards(): failed to return s_text_layer");
+		if (!bool_log_error("Error in pms_init_cards(): failed to return s_text_layer", function, NULL, false))
+		{
+			sos_pulse();
+		}
 		return false;
 	}
 
@@ -403,7 +557,10 @@ static bool pms_init_cards()
 	 if (!s_dictation_session)
 	 {
 
-		APP_LOG(APP_LOG_LEVEL_ERROR, "Error in pms_init_cards(): failed to return s_dictation_session");
+		if (!bool_log_error("Error in pms_init_cards(): failed to return s_dictation_session", function, NULL, false))
+		{
+			sos_pulse();
+		}
 		return false;
 	 }
 	set_mode(NONE); 
@@ -413,6 +570,7 @@ static bool pms_init_cards()
 
 bool pms_init() 
 {
+	char *function = "pms_init()";
 	s_window = window_create();
 	window_set_window_handlers(s_window, (WindowHandlers) 
 			{
@@ -422,7 +580,10 @@ bool pms_init()
 	const bool animated = true;
 	if (!pms_init_cards())
 	{
-		APP_LOG(APP_LOG_LEVEL_ERROR, "pms_init_cards() failed during pms_init()");
+		if (!bool_log_error("pms_init_cards() failed during pms_init()", function, NULL, false))
+		{
+			sos_pulse();
+		}
 		return false;
 	}
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "Pushing Window");
@@ -430,12 +591,25 @@ bool pms_init()
 	return true;
 }
 
-void sms_success_handler(char *msg)
+bool sms_success_handler(char *msg)
 {
-	text_layer_set_text(s_text_layer, msg);
+	char *function = "sms_success_handler(char *msg)";
+	if (!bool_set_text(msg, false))
+	{
+		char *error = "bool_set_text_failed on %s", msg;
+		if (!bool_log_error(error, function, NULL, false))
+		{
+			sos_pulse();
+		}
+		vibes_long_pulse();
+		return false;
+	}
+	vibes_double_pulse();
+	return true;
 }
 static bool deinitialize_menu() 
 {
+	char *function = "deinitialize_menu()";
 	layer_remove_from_parent(menu_layer_get_layer(s_menu_layer));
 	if (s_menu_layer)
 	{
@@ -444,14 +618,20 @@ static bool deinitialize_menu()
 	}
 	if (!bool_set_response_items(0, true))
 	{
-		APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_response_items() failed to resetin deinitialize_menu()");
+		if (!bool_log_error("bool_set_response_items() failed to resetin deinitialize_menu()", function, NULL, false))
+		{
+			sos_pulse();
+		}
 		return false;
 	}
 	set_mode(NONE);
 	if (!bool_set_index(0, true))
 	{
 
-		APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_response_index() failed to resetin deinitialize_menu()");
+		if (!bool_log_error("bool_set_response_index() failed to resetin deinitialize_menu()", function, NULL, false))
+		{
+			sos_pulse();
+		}
 		return false;
 	}
 	return true;
@@ -459,9 +639,13 @@ static bool deinitialize_menu()
 
 bool menu_initializer()
 {
+	char *function = "menu_initializer()";
 	if (!initialize_menu())
 	{
-		APP_LOG(APP_LOG_LEVEL_ERROR, "initialize_menu() failed");
+		if (!bool_log_error("initialize_menu() failed", function, NULL, false))
+		{
+			sos_pulse();
+		}
 		return false;
 	}
 	return true;

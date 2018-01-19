@@ -24,6 +24,7 @@
 
 static void inbox_received_callback(DictionaryIterator *iter, void *context) 
 {  
+	char *function = "inbox_received_callback()";
 	if (!bool_get_js_ready()) 
 	{
 		Tuple *ready_tuple = dict_find(iter, MESSAGE_KEY_JSReady);
@@ -32,16 +33,25 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 			set_js_ready(true);
 			if (!bool_set_index(0, true))
 			{
-				APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_index() failed.");
+				if (!bool_log_error("bool_set_index() failed.", function, NULL, false))
+				{
+					sos_pulse();
+				}
 			}
 			if (!bool_set_response_items(0, true))
 			{
-				APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_response_items() failed to reset");
+				if (!bool_log_error("bool_set_response_items() failed to reset", function, NULL, false))
+				{
+					sos_pulse();
+				}
 			}
 			read_stored_values();
 			if (!pms_verify_setup())
 			{
-				APP_LOG(APP_LOG_LEVEL_ERROR, "pms_verify_setup() failed in inbox_received_callback()");
+				if (!bool_log_error("pms_verify_setup() failed in inbox_received_callback()", function, NULL, false))
+				{
+					sos_pulse();
+				}
 			 	return;
 			}
 		}
@@ -54,13 +64,19 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 		int response_index = (int)pms_response_index->value->int32;
 		if(response_index > 8) 
 		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Over expected bounds for response array. %d", response_index);
+			if (!bool_log_error("Over expected bounds for response array.", function, &response_index, false))
+			{
+				sos_pulse();
+			}
 			return;
 		}
 
 		if (!bool_set_index(response_index, false))
 		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to Increment index");
+			if (!bool_log_error("Failed to Increment index", function, NULL, false))
+			{
+				sos_pulse();
+			}
 		}
 	}
 
@@ -70,7 +86,10 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 		int response_items = (int)pms_response_items->value->int32;
 		if (!bool_set_response_items(response_items, false))
 		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_response_items() failed to set %d", response_items);
+			if (!bool_log_error("bool_set_response_items() failed to set", function, &response_items, false))
+			{
+				sos_pulse();
+			}
 		}
 	}
 	Tuple *server_response = dict_find(iter, MESSAGE_KEY_PMS_RESPONSE + int_get_response_index());
@@ -80,7 +99,10 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 		APP_LOG(APP_LOG_LEVEL_DEBUG, "Received Server Response %s!", server_response->value->cstring);
 		if (!bool_set_response_at_index(int_get_response_index(), server_response->value->cstring))
 		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Failed bool_set_response_at_index(%d)", int_get_response_index());
+			if (!bool_log_error("Failed bool_set_response_at_index: ", function, int_get_response_index(), false))
+			{
+				sos_pulse();
+			}
 		}
 		return;
 	}
@@ -97,7 +119,10 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 	{
 		if (!pms_error_response_handler(pms_error->value->cstring))
 		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Error Handler failed in inbox_callback_received()");
+			if (!bool_log_error("Error Handler failed in inbox_callback_received()", function, NULL, false))
+			{
+				sos_pulse();
+			}
 		}
 		return;
 	}
@@ -113,18 +138,27 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 	{
 //		if (!bool_set_response_items(int_get_response_index()))
 //		{
-//			APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to set response items: response_sent event handler.");
+//			if (!bool_log_error("Failed to set response items: response_sent event handler.", function, NULL, false))
+		{
+			sos_pulse();
+		}
 //		}
 		if (!bool_set_index(0, true))
 		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to set index in response_sent event handler.");
+			if (!bool_log_error("Failed to set index in response_sent event handler.", function, NULL, false))
+			{
+				sos_pulse();
+			}
 			return;
 		}
 		APP_LOG(APP_LOG_LEVEL_DEBUG, "Received All Items");
 
 		if (!menu_initializer())
 		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "menu_initializer() failed after receiving all items.");
+			if (!bool_log_error("menu_initializer() failed after receiving all items.", function, NULL, false))
+			{
+				sos_pulse();
+			}
 			return;
 		}
 		return;
@@ -135,7 +169,10 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 	{
 		if (!bool_set_base_url(server_url->value->cstring))
 		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_base_url() failed");
+			if (!bool_log_error("bool_set_base_url() failed", function, NULL, false))
+			{
+				sos_pulse();
+			}
 		}
 	}
 	Tuple *sonarr_port = dict_find(iter, MESSAGE_KEY_SONARR_PORT);
@@ -143,7 +180,10 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 	{
 		if (!bool_set_sonarr_port(sonarr_port->value->cstring))
 		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "failed to set sonar_port");
+			if (!bool_log_error("failed to set sonar_port", function, NULL, false))
+			{
+				sos_pulse();
+			}
 		}
 	}
 	
@@ -152,7 +192,10 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 	{
 		if (!bool_set_sonarr_api_key(sonarr_api->value->cstring))
 		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_sonarr_api() failed");
+			if (!bool_log_error("bool_set_sonarr_api() failed", function, NULL, false))
+			{
+				sos_pulse();
+			}
 		}
 	}
 	Tuple *radarr_api = dict_find(iter, MESSAGE_KEY_RADARR_API);
@@ -160,7 +203,10 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 	{
 		if (!bool_set_radarr_api_key(radarr_api->value->cstring))
 		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_radarr_api() failed.");
+			if (!bool_log_error("bool_set_radarr_api() failed.", function, NULL, false))
+			{
+				sos_pulse();
+			}
 		}
 	}
 	Tuple *radarr_port = dict_find(iter, MESSAGE_KEY_RADARR_PORT);
@@ -168,7 +214,10 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 	{
 		if (!bool_set_radarr_port(radarr_port->value->cstring))
 		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_radarr_port() failed.");
+			if (!bool_log_error("bool_set_radarr_port() failed.", function, NULL, false))
+			{
+				sos_pulse();
+			}
 		}
 	}
 
@@ -177,7 +226,10 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 	{
 		if (!bool_set_sms_port(sms_port->value->cstring))
 		{
-			APP_LOG(APP_LOG_LEVEL_ERROR, "bool_set_sms_port() failed");
+			if (!bool_log_error("bool_set_sms_port() failed", function, NULL, false))
+			{
+				sos_pulse();
+			}
 		}
 	}
 
@@ -192,9 +244,13 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context)
 
 bool initialize_client()
 {
+	char *function = "initialize_client()";
 	if (!pms_init())
 	{
-		APP_LOG(APP_LOG_LEVEL_ERROR, "pms_init failed at initialize_client()");
+		if (!bool_log_error("pms_init failed at initialize_client()", function, NULL, false))
+		{
+			sos_pulse();
+		}
 		return false;
 	}
 	persist_write_bool(MESSAGE_KEY_PMS_IS_CONFIGURED, false);
